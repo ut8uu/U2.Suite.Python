@@ -1,0 +1,1 @@
+c:\tools\sonarscanner\bin\sonar-scanner.bat -D"sonar.projectKey=U2.Suite.Python" -D"sonar.sources=." -D"sonar.host.url=http://localhost:9000" -D"sonar.login=2100e00fa0b7b851310b4eb7db883ab63dc9b235" -D"sonar.python.version=3.10.5" -D"sonar.exclusions=**/Ui_*.py"
