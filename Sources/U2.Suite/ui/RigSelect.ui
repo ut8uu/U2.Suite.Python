@@ -97,8 +97,8 @@
      <y>277</y>
     </hint>
     <hint type="destinationlabel">
-     <x>268</x>
-     <y>265</y>
+     <x>432</x>
+     <y>274</y>
     </hint>
    </hints>
   </connection>
@@ -118,5 +118,41 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>tableWidget</sender>
+   <signal>itemChanged(QTableWidgetItem*)</signal>
+   <receiver>RigSelector</receiver>
+   <slot>selectRig()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>164</x>
+     <y>162</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>235</x>
+     <y>270</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnNew</sender>
+   <signal>pressed()</signal>
+   <receiver>RigSelector</receiver>
+   <slot>addNewRig()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>80</x>
+     <y>269</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>137</x>
+     <y>268</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
+ <slots>
+  <slot>addNewRig()</slot>
+  <slot>selectRig()</slot>
+ </slots>
 </ui>
