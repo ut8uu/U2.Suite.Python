@@ -120,9 +120,9 @@
   </connection>
   <connection>
    <sender>tableWidget</sender>
-   <signal>itemChanged(QTableWidgetItem*)</signal>
+   <signal>cellPressed(int,int)</signal>
    <receiver>RigSelector</receiver>
-   <slot>selectRig()</slot>
+   <slot>selectRig(int)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>164</x>
@@ -153,6 +153,6 @@
  </connections>
  <slots>
   <slot>addNewRig()</slot>
-  <slot>selectRig()</slot>
+  <slot>selectRig(int)</slot>
  </slots>
 </ui>

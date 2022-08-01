@@ -7,17 +7,22 @@ from PyQt5.uic import loadUi
 from Ui_RigSelect import Ui_RigSelector
 
 class RigSelectorDialog(QDialog, Ui_RigSelector):
+    __selected_rig = 0
+    
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
-        #self.connectSignalsSlots()
+        
+    def getSelectedRig(self):
+        return self.__selected_rig
     
     def debugPrint(self, msg):
         print(msg)
         
     @pyqtSlot()
-    def selectRig(self):
+    def selectRig(self, widget_item: QTableWidgetItem):
         self.debugPrint('A new rig selected.')
+        widget_item.data.toString()
  
     @pyqtSlot()
     def addNewRig(self):

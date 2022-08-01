@@ -50,7 +50,7 @@ class Ui_RigSelector(object):
         self.retranslateUi(RigSelector)
         self.btnOk.pressed.connect(RigSelector.accept) # type: ignore
         self.btnCancel.pressed.connect(RigSelector.reject) # type: ignore
-        self.tableWidget.itemChanged['QTableWidgetItem*'].connect(RigSelector.selectRig) # type: ignore
+        self.tableWidget.cellPressed['int','int'].connect(RigSelector.selectRig) # type: ignore
         self.btnNew.pressed.connect(RigSelector.addNewRig) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(RigSelector)
 
