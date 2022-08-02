@@ -18,3 +18,10 @@ class NewRigDialog(QDialog, Ui_NewRigDialog):
     @pyqtSlot()
     def testRig(self):
         self.debugPrint('A testRig button clicked.')
+
+    if __name__ == '__main__':
+        from NewRigDialog import NewRigDialog
+        app = QApplication(sys.argv)
+        dialog = NewRigDialog()
+        dialog.exec()
+        sys.exit(0)
