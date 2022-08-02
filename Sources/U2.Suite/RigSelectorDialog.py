@@ -17,9 +17,8 @@
 
 import sys
 
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-from PyQt5.uic import loadUi
+from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtWidgets import QDialog, QTableWidgetItem
 
 from ui.Ui_RigSelectDialog import Ui_RigSelector
 from NewRigDialog import NewRigDialog

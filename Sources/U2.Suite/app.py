@@ -17,8 +17,7 @@
 
 import sys
 
-from PyQt5.QtWidgets import *
-from PyQt5.uic import loadUi
+from PyQt5.QtWidgets import QApplication
 
 from RigSelectorDialog import RigSelectorDialog
 from MainWindow import MainWindow
