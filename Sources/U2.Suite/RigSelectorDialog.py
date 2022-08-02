@@ -21,7 +21,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.uic import loadUi
 
-from ui.Ui_RigSelect import Ui_RigSelector
+from ui.Ui_RigSelectDialog import Ui_RigSelector
 from NewRigDialog import NewRigDialog
 
 class RigSelectorDialog(QDialog, Ui_RigSelector):
