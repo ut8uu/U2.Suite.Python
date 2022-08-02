@@ -128,3 +128,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 /Sources/.vs/
+.sonar_lock
+.scannerwork
+.vscode
