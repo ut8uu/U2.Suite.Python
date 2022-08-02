@@ -15,21 +15,18 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+from locale import locale_alias
 import sys
-from os import listdir, getcwd
-from os.path import isfile, join#, open
+from helpers.FileSystemHelper import FileSystemHelper as fh
+from os.path import join
 
-class FileSystemHelper():
-    @staticmethod
-    def enumerateDirectory(path, ext):
-        return [f for f in listdir(path) if isfile(join(path, f)) & f.endswith(ext)]
+def test_get_local_folder():
+    folder = fh.getLocalFolder()
+    assert folder.find('U2.Suite') > -1
     
-    @staticmethod
-    def readFile(path):
-        with open(path) as f: lines = f.readlines()
-        return lines
-    
-    @staticmethod
-    def getLocalFolder():
-        return getcwd()
+def test_enumerate_files():
+    local_folder = fh.getLocalFolder()
+    path = join(local_folder, 'U2.Suite', 'ini')
+    files = fh.enumerateDirectory(path, '.ini')
+    assert files.count('IC-705.ini') == 1
     
