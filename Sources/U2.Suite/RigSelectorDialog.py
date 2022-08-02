@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.uic import loadUi
 
 from Ui_RigSelect import Ui_RigSelector
+from NewRigDialog import NewRigDialog
 
 class RigSelectorDialog(QDialog, Ui_RigSelector):
     __selected_rig = 0
@@ -27,4 +28,6 @@ class RigSelectorDialog(QDialog, Ui_RigSelector):
     @pyqtSlot()
     def addNewRig(self):
         self.debugPrint('A new rig button clicked.')
+        newRigDialog = NewRigDialog()
+        newRigDialog.exec()
  
