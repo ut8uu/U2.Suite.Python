@@ -112,7 +112,7 @@ class Ui_NewRigDialog(object):
         self.lblDtr_3.setObjectName("lblDtr_3")
         self.gridLayout.addWidget(self.lblDtr_3, 9, 0, 1, 1)
         self.udTimeout = QtWidgets.QSpinBox(NewRigDialog)
-        self.udTimeout.setMinimum(2000)
+        self.udTimeout.setMinimum(100)
         self.udTimeout.setMaximum(9999)
         self.udTimeout.setProperty("value", 2000)
         self.udTimeout.setObjectName("udTimeout")
@@ -142,6 +142,7 @@ class Ui_NewRigDialog(object):
         self.btnOk.pressed.connect(NewRigDialog.accept) # type: ignore
         self.btnCancel.pressed.connect(NewRigDialog.reject) # type: ignore
         self.btnTest.pressed.connect(NewRigDialog.testRig) # type: ignore
+        self.cbRigType.currentIndexChanged['QString'].connect(NewRigDialog.rigTypeChanged) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(NewRigDialog)
 
     def retranslateUi(self, NewRigDialog):

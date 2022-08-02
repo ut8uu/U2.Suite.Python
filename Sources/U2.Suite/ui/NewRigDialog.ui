@@ -397,8 +397,25 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>cbRigType</sender>
+   <signal>currentIndexChanged(QString)</signal>
+   <receiver>NewRigDialog</receiver>
+   <slot>rigTypeChanged(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>193</x>
+     <y>24</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>141</x>
+     <y>35</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>testRig()</slot>
+  <slot>rigTypeChanged(QString)</slot>
  </slots>
 </ui>
