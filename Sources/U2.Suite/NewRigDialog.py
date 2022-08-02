@@ -4,7 +4,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.uic import loadUi
 
-from Ui_NewRigDialog import Ui_NewRigDialog
+from ui.Ui_NewRigDialog import Ui_NewRigDialog
 
 class NewRigDialog(QDialog, Ui_NewRigDialog):
     

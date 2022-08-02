@@ -1,4 +1,3 @@
-import imp
 import sys
 
 from PyQt5.QtWidgets import *
@@ -11,7 +10,8 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     
     rig_selector = RigSelectorDialog()
-    rig_selector.exec()
+    dialog_code = rig_selector.exec()
+    print(dialog_code)
     
     print('Rig selected')
     
