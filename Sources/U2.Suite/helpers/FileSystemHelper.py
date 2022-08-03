@@ -17,7 +17,7 @@
 
 import sys
 from os import listdir, getcwd
-from os.path import isfile, join#, open
+from os.path import isfile, join
 
 class FileSystemHelper():
     @staticmethod
@@ -32,4 +32,8 @@ class FileSystemHelper():
     @staticmethod
     def getLocalFolder():
         return getcwd()
+    
+    @staticmethod
+    def getIniFilesFolder():
+        return join(getcwd(), 'U2.Suite', 'ini')
     
