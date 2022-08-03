@@ -31,19 +31,11 @@ class ConversionHelper():
         if (len(s) == 0):
             return []
         
-        result = bytearray()
         trimmed = s.strip()
         if (trimmed.startswith('(')):
             trimmed = trimmed.strip('(').strip(')')
             trimmed = trimmed.replace('.', chr(0))
-            
-            for c in trimmed:
-                result.append(ord(c))
-
-            #result.replace(ord('.'), 0)
-            #bytearray.append()
-                    
-            return result
+            return bytearray([ord(f) for f in trimmed])
         
         elif ('0123456789abcdef'.find(trimmed[0].lower()) > -1):
             return ConversionHelper.HexStrToBytes(trimmed)
