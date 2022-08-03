@@ -17,12 +17,15 @@
 
 import sys
 
+from contracts.RigCommand import RigCommand
+from typing import List
+
 class RigCommands(object):
     def __init__(self):
         self._RigType = None
-        self._InitCmd = None
-        self._WriteCmd = None
-        self._StatusCmd = None
+        self._InitCmd = []
+        self._WriteCmd = []
+        self._StatusCmd = []
         self._ReadableParams = None
         self._WriteableParams = None
         self._Title = None
@@ -33,19 +36,19 @@ class RigCommands(object):
     def RigType(self, value):
         self._RigType = value
     @property
-    def InitCmd(self):
+    def InitCmd(self) -> List[RigCommand]:
         return self._InitCmd
     @InitCmd.setter
     def InitCmd(self, value):
         self._InitCmd = value
     @property
-    def WriteCmd(self):
+    def WriteCmd(self) -> List[RigCommand]:
         return self._WriteCmd
     @WriteCmd.setter
     def WriteCmd(self, value):
         self._WriteCmd = value
     @property
-    def StatusCmd(self):
+    def StatusCmd(self) -> List[RigCommand]:
         return self._StatusCmd
     @StatusCmd.setter
     def StatusCmd(self, value):
