@@ -15,25 +15,27 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class BitMask(object):
+from contracts import RigParameter
+
+class BitMask:
     def __init__(self):
         self._Mask = None
-        self._Flags = None
+        self._Flags = []
         self._Param = None
     @property
-    def Mask(self):
+    def Mask(self) -> bytearray:
         return self._Mask
     @Mask.setter
     def Mask(self, value):
         self._Mask = value
     @property
-    def Flags(self):
+    def Flags(self) -> bytearray:
         return self._Flags
     @Flags.setter
     def Flags(self, value):
         self._Flags = value
     @property
-    def Param(self):
+    def Param(self) -> RigParameter:
         return self._Param
     @Param.setter
     def Param(self, value):
