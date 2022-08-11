@@ -40,13 +40,11 @@ class IniFileHelper():
         return result
     
     @staticmethod
-    def ReadString(config_parser:configparser.ConfigParser, section: str, option: str) \
-        -> str:
+    def ReadString(config_parser:configparser.ConfigParser, section: str, option: str) -> str:
         return config_parser.get(section, option)
     
     @staticmethod
-    def ReadInt(config_parser:configparser.ConfigParser, section: str, option: str) \
-        -> int:
+    def ReadInt(config_parser:configparser.ConfigParser, section: str, option: str) -> int:
         return config_parser.getint(section, option)
     
     @staticmethod
@@ -55,9 +53,13 @@ class IniFileHelper():
 
     @staticmethod
     def GetReplyEndOption(config_parser:configparser.ConfigParser, section: str) -> bytearray:
-        return ch.HexStrToBytes(config_parser.get(section, 'ReplyEnd'))
+        try:
+            s = config_parser.get(section, 'ReplyEnd')
+            return ch.HexStrToBytes(s)
+        except Exception as e:
+            return bytearray()
 
     @staticmethod
     def GetValidateOption(config_parser:configparser.ConfigParser, section: str) -> str:
-        return ch.HexStrToBytes(config_parser.get(section, 'Validate'))
+        return config_parser.get(section, 'Validate')
 

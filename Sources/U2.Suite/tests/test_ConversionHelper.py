@@ -63,3 +63,29 @@ class RigParameterTests(unittest.TestCase):
         arr2 = bytearray(b'\x30\xff\x00\xa9')
         actual_result = ch.BytesAnd(arr1, arr2)
         expected_result = bytearray(b'\x10\x22\x00\x01')
+        
+    def test_str_to_bitmask_empty(self):
+        source = ''
+        expected_mask = bytearray()        
+        expected_flags = bytearray()
+        expected_param = rp.none
+        
+        result = ch.StrToBitMask(source)
+        assert result.Flags == expected_flags
+        assert result.Mask == expected_mask
+        assert result.Param == expected_param
+        
+    def test_str_to_bitmask_hex(self):
+        #Mask:  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        #Flags: FEFEA4E01A05013201FDFEFEE0A4FBFD
+        #Param: None
+        source = 'FEFEA4E01A05013201FD.FEFEE0A4FBFD'
+        expected_mask = bytearray(b'\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF') 
+        expected_flags = bytearray(b'\xFE\xFE\xA4\xE0\x1A\x05\x01\x32\x01\xFD\xFE\xFE\xE0\xA4\xFB\xFD')
+        expected_param = rp.none
+        
+        result = ch.StrToBitMask(source)
+        assert result.Flags == expected_flags
+        assert result.Mask == expected_mask
+        assert result.Param == expected_param
+        

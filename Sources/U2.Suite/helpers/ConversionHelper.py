@@ -43,7 +43,7 @@ class ConversionHelper():
     
     @staticmethod
     def HexStrToBytes(s : str) -> bytearray:
-        prepared = re.sub('[^0-9a-f]', '', s)
+        prepared = re.sub('[^0-9a-f]', '', s.lower())
         if (len(prepared) % 2 != 0):
             return []
         return bytearray.fromhex(prepared)
@@ -68,7 +68,7 @@ class ConversionHelper():
     
     @staticmethod
     def FlagsFromBitMask(mask: bytearray, is_string: bool) -> bytearray:
-        flags = mask
+        flags = bytearray(mask)
         dot = ord('.')
         
         index = 0
@@ -84,7 +84,8 @@ class ConversionHelper():
             for m in mask:
                 if (m != 0x00):
                     mask[index] = 0xFF
-                index = index + 1             
+                index = index + 1
+        return flags          
     
     @staticmethod
     def StrToRigParameter(s : str) -> RigParameter:

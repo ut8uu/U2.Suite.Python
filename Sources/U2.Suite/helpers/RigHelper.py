@@ -25,6 +25,7 @@ from contracts.RigCommands import RigCommands
 from contracts.RigParameter import RigParameter
 from exceptions.EntryLoadErrorException import EntryLoadErrorException
 from exceptions.IniFileLoadException import IniFileLoadException
+from exceptions.LoadInitCommandsException import LoadInitCommandsException
 from exceptions.MaskValidationException import MaskValidationException
 from exceptions.UnexpectedEntryException import UnexpectedEntryException
 from helpers.ConversionHelper import ConversionHelper as ch
@@ -37,21 +38,21 @@ class RigHelper():
     
     @staticmethod
     def ValidateEntries(entries:List[Tuple[str,str]], allowed_entries:List[str]):
-        if (empty(entries)):
+        if (len(entries) == 0):
             return
         for entry in entries:
-            if (allowed_entries.count(entry) == 0):
+            if (allowed_entries.count(entry[0].lower()) == 0):
                 raise UnexpectedEntryException('Unexpected entry found: {}'.format(entry))
     
     @staticmethod
     def ValidateMaskChecks(mask, length):
-        if mask.Mask.Length == 0 or mask.Flags.Length == 0:
+        if len(mask.Mask) == 0 or len(mask.Flags) == 0:
             raise MaskValidationException("Incorrect mask length")
-        if mask.Mask.Length != mask.Flags.Length:
+        if len(mask.Mask) != len(mask.Flags):
             raise MaskValidationException("Incorrect mask length")
-        if length > 0 and mask.Mask.Length != length:
+        if length > 0 and len(mask.Mask) != length:
             raise MaskValidationException("Mask length <> ReplyLength")
-        if not ch.BytesAnd(mask.Flags, mask.Flags).SequenceEqual(mask.Flags):
+        if not ch.BytesAnd(mask.Flags, mask.Flags) == mask.Flags:
             raise MaskValidationException("Mask hides valid bits")
 
     @staticmethod
@@ -72,7 +73,7 @@ class RigHelper():
                 raise MaskValidationException("Parameter name is not allowed")
             startIndex = mask.Flags.Length - reply_end.Length
             ending = mask.Flags.partition[startIndex:]
-            if not ending.SequenceEqual(reply_end):
+            if not ending == reply_end:
                 raise MaskValidationException("Mask does not end with ReplyEnd")
         else:
             if mask.Param == RigParameter.none:
@@ -96,13 +97,13 @@ class RigHelper():
         if (len(result.Code) == 0):
             raise EntryLoadErrorException('Failed loading the Common section from {}'.format(section))
 
-        result.ReplyLength = ih.ReadInt(config_parser, section, option)
+        result.ReplyLength = ih.ReadInt(config_parser, section, "replylength")
         result.ReplyEnd = ih.GetReplyEndOption(config_parser, section)
         
         try:
             mask_value = ih.GetValidateOption(config_parser, section)
             result.Validation = ch.StrToBitMask(mask_value)
-        except:
+        except Exception as ex:
             raise EntryLoadErrorException('Failed loading the Validate section from {}'.format(section))
         
         RigHelper.ValidateMask('Validate', result.Validation, result.ReplyLength, result.ReplyEnd)
@@ -115,15 +116,19 @@ class RigHelper():
         assert len(sections) > 0
         
         for section in sections:
-            entries = ih.LoadSectionSettings(config_parser, section)
-            if (len(entries) == 0):
-                continue
-            
-            allowed_entries = ['Command', 'ReplyLength', 'ReplyEnd', 'Validate',]
-            RigHelper.ValidateEntries(entries, allowed_entries)
-            
-            command = RigHelper.LoadCommon(config_parser, section)
-            
+            try:
+                entries = ih.LoadSectionSettings(config_parser, section)
+                if (len(entries) == 0):
+                    continue
+                
+                allowed_entries = ['command', 'replylength', 'replyend', 'validate',]
+                RigHelper.ValidateEntries(entries, allowed_entries)
+                
+                command = RigHelper.LoadCommon(config_parser, section)
+                if len(command.Code) > 0:
+                    result.append(command)
+            except Exception as ex:
+                raise LoadInitCommandsException('Failed to load the INIT commands: ' + ex.message)
             
         return result
     

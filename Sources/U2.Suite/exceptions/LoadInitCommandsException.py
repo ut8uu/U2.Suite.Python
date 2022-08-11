@@ -15,28 +15,8 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from contracts.RigParameter import RigParameter
+import sys
 
-class BitMask:
-    def __init__(self):
-        self._Mask = bytearray(b'')
-        self._Flags = bytearray(b'')
-        self._Param = RigParameter.none
-    @property
-    def Mask(self) -> bytearray:
-        return self._Mask
-    @Mask.setter
-    def Mask(self, value):
-        self._Mask = value
-    @property
-    def Flags(self) -> bytearray:
-        return self._Flags
-    @Flags.setter
-    def Flags(self, value):
-        self._Flags = value
-    @property
-    def Param(self) -> RigParameter:
-        return self._Param
-    @Param.setter
-    def Param(self, value):
-        self._Param = value
+class LoadInitCommandsException(Exception):
+    def __init__(self, message):
+        super(LoadInitCommandsException, self).__init__(message)
