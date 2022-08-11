@@ -104,3 +104,18 @@ class RigParameterTests(unittest.TestCase):
         assert result.Mask == expected_mask
         assert result.Param == expected_param
         
+    def test_str_to_bitmask_three_params(self):
+        # src: 00000000000000.00000000.0000.0F.00|00000000000000.00000000.0000.00.00|pmRx
+        #Mask:  000000000000000000000000000F00
+        #Flags: 000000000000000000000000000000
+        #Param: Tx
+        source = '00000000000000.00000000.0000.0F.00|00000000000000.00000000.0000.00.00|pmRx'
+        expected_mask = bytearray(b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0F\x00') 
+        expected_flags = bytearray(b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
+        expected_param = rp.rx
+        
+        result = ch.StrToBitMask(source)
+        assert result.Flags == expected_flags
+        assert result.Mask == expected_mask
+        assert result.Param == expected_param
+        
