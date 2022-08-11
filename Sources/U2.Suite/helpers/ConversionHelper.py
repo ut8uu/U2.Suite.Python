@@ -18,6 +18,8 @@
 import re
 from contracts.BitMask import BitMask
 from contracts.RigParameter import RigParameter
+from contracts.ValueFormat import ValueFormat
+from exceptions.FormatParseException import FormatParseException
 from exceptions.MaskParseException import MaskParseException
 from exceptions.ParameterParseException import ParameterParseException
 from typing import List
@@ -132,3 +134,16 @@ class ConversionHelper():
             raise MaskParseException('Cannot parse mask {}'.format(input_string))
 
         return result
+
+    def StrToValueFormat(s : str) -> ValueFormat:
+        if not s.lower().startswith('vf'):
+            raise FormatParseException('String "{}" not recognized as a valid FormatValue'.format(s));
+        
+        statuses = [status for status in dir(
+            ValueFormat) if not status.startswith('_')]
+        
+        cut_value = s.strip().removeprefix('pm').lower()
+        if cut_value in statuses:
+            return eval('ValueFormat.' + cut_value)
+        
+        raise FormatParseException('Cannot parse ValueFormat {}'.format(s))

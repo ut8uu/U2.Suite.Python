@@ -15,11 +15,13 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from pyrsistent import b
-from exceptions.ParameterParseException import ParameterParseException
-import unittest
-from helpers.ConversionHelper import ConversionHelper as ch
 from contracts.RigParameter import RigParameter as rp
+from contracts.ValueFormat import ValueFormat
+from exceptions.FormatParseException import FormatParseException
+from exceptions.ParameterParseException import ParameterParseException
+from helpers.ConversionHelper import ConversionHelper as ch
+from pyrsistent import b
+import unittest
 
 class RigParameterTests(unittest.TestCase):
     def test_hex_str_to_bytes():
@@ -39,7 +41,7 @@ class RigParameterTests(unittest.TestCase):
         actual = ch.HexStrToBytes('41 1') # odd number with space
         assert expected == actual
         
-    def test_str_to_bytes():
+    def test_str_to_bytes(self):
         expected = bytearray(b'AB\x00CY')
         actual = ch.StrToBytes('(AB.CY)')
         assert expected == actual
@@ -63,6 +65,7 @@ class RigParameterTests(unittest.TestCase):
         arr2 = bytearray(b'\x30\xff\x00\xa9')
         actual_result = ch.BytesAnd(arr1, arr2)
         expected_result = bytearray(b'\x10\x22\x00\x01')
+        assert expected_result == actual_result
         
     def test_str_to_bitmask_empty(self):
         source = ''
@@ -118,4 +121,18 @@ class RigParameterTests(unittest.TestCase):
         assert result.Flags == expected_flags
         assert result.Mask == expected_mask
         assert result.Param == expected_param
+    
+    def test_str_to_value_format_positive(self):
+        #Src: vfText
+        source = 'vfText'
+        actual = ch.StrToValueFormat(source)
+        assert actual == ValueFormat.text
         
+    def test_str_to_value_format_negative(self):
+        #Src: aaa
+        with self.assertRaises(FormatParseException) as cm:
+            ch.StrToValueFormat('aaa')
+            
+        with self.assertRaises(FormatParseException) as cm:
+            ch.StrToValueFormat('vfAaaa')
+            
