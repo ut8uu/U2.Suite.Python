@@ -172,26 +172,26 @@ class ConversionHelper():
             print("invalid BCD value: {0}. {1}", ConversionHelper.BytesToHex(data), ex.Message)
             raise
         
-"""
     @staticmethod
-    def FromBcdLS(data : bytearray):
+    def FromBcdLS(data : bytearray) -> int:
         data = data[::-1] # Array.Reverse(data)        
         return ConversionHelper.FromBcdBS(data)
     
     @staticmethod
-    def FromBcdLU(data : bytearray):
+    def FromBcdLU(data : bytearray) -> int:
         data = data[::-1] # Array.Reverse(data)        
         return ConversionHelper.FromBcdBU(data)
     
     @staticmethod
-    def FromBinB(data : bytearray):
+    def FromBinB(data : bytearray) -> int:
         data = data[::-1] # Array.Reverse(data)        
         return ConversionHelper.FromBinL(data)
     
     @staticmethod
-    def FromBinL(data : bytearray):
-        return Convert.ToInt32(data)
+    def FromBinL(data : bytearray) -> int:
+        return int.from_bytes(data, byteorder='little', signed=True)
     
+"""
     @staticmethod
     def FromText(data : bytearray):
         s = Encoding.UTF8.GetString(data)

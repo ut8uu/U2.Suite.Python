@@ -149,4 +149,25 @@ class RigParameterTests(unittest.TestCase):
         result = ch.FromBcdBS(data)
         self.assertEqual(233207, result)
                 
-            
+    def test_from_bcd_ls(self):
+        data = bytearray(b'\x07\x32\x23\x01')
+        result = ch.FromBcdLS(data)
+        self.assertEqual(-233207, result)
+        
+        data = bytearray(b'\x07\x32\x23\x00')
+        result = ch.FromBcdLS(data)
+        self.assertEqual(233207, result)
+                
+    def test_from_bin_b(self):
+        data = bytearray(b'\x01')
+        result = ch.FromBinB(data)
+        self.assertEqual(1, result)
+        
+        data = bytearray(b'\x00\x00\x00\x00')
+        result = ch.FromBinB(data)
+        self.assertEqual(0, result)
+        
+        data = bytearray(b'\xFF\xFF\xFF\xFF')
+        result = ch.FromBinB(data)
+        self.assertEqual(-1, result)
+
