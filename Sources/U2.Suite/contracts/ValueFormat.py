@@ -21,13 +21,13 @@ import enum
 class ValueFormat(enum.Enum):    
     none = 0
     text = 1
-    binL = 2
-    binB = 3
-    bcdLU = 4
-    bcdLS = 5
-    bcdBU = 6
-    bcdBS = 7
+    binl = 2
+    binb = 3
+    bcdlu = 4
+    bcdls = 5
+    bcdbu = 6
+    bcdbs = 7
     yaesu = 8
-    dpIcom = 9
-    textUD = 10
+    dpicom = 9
+    textud = 10
     float = 11

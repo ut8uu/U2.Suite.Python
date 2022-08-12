@@ -127,6 +127,10 @@ class RigParameterTests(unittest.TestCase):
         source = 'vfText'
         actual = ch.StrToValueFormat(source)
         assert actual == ValueFormat.text
+
+        source = 'vfBcdLU'
+        actual = ch.StrToValueFormat(source)
+        assert actual == ValueFormat.bcdlu
         
     def test_str_to_value_format_negative(self):
         #Src: aaa
@@ -135,4 +139,14 @@ class RigParameterTests(unittest.TestCase):
             
         with self.assertRaises(FormatParseException) as cm:
             ch.StrToValueFormat('vfAaaa')
+            
+    def test_from_bcd_bs(self):
+        data = bytearray(b'\x10\x23\x32\x07')
+        result = ch.FromBcdBS(data)
+        self.assertEqual(-233207, result)
+        
+        data = bytearray(b'\x00\x23\x32\x07')
+        result = ch.FromBcdBS(data)
+        self.assertEqual(233207, result)
+                
             

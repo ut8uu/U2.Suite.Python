@@ -135,6 +135,7 @@ class ConversionHelper():
 
         return result
 
+    @staticmethod
     def StrToValueFormat(s : str) -> ValueFormat:
         if not s.lower().startswith('vf'):
             raise FormatParseException('String "{}" not recognized as a valid FormatValue'.format(s));
@@ -142,8 +143,215 @@ class ConversionHelper():
         statuses = [status for status in dir(
             ValueFormat) if not status.startswith('_')]
         
-        cut_value = s.strip().removeprefix('pm').lower()
+        cut_value = s.strip().removeprefix('vf').lower()
         if cut_value in statuses:
             return eval('ValueFormat.' + cut_value)
         
         raise FormatParseException('Cannot parse ValueFormat {}'.format(s))
+
+    @staticmethod
+    def FromBcdBS(data : bytearray) -> int:
+        sign = -1
+        if (data[0] == 0):
+            sign = 1
+        data[0] = 0
+        return (sign * ConversionHelper.FromBcdBU(data))
+    
+    @staticmethod
+    def FromBcdBU(data : bytearray) -> int:
+        sb = ''
+        i = 0
+        while (i <= (len(data) - 1)):
+            sb += chr(0x30 + round(data[i] / 16))
+            sb += chr(0x30 + (data[i] % 16))
+            i += 1
+        try:
+            x = int(sb)
+            return x
+        except Exception as ex:
+            print("invalid BCD value: {0}. {1}", ConversionHelper.BytesToHex(data), ex.Message)
+            raise
+        
+"""
+    @staticmethod
+    def FromBcdLS(data : bytearray):
+        data = data[::-1] # Array.Reverse(data)        
+        return ConversionHelper.FromBcdBS(data)
+    
+    @staticmethod
+    def FromBcdLU(data : bytearray):
+        data = data[::-1] # Array.Reverse(data)        
+        return ConversionHelper.FromBcdBU(data)
+    
+    @staticmethod
+    def FromBinB(data : bytearray):
+        data = data[::-1] # Array.Reverse(data)        
+        return ConversionHelper.FromBinL(data)
+    
+    @staticmethod
+    def FromBinL(data : bytearray):
+        return Convert.ToInt32(data)
+    
+    @staticmethod
+    def FromText(data : bytearray):
+        s = Encoding.UTF8.GetString(data)
+        try:
+            return Convert.ToInt32(s)
+        except Exception as ex:
+            ClassLog.ErrorFormat("Invalid reply: {0}", ConversionHelper.BytesToHex(data))
+            raise ValueConversionException(message = "Cannot convert string {} to int.".format(s))
+        
+    @staticmethod
+    def FromDPIcom(data : bytearray):
+        try:
+            s = Encoding.UTF8.GetString(data)
+            s = RegularExpressionHelper.MatchAndGetFirst("([\\d+\\.*\\d*])", s)
+            return Convert.ToInt32(Math.Round(Convert.ToDouble((1000000.0 * Convert.ToDouble(s.Trim()))), MidpointRounding.AwayFromZero))
+        except Exception as ex:
+            ClassLog.ErrorFormat("Invalid DPIcom reply: {0}", ConversionHelper.BytesToHex(data))
+            raise
+        
+    @staticmethod
+    def FromYaesu(data : bytearray):
+        sign = -1
+        if (data[0] & 128) == 0:
+            sign = 1
+        data[0] = data[0] & 127
+        return (sign * ConversionHelper.FromBinB(data))
+    
+    @staticmethod
+    def FromFloat(data : bytearray):
+        try:
+            s = Encoding.UTF8.GetString(data)
+            value = Convert.ToDouble(s.Trim(), CultureInfo.InvariantCulture)
+            return Convert.ToInt32(Math.Round(value, MidpointRounding.AwayFromZero))
+        except Exception:
+            ClassLog.ErrorFormat("Invalid reply: {0}", ConversionHelper.BytesToHex(data))
+            raise
+    @staticmethod
+    def UnformatValue(sourceData, info):
+        if (sourceData.Length < (info.Start + info.Len)):
+            raise ValueValidationException("Reply too short")
+        data = sourceData.Skip(info.Start).Take(info.Len).ToArray()
+        if ((info.Format == ValueFormat.Text)):
+            return FromText(data)
+        elif ((info.Format == ValueFormat.BinL)):
+            return FromBinL(data)
+        elif ((info.Format == ValueFormat.BinB)):
+            return FromBinB(data)
+        elif ((info.Format == ValueFormat.BcdLU)):
+            return FromBcdLU(data)
+        elif ((info.Format == ValueFormat.BcdLS)):
+            return FromBcdLS(data)
+        elif ((info.Format == ValueFormat.BcdBU)):
+            return FromBcdBU(data)
+        elif ((info.Format == ValueFormat.BcdBS)):
+            return FromBcdBS(data)
+        elif ((info.Format == ValueFormat.DPIcom)):
+            return FromDPIcom(data)
+        elif ((info.Format == ValueFormat.Float)):
+            return FromFloat(data)
+        elif ((info.Format == ValueFormat.Yaesu)):
+            return FromYaesu(data)
+        elif (((info.Format == ValueFormat.None)) or ((info.Format == ValueFormat.TextUD))):
+            return 0
+        else:
+            raise ArgumentOutOfRangeException("Parameter {} not recognized.".format(info.Format))
+
+    @staticmethod
+    def FormatValue(inputValue, info):
+        value = Convert.ToInt32(Math.Round(Convert.ToDouble(((inputValue * info.Mult) + info.Add)), MidpointRounding.AwayFromZero))
+        if ((((info.Format == ValueFormat.BcdLU) or (info.Format == ValueFormat.BcdBU))) and (value < 0)):
+            ClassLog.ErrorFormat("Passed invalid value: {}. Expected to be a BCD kind.".format(inputValue))
+            return Array.Empty()
+        if ((info.Format == ValueFormat.Text)):
+            return ToText(value, info.Len)
+        elif ((info.Format == ValueFormat.BinL)):
+            return ToBinL(value, info.Len)
+        elif ((info.Format == ValueFormat.BinB)):
+            return ToBinB(value, info.Len)
+        elif ((info.Format == ValueFormat.BcdLU)):
+            return ToBcdLU(value, info.Len)
+        elif ((info.Format == ValueFormat.BcdLS)):
+            return ToBcdLS(value, info.Len)
+        elif ((info.Format == ValueFormat.BcdBU)):
+            return ToBcdBU(value, info.Len)
+        elif ((info.Format == ValueFormat.BcdBS)):
+            return ToBcdBS(value, info.Len)
+        elif ((info.Format == ValueFormat.Yaesu)):
+            return ToYaesu(value, info.Len)
+        elif ((info.Format == ValueFormat.DPIcom)):
+            return ToDPIcom(value, info.Len)
+        elif ((info.Format == ValueFormat.TextUD)):
+            return ToTextUD(value, info.Len)
+        elif ((info.Format == ValueFormat.Float)):
+            return ToFloat(value, info.Len)
+        elif ((info.Format == ValueFormat.None)):
+            return Array.Empty()
+        else:
+            raise ArgumentOutOfRangeException("{} not recognized.".format(info.Format))
+
+    @staticmethod
+    def ToText(value, len):
+        s = "value.ToString().PadLeft(len, \'0\')"
+        return Encoding.UTF8.GetBytes(s)
+    @staticmethod
+    def ToBcdBS(value, len):
+        result = ToBcdBU(Math.Abs(value), len)
+        if (value < 0):
+            result[0] = 255
+        return result
+    @staticmethod
+    def ToBcdBU(value, len):
+        chars = ToText(value, (len * 2))
+        result = []
+        i = 0
+        while (i < len):
+            char1 = ((((chars[(i * 2)] - 48)) << 4))
+            char2 = ((chars[((i * 2) + 1)] - 48))
+            result[i] = ((char1 | char2))
+            i += 1
+        return result
+    @staticmethod
+    def ToBcdLS(value, len):
+        arr = ToBcdLU(Math.Abs(value), len)
+        if (value < 0):
+            arr[( ^ 1)] = 255
+        return arr
+    @staticmethod
+    def ToBcdLU(value, len):
+        arr = ToBcdBU(value, len)
+        Array.Reverse(arr)
+        return arr
+    @staticmethod
+    def ToBinB(value, len):
+        arr = ToBinL(value, len)
+        Array.Reverse(arr)
+        return arr
+    @staticmethod
+    def ToBinL(value, len):
+        bytes = BitConverter.GetBytes(value)
+        if BitConverter.IsLittleEndian:
+            Array.Reverse(bytes)
+        return bytes
+    @staticmethod
+    def ToDPIcom(value, len):
+        f = (value / 1000000)
+        s = "Convert.ToString(f).PadLeft(len, \'0\')"
+        return Encoding.UTF8.GetBytes(s)
+    @staticmethod
+    def ToYaesu(value, len):
+        arr = ToBinB(Math.Abs(value), len)
+        if (value < 0):
+            arr[0] = ((arr[0] | 128))
+        return arr
+    @staticmethod
+    def ToFloat(value, len):
+        s = "value.ToString(\"F\", CultureInfo.InvariantCulture).PadLeft(len, \' \')"
+        return Encoding.UTF8.GetBytes(s)
+    @staticmethod
+    def ToTextUD(value, len):
+        prefix = ("U" if ((value >= 0)) else "D")
+        s = "prefix + Convert.ToString(Math.Abs(value))            .PadLeft(len - 1, \'0\')"
+        return Encoding.UTF8.GetBytes(s)
+"""
