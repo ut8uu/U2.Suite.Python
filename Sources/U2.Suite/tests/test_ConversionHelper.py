@@ -15,7 +15,8 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from contracts.RigParameter import RigParameter as rp
+from contracts.ParameterValue import ParameterValue
+from contracts.RigParameter import RigParameter
 from contracts.ValueFormat import ValueFormat
 from exceptions.FormatParseException import FormatParseException
 from exceptions.ParameterParseException import ParameterParseException
@@ -25,7 +26,7 @@ from pyrsistent import b
 import unittest
 
 class RigParameterTests(unittest.TestCase):
-    def test_hex_str_to_bytes():
+    def test_hex_str_to_bytes(self):
         expected = bytearray(b'ABC')
         actual = ch.HexStrToBytes('414243')
         assert expected == actual
@@ -48,7 +49,7 @@ class RigParameterTests(unittest.TestCase):
         assert expected == actual
 
     def test_parse_rig_parameter(self):
-        assert rp.none == ch.StrToRigParameter('pmNone')
+        assert RigParameter.none == ch.StrToRigParameter('pmNone')
         
         # non existent value
         with self.assertRaises(ParameterParseException) as cm:
@@ -72,7 +73,7 @@ class RigParameterTests(unittest.TestCase):
         source = ''
         expected_mask = bytearray()        
         expected_flags = bytearray()
-        expected_param = rp.none
+        expected_param = RigParameter.none
         
         result = ch.StrToBitMask(source)
         assert result.Flags == expected_flags
@@ -86,7 +87,7 @@ class RigParameterTests(unittest.TestCase):
         source = 'FEFEA4E01A05013201FD.FEFEE0A4FBFD'
         expected_mask = bytearray(b'\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF') 
         expected_flags = bytearray(b'\xFE\xFE\xA4\xE0\x1A\x05\x01\x32\x01\xFD\xFE\xFE\xE0\xA4\xFB\xFD')
-        expected_param = rp.none
+        expected_param = RigParameter.none
         
         result = ch.StrToBitMask(source)
         assert result.Flags == expected_flags
@@ -101,7 +102,7 @@ class RigParameterTests(unittest.TestCase):
         source = '00000000000000.00000000.0000.01.00|pmTx'
         expected_mask = bytearray(b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xFF\x00') 
         expected_flags = bytearray(b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00')
-        expected_param = rp.tx
+        expected_param = RigParameter.tx
         
         result = ch.StrToBitMask(source)
         assert result.Flags == expected_flags
@@ -116,7 +117,7 @@ class RigParameterTests(unittest.TestCase):
         source = '00000000000000.00000000.0000.0F.00|00000000000000.00000000.0000.00.00|pmRx'
         expected_mask = bytearray(b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0F\x00') 
         expected_flags = bytearray(b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
-        expected_param = rp.rx
+        expected_param = RigParameter.rx
         
         result = ch.StrToBitMask(source)
         assert result.Flags == expected_flags
@@ -184,3 +185,23 @@ class RigParameterTests(unittest.TestCase):
         
         with self.assertRaises(ValueConversionException) as ex:
             ch.FromDPIcom(bytearray(b'asd'))
+            
+    def test_from_yaesu(self):
+        # positive value
+        self.assertEqual(4660, ch.FromYaesu(bytearray(b'\x12\x34'))) # 1*4096 + 2*256 + 3*16 + 4
+
+        # negative value from previous case
+        self.assertEqual(-4660, ch.FromYaesu(bytearray(b'\x92\x34'))) # 0x12 & 0x80 = 0x92
+                
+    def test_from_float(self):
+        self.assertEqual(1, ch.FromFloat(bytearray(b'1.23')))
+        
+    def test_unformat_value(self):
+        # 13|5|vfBcdLU|1|0|pmFreqA
+        data = bytearray(b'\xFE\xFE\xA4\xE0\x25\x00\xFD\xFE\xFE\xE0\xA4\x25\x00\x23\x01\x00\x00\x00\xFD')
+        pv = ParameterValue()
+        pv.Format = ValueFormat.bcdlu
+        pv.Start = 13
+        pv.Len = 5
+        result = ch.UnformatValue(data, pv)
+        self.assertEqual(123, result)

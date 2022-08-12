@@ -17,12 +17,15 @@
 
 import binascii, re, sys
 from contracts.BitMask import BitMask
+from contracts.ParameterValue import ParameterValue
 from contracts.RigParameter import RigParameter
 from contracts.ValueFormat import ValueFormat
+from exceptions.ArgumentOutOfRangeException import ArgumentOutOfRangeException
 from exceptions.FormatParseException import FormatParseException
 from exceptions.MaskParseException import MaskParseException
 from exceptions.ParameterParseException import ParameterParseException
 from exceptions.ValueConversionException import ValueConversionException
+from exceptions.ValueValidationException import ValueValidationException
 from typing import List
 
 class ConversionHelper():
@@ -206,7 +209,7 @@ class ConversionHelper():
             raise ValueConversionException(message = f"Cannot convert string {s} to int.")
         
     @staticmethod
-    def FromDPIcom(data : bytearray):
+    def FromDPIcom(data : bytearray) -> int:
         try:
             s = ''.join(chr(x) for x in data)
             m = re.search(r"(\d+.?\d*)$", s)
@@ -216,54 +219,55 @@ class ConversionHelper():
         except Exception as ex:
             raise ValueConversionException(f"Invalid DPIcom reply: {ConversionHelper.BytesToHexStr(data)}", )
         
-"""
     @staticmethod
-    def FromYaesu(data : bytearray):
+    def FromYaesu(data : bytearray) -> int:
         sign = -1
         if (data[0] & 128) == 0:
             sign = 1
         data[0] = data[0] & 127
-        return (sign * ConversionHelper.FromBinB(data))
+        return sign * ConversionHelper.FromBinB(data)
     
     @staticmethod
-    def FromFloat(data : bytearray):
+    def FromFloat(data : bytearray) -> int:
         try:
-            s = Encoding.UTF8.GetString(data)
-            value = Convert.ToDouble(s.Trim(), CultureInfo.InvariantCulture)
-            return Convert.ToInt32(Math.Round(value, MidpointRounding.AwayFromZero))
+            s = ''.join(chr(x) for x in data)
+            f = float(s)
+            return int(f)
         except Exception:
-            ClassLog.ErrorFormat("Invalid reply: {0}", ConversionHelper.BytesToHex(data))
-            raise
+            raise ValueConversionException(f"Invalid reply: {ConversionHelper.BytesToHex(data)}")
+
     @staticmethod
-    def UnformatValue(sourceData, info):
-        if (sourceData.Length < (info.Start + info.Len)):
+    def UnformatValue(sourceData : bytearray, info : ParameterValue) -> int:
+        if len(sourceData) < (info.Start + info.Len):
             raise ValueValidationException("Reply too short")
-        data = sourceData.Skip(info.Start).Take(info.Len).ToArray()
-        if ((info.Format == ValueFormat.Text)):
-            return FromText(data)
-        elif ((info.Format == ValueFormat.BinL)):
-            return FromBinL(data)
-        elif ((info.Format == ValueFormat.BinB)):
-            return FromBinB(data)
-        elif ((info.Format == ValueFormat.BcdLU)):
-            return FromBcdLU(data)
-        elif ((info.Format == ValueFormat.BcdLS)):
-            return FromBcdLS(data)
-        elif ((info.Format == ValueFormat.BcdBU)):
-            return FromBcdBU(data)
-        elif ((info.Format == ValueFormat.BcdBS)):
-            return FromBcdBS(data)
-        elif ((info.Format == ValueFormat.DPIcom)):
-            return FromDPIcom(data)
-        elif ((info.Format == ValueFormat.Float)):
-            return FromFloat(data)
-        elif ((info.Format == ValueFormat.Yaesu)):
-            return FromYaesu(data)
-        elif (((info.Format == ValueFormat.None)) or ((info.Format == ValueFormat.TextUD))):
+        
+        data = bytearray(sourceData[info.Start : info.Start + info.Len])
+        if info.Format == ValueFormat.text:
+            return ConversionHelper.FromText(data)
+        elif info.Format == ValueFormat.binl:
+            return ConversionHelper.FromBinL(data)
+        elif info.Format == ValueFormat.binb:
+            return ConversionHelper.FromBinB(data)
+        elif info.Format == ValueFormat.bcdlu:
+            return ConversionHelper.FromBcdLU(data)
+        elif info.Format == ValueFormat.bcdls:
+            return ConversionHelper.FromBcdLS(data)
+        elif info.Format == ValueFormat.bcdbu:
+            return ConversionHelper.FromBcdBU(data)
+        elif info.Format == ValueFormat.bcdbs:
+            return ConversionHelper.FromBcdBS(data)
+        elif info.Format == ValueFormat.dpicom:
+            return ConversionHelper.FromDPIcom(data)
+        elif info.Format == ValueFormat.float:
+            return ConversionHelper.FromFloat(data)
+        elif info.Format == ValueFormat.yaesu:
+            return ConversionHelper.FromYaesu(data)
+        elif info.Format == ValueFormat.none or info.Format == ValueFormat.TextUD:
             return 0
         else:
             raise ArgumentOutOfRangeException("Parameter {} not recognized.".format(info.Format))
 
+"""
     @staticmethod
     def FormatValue(inputValue, info):
         value = Convert.ToInt32(Math.Round(Convert.ToDouble(((inputValue * info.Mult) + info.Add)), MidpointRounding.AwayFromZero))
