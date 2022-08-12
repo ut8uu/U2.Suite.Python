@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+from unittest import result
 from contracts.ParameterValue import ParameterValue
 from contracts.RigParameter import RigParameter
 from contracts.ValueFormat import ValueFormat
@@ -205,3 +206,27 @@ class RigParameterTests(unittest.TestCase):
         pv.Len = 5
         result = ch.UnformatValue(data, pv)
         self.assertEqual(123, result)
+        
+    def test_to_text(self):
+        result = ch.ToText('123', 4)
+        self.assertEqual(bytearray(b'0123'), result)
+        
+    def test_to_bcdbu(self):
+        result = ch.ToBcdBU(123, 2)
+        self.assertEqual(bytearray(b'\x01\x23'), result)
+    
+    def test_to_bcdbs(self):
+        result = ch.ToBcdBS(-123, 4)
+        self.assertEqual(bytearray(b'\xff\x00\x01\x23'), result)
+        
+    def test_to_bcdls(self):
+        result = ch.ToBcdLS(-123, 4)
+        self.assertEqual(bytearray(b'\x23\x01\x00\xff'), result)
+        result = ch.ToBcdLS(123, 4)
+        self.assertEqual(bytearray(b'\x23\x01\x00\x00'), result)
+        
+    def test_to_bcdlu(self):
+        result = ch.ToBcdLU(123, 4)
+        self.assertEqual(bytearray(b'\x23\x01\x00\x00'), result)
+        result = ch.ToBcdLU(-123, 4)
+        self.assertEqual(bytearray(b'\x23\x01\x00\x00'), result)

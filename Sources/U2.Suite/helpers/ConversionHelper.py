@@ -16,6 +16,8 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import binascii, re, sys
+
+from pyrsistent import b
 from contracts.BitMask import BitMask
 from contracts.ParameterValue import ParameterValue
 from contracts.RigParameter import RigParameter
@@ -267,7 +269,79 @@ class ConversionHelper():
         else:
             raise ArgumentOutOfRangeException("Parameter {} not recognized.".format(info.Format))
 
+    @staticmethod
+    def ToText(value : str, len : int) -> bytearray:
+        s = value.zfill(len)
+        arr = [ord(elem) for elem in s]
+        b = bytearray()
+        b.extend(arr)
+        return b
+
+    @staticmethod
+    def ToBcdBS(value : int, len : int) -> bytearray:
+        result = ConversionHelper.ToBcdBU(abs(value), len)
+        if (value < 0):
+            result[0] = 255
+        return result
+
+    @staticmethod
+    def ToBcdBU(value : int, len : int) -> bytearray:
+        chars = ConversionHelper.ToText(str(value), (len * 2))
+        result = bytearray()
+        i = 0
+        while (i < len):
+            char1 = (chars[i * 2] - 48) * 16
+            char2 = chars[(i * 2) + 1] - 48
+            result.append(char1 + char2)
+            i += 1
+        return result
+    
+    @staticmethod
+    def ToBcdLS(value : int, len : int) -> bytearray:
+        arr = ConversionHelper.ToBcdLU(value, len)
+        if (value < 0):
+            #idx = arr.count() - 1
+            arr[-1] = 0xff
+        return arr
+
+    @staticmethod
+    def ToBcdLU(value : int, len : int) -> bytearray:
+        arr = ConversionHelper.ToBcdBU(abs(value), len)
+        return arr[::-1]
+
 """
+    @staticmethod
+    def ToBinB(value, len):
+        arr = ToBinL(value, len)
+        Array.Reverse(arr)
+        return arr
+    @staticmethod
+    def ToBinL(value, len):
+        bytes = BitConverter.GetBytes(value)
+        if BitConverter.IsLittleEndian:
+            Array.Reverse(bytes)
+        return bytes
+    @staticmethod
+    def ToDPIcom(value, len):
+        f = (value / 1000000)
+        s = "Convert.ToString(f).PadLeft(len, \'0\')"
+        return Encoding.UTF8.GetBytes(s)
+    @staticmethod
+    def ToYaesu(value, len):
+        arr = ToBinB(Math.Abs(value), len)
+        if (value < 0):
+            arr[0] = ((arr[0] | 128))
+        return arr
+    @staticmethod
+    def ToFloat(value, len):
+        s = "value.ToString(\"F\", CultureInfo.InvariantCulture).PadLeft(len, \' \')"
+        return Encoding.UTF8.GetBytes(s)
+    @staticmethod
+    def ToTextUD(value, len):
+        prefix = ("U" if ((value >= 0)) else "D")
+        s = "prefix + Convert.ToString(Math.Abs(value))            .PadLeft(len - 1, \'0\')"
+        return Encoding.UTF8.GetBytes(s)
+
     @staticmethod
     def FormatValue(inputValue, info):
         value = Convert.ToInt32(Math.Round(Convert.ToDouble(((inputValue * info.Mult) + info.Add)), MidpointRounding.AwayFromZero))
@@ -301,67 +375,4 @@ class ConversionHelper():
         else:
             raise ArgumentOutOfRangeException("{} not recognized.".format(info.Format))
 
-    @staticmethod
-    def ToText(value, len):
-        s = "value.ToString().PadLeft(len, \'0\')"
-        return Encoding.UTF8.GetBytes(s)
-    @staticmethod
-    def ToBcdBS(value, len):
-        result = ToBcdBU(Math.Abs(value), len)
-        if (value < 0):
-            result[0] = 255
-        return result
-    @staticmethod
-    def ToBcdBU(value, len):
-        chars = ToText(value, (len * 2))
-        result = []
-        i = 0
-        while (i < len):
-            char1 = ((((chars[(i * 2)] - 48)) << 4))
-            char2 = ((chars[((i * 2) + 1)] - 48))
-            result[i] = ((char1 | char2))
-            i += 1
-        return result
-    @staticmethod
-    def ToBcdLS(value, len):
-        arr = ToBcdLU(Math.Abs(value), len)
-        if (value < 0):
-            arr[( ^ 1)] = 255
-        return arr
-    @staticmethod
-    def ToBcdLU(value, len):
-        arr = ToBcdBU(value, len)
-        Array.Reverse(arr)
-        return arr
-    @staticmethod
-    def ToBinB(value, len):
-        arr = ToBinL(value, len)
-        Array.Reverse(arr)
-        return arr
-    @staticmethod
-    def ToBinL(value, len):
-        bytes = BitConverter.GetBytes(value)
-        if BitConverter.IsLittleEndian:
-            Array.Reverse(bytes)
-        return bytes
-    @staticmethod
-    def ToDPIcom(value, len):
-        f = (value / 1000000)
-        s = "Convert.ToString(f).PadLeft(len, \'0\')"
-        return Encoding.UTF8.GetBytes(s)
-    @staticmethod
-    def ToYaesu(value, len):
-        arr = ToBinB(Math.Abs(value), len)
-        if (value < 0):
-            arr[0] = ((arr[0] | 128))
-        return arr
-    @staticmethod
-    def ToFloat(value, len):
-        s = "value.ToString(\"F\", CultureInfo.InvariantCulture).PadLeft(len, \' \')"
-        return Encoding.UTF8.GetBytes(s)
-    @staticmethod
-    def ToTextUD(value, len):
-        prefix = ("U" if ((value >= 0)) else "D")
-        s = "prefix + Convert.ToString(Math.Abs(value))            .PadLeft(len - 1, \'0\')"
-        return Encoding.UTF8.GetBytes(s)
 """
