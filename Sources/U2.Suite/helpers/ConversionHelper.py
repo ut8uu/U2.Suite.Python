@@ -15,13 +15,14 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import re
+import binascii, re, sys
 from contracts.BitMask import BitMask
 from contracts.RigParameter import RigParameter
 from contracts.ValueFormat import ValueFormat
 from exceptions.FormatParseException import FormatParseException
 from exceptions.MaskParseException import MaskParseException
 from exceptions.ParameterParseException import ParameterParseException
+from exceptions.ValueConversionException import ValueConversionException
 from typing import List
 
 class ConversionHelper():
@@ -49,6 +50,10 @@ class ConversionHelper():
         if (len(prepared) % 2 != 0):
             return []
         return bytearray.fromhex(prepared)
+    
+    @staticmethod
+    def BytesToHexStr(data : bytearray) -> str:
+        return binascii.hexlify(data)
     
     @staticmethod
     def StrToBytes(s : str) -> bytearray:
@@ -191,26 +196,27 @@ class ConversionHelper():
     def FromBinL(data : bytearray) -> int:
         return int.from_bytes(data, byteorder='little', signed=True)
     
-"""
     @staticmethod
-    def FromText(data : bytearray):
-        s = Encoding.UTF8.GetString(data)
+    def FromText(data : bytearray) -> int:
+        s = ''.join(chr(x) for x in data)
         try:
-            return Convert.ToInt32(s)
+            return int(s)
         except Exception as ex:
-            ClassLog.ErrorFormat("Invalid reply: {0}", ConversionHelper.BytesToHex(data))
-            raise ValueConversionException(message = "Cannot convert string {} to int.".format(s))
+            print("Invalid reply: {0}", ConversionHelper.by(data), file=sys.stderr)
+            raise ValueConversionException(message = f"Cannot convert string {s} to int.")
         
     @staticmethod
     def FromDPIcom(data : bytearray):
         try:
-            s = Encoding.UTF8.GetString(data)
-            s = RegularExpressionHelper.MatchAndGetFirst("([\\d+\\.*\\d*])", s)
-            return Convert.ToInt32(Math.Round(Convert.ToDouble((1000000.0 * Convert.ToDouble(s.Trim()))), MidpointRounding.AwayFromZero))
+            s = ''.join(chr(x) for x in data)
+            m = re.search(r"(\d+.?\d*)$", s)
+            g = m.group(1)
+            f = float(g) * 1000000
+            return int(f)
         except Exception as ex:
-            ClassLog.ErrorFormat("Invalid DPIcom reply: {0}", ConversionHelper.BytesToHex(data))
-            raise
+            raise ValueConversionException(f"Invalid DPIcom reply: {ConversionHelper.BytesToHexStr(data)}", )
         
+"""
     @staticmethod
     def FromYaesu(data : bytearray):
         sign = -1

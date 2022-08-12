@@ -19,6 +19,7 @@ from contracts.RigParameter import RigParameter as rp
 from contracts.ValueFormat import ValueFormat
 from exceptions.FormatParseException import FormatParseException
 from exceptions.ParameterParseException import ParameterParseException
+from exceptions.ValueConversionException import ValueConversionException
 from helpers.ConversionHelper import ConversionHelper as ch
 from pyrsistent import b
 import unittest
@@ -171,3 +172,15 @@ class RigParameterTests(unittest.TestCase):
         result = ch.FromBinB(data)
         self.assertEqual(-1, result)
 
+    def test_from_text(self):
+        data = bytearray(b'12345')
+        result = ch.FromText(data)
+        self.assertEqual(12345, result)
+        
+    def test_from_dpicom(self):
+        data = bytearray(b';$PICOA,90,01,RXF,14.103600')
+        result = ch.FromDPIcom(data)
+        self.assertEqual(14103600, result)
+        
+        with self.assertRaises(ValueConversionException) as ex:
+            ch.FromDPIcom(bytearray(b'asd'))
