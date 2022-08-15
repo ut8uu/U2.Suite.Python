@@ -270,12 +270,16 @@ class ConversionHelper():
             raise ArgumentOutOfRangeException("Parameter {} not recognized.".format(info.Format))
 
     @staticmethod
-    def ToText(value : str, len : int) -> bytearray:
-        s = value.zfill(len)
-        arr = [ord(elem) for elem in s]
+    def ToRawBytes(value: str) -> bytearray:
+        arr = [ord(elem) for elem in value]
         b = bytearray()
         b.extend(arr)
         return b
+
+    @staticmethod
+    def ToText(value : int, len : int) -> bytearray:
+        s = str(value).zfill(len)
+        return ConversionHelper.ToRawBytes(s)
 
     @staticmethod
     def ToBcdBS(value : int, len : int) -> bytearray:
@@ -291,7 +295,7 @@ class ConversionHelper():
         i = 0
         while (i < len):
             char1 = (chars[i * 2] - 48) * 16
-            char2 = chars[(i * 2) + 1] - 48
+            char2 = chars[i * 2 + 1] - 48
             result.append(char1 + char2)
             i += 1
         return result
@@ -300,7 +304,6 @@ class ConversionHelper():
     def ToBcdLS(value : int, len : int) -> bytearray:
         arr = ConversionHelper.ToBcdLU(value, len)
         if (value < 0):
-            #idx = arr.count() - 1
             arr[-1] = 0xff
         return arr
 
@@ -311,7 +314,7 @@ class ConversionHelper():
 
     @staticmethod
     def ToBinB(value : int, len : int) -> bytearray:
-        return value.to_bytes(len, 'big')
+        return bytearray(value.to_bytes(len, 'big'))
 
     @staticmethod
     def ToBinL(value : int, len : int) -> bytearray:
@@ -322,54 +325,56 @@ class ConversionHelper():
         f = str(value / 1000000)
         return ConversionHelper.ToText(f, len)
 
-"""
     @staticmethod
-    def ToYaesu(value, len):
-        arr = ToBinB(Math.Abs(value), len)
+    def ToYaesu(value : int, len : int) -> bytearray:
+        data = ConversionHelper.ToBinB(abs(value), len)
         if (value < 0):
-            arr[0] = ((arr[0] | 128))
-        return arr
+            data[0] = data[0] | 128
+        return data
+    
     @staticmethod
-    def ToFloat(value, len):
-        s = "value.ToString(\"F\", CultureInfo.InvariantCulture).PadLeft(len, \' \')"
-        return Encoding.UTF8.GetBytes(s)
-    @staticmethod
-    def ToTextUD(value, len):
-        prefix = ("U" if ((value >= 0)) else "D")
-        s = "prefix + Convert.ToString(Math.Abs(value))            .PadLeft(len - 1, \'0\')"
-        return Encoding.UTF8.GetBytes(s)
+    def ToFloat(value : int, size : int) -> bytearray:
+        s = str(value).rjust(size, ' ')
+        arr = [ord(elem) for elem in s]
+        b = bytearray()
+        b.extend(arr)
+        return b
 
     @staticmethod
-    def FormatValue(inputValue, info):
-        value = Convert.ToInt32(Math.Round(Convert.ToDouble(((inputValue * info.Mult) + info.Add)), MidpointRounding.AwayFromZero))
-        if ((((info.Format == ValueFormat.BcdLU) or (info.Format == ValueFormat.BcdBU))) and (value < 0)):
-            ClassLog.ErrorFormat("Passed invalid value: {}. Expected to be a BCD kind.".format(inputValue))
-            return Array.Empty()
-        if ((info.Format == ValueFormat.Text)):
-            return ToText(value, info.Len)
-        elif ((info.Format == ValueFormat.BinL)):
-            return ToBinL(value, info.Len)
-        elif ((info.Format == ValueFormat.BinB)):
-            return ToBinB(value, info.Len)
-        elif ((info.Format == ValueFormat.BcdLU)):
-            return ToBcdLU(value, info.Len)
-        elif ((info.Format == ValueFormat.BcdLS)):
-            return ToBcdLS(value, info.Len)
-        elif ((info.Format == ValueFormat.BcdBU)):
-            return ToBcdBU(value, info.Len)
-        elif ((info.Format == ValueFormat.BcdBS)):
-            return ToBcdBS(value, info.Len)
-        elif ((info.Format == ValueFormat.Yaesu)):
-            return ToYaesu(value, info.Len)
-        elif ((info.Format == ValueFormat.DPIcom)):
-            return ToDPIcom(value, info.Len)
-        elif ((info.Format == ValueFormat.TextUD)):
-            return ToTextUD(value, info.Len)
-        elif ((info.Format == ValueFormat.Float)):
-            return ToFloat(value, info.Len)
-        elif ((info.Format == ValueFormat.None)):
-            return Array.Empty()
+    def ToTextUD(value : int, size : int) -> bytearray:
+        prefix = "U" if value >= 0 else "D"
+        s = prefix + str(abs(value)).rjust(size-1, ' ')
+        return ConversionHelper.ToRawBytes(s)
+
+    @staticmethod
+    def FormatValue(input : int, info : ParameterValue) -> bytearray:
+        value = int(round(input * info.Mult + info.Add))
+        if (info.Format == ValueFormat.bcdlu or info.Format == ValueFormat.bcdbu) and value < 0:
+            print(f"Passed invalid value: {input}. Expected to be a BCD kind.")
+            return bytearray()
+        if info.Format == ValueFormat.text:
+            return ConversionHelper.ToText(value, info.Len)
+        elif info.Format == ValueFormat.binl:
+            return ConversionHelper.ToBinL(value, info.Len)
+        elif info.Format == ValueFormat.binb:
+            return ConversionHelper.ToBinB(value, info.Len)
+        elif info.Format == ValueFormat.bcdlu:
+            return ConversionHelper.ToBcdLU(value, info.Len)
+        elif info.Format == ValueFormat.bcdls:
+            return ConversionHelper.ToBcdLS(value, info.Len)
+        elif info.Format == ValueFormat.bcdbu:
+            return ConversionHelper.ToBcdBU(value, info.Len)
+        elif info.Format == ValueFormat.bcdbs:
+            return ConversionHelper.ToBcdBS(value, info.Len)
+        elif info.Format == ValueFormat.yaesu:
+            return ConversionHelper.ToYaesu(value, info.Len)
+        elif info.Format == ValueFormat.dpicom:
+            return ConversionHelper.ToDPIcom(value, info.Len)
+        elif info.Format == ValueFormat.textud:
+            return ConversionHelper.ToTextUD(value, info.Len)
+        elif info.Format == ValueFormat.float:
+            return ConversionHelper.ToFloat(value, info.Len)
+        elif info.Format == ValueFormat.none:
+            return bytearray()
         else:
-            raise ArgumentOutOfRangeException("{} not recognized.".format(info.Format))
-
-"""
+            raise ArgumentOutOfRangeException(f"{info.Format} not recognized.")

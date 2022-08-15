@@ -15,7 +15,8 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import sys
+from contracts.RigParameter import RigParameter
+from contracts.ValueFormat import ValueFormat
 
 class ParameterValue(object):
     def __init__(self):
@@ -26,37 +27,37 @@ class ParameterValue(object):
         self._Add = None
         self._Param = None
     @property
-    def Start(self):
+    def Start(self) -> int:
         return self._Start
     @Start.setter
     def Start(self, value):
         self._Start = value
     @property
-    def Len(self):
+    def Len(self) -> int:
         return self._Len
     @Len.setter
     def Len(self, value):
         self._Len = value
     @property
-    def Format(self):
+    def Format(self) -> ValueFormat:
         return self._Format
     @Format.setter
     def Format(self, value):
         self._Format = value
     @property
-    def Mult(self):
+    def Mult(self) -> float:
         return self._Mult
     @Mult.setter
     def Mult(self, value):
         self._Mult = value
     @property
-    def Add(self):
+    def Add(self) -> float:
         return self._Add
     @Add.setter
     def Add(self, value):
         self._Add = value
     @property
-    def Param(self):
+    def Param(self) -> RigParameter:
         return self._Param
     @Param.setter
     def Param(self, value):

@@ -19,6 +19,7 @@ from unittest import result
 from contracts.ParameterValue import ParameterValue
 from contracts.RigParameter import RigParameter
 from contracts.ValueFormat import ValueFormat
+from exceptions.ArgumentOutOfRangeException import ArgumentOutOfRangeException
 from exceptions.FormatParseException import FormatParseException
 from exceptions.ParameterParseException import ParameterParseException
 from exceptions.ValueConversionException import ValueConversionException
@@ -238,3 +239,51 @@ class RigParameterTests(unittest.TestCase):
     def test_to_dpicom(self):
         self.assertEqual(bytearray(b'1.234567'), ch.ToDPIcom(1234567, 8))
 
+    def test_to_yaesu(self):
+        # positive
+        self.assertEqual(bytearray(b'\x00\x00\x00\x01'), ch.ToYaesu(1, 4))
+        # negative
+        self.assertEqual(bytearray(b'\x80\x00\x00\x01'), ch.ToYaesu(-1, 4))
+
+    def test_to_float(self):
+        self.assertEqual(bytearray(b' 123'), ch.ToFloat(123, 4))
+        
+    def test_to_text_ud(self):
+        self.assertEqual(bytearray(b'U123'), ch.ToTextUD(123, 4))
+        self.assertEqual(bytearray(b'D123'), ch.ToTextUD(-123, 4))
+        
+    def do_format_value(self, expected: bytearray, value: int, format: ValueFormat):
+        pv = ParameterValue()
+        pv.Format = format
+        pv.Mult = 1
+        pv.Add = 0
+        pv.Start = 0
+        pv.Len = 4
+        
+        self.assertEqual(expected, ch.FormatValue(value, pv))
+        
+    def test_format_value(self):
+        self.do_format_value(bytearray(b'\xff\x00\x01\x23'), -123, ValueFormat.bcdbs)
+        self.do_format_value(bytearray(b'\x00\x00\x01\x23'), 123, ValueFormat.bcdbu)
+        self.do_format_value(bytearray(b'\x23\x01\x00\xff'), -123, ValueFormat.bcdls)
+        self.do_format_value(bytearray(b'\x23\x01\x00\x00'), 123, ValueFormat.bcdlu)
+        self.do_format_value(bytearray(b'\x01\x00\x00\x00'), 1, ValueFormat.binl)
+        self.do_format_value(bytearray(b'\x00\x00\x00\x01'), 1, ValueFormat.binb)
+        self.do_format_value(bytearray(b'1.234567'), 1234567, ValueFormat.dpicom)
+        self.do_format_value(bytearray(b' 123'), 123, ValueFormat.float)
+        self.do_format_value(bytearray(b'0123'), 123, ValueFormat.text)
+        self.do_format_value(bytearray(b'D123'), -123, ValueFormat.textud)
+        self.do_format_value(bytearray(b'U123'), 123, ValueFormat.textud)
+        self.do_format_value(bytearray(b'\x00\x00\x00\x01'), 1, ValueFormat.yaesu)
+        self.do_format_value(bytearray(b'\x80\x00\x00\x01'), -1, ValueFormat.yaesu)
+        
+        # unknown format
+        pv = ParameterValue()
+        pv.Format = 'aaa'
+        pv.Mult = 1
+        pv.Add = 0
+        pv.Start = 0
+        pv.Len = 4
+        with self.assertRaises(ArgumentOutOfRangeException) as ex:
+            ch.FormatValue(123, pv)
+    
