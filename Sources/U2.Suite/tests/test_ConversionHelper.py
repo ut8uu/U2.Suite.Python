@@ -230,3 +230,11 @@ class RigParameterTests(unittest.TestCase):
         self.assertEqual(bytearray(b'\x23\x01\x00\x00'), result)
         result = ch.ToBcdLU(-123, 4)
         self.assertEqual(bytearray(b'\x23\x01\x00\x00'), result)
+
+    def test_to_bin(self):
+        self.assertEqual(bytearray(b'\x01\x00\x00\x00'), ch.ToBinL(1, 4))
+        self.assertEqual(bytearray(b'\x00\x00\x00\x01'), ch.ToBinB(1, 4))
+    
+    def test_to_dpicom(self):
+        self.assertEqual(bytearray(b'1.234567'), ch.ToDPIcom(1234567, 8))
+

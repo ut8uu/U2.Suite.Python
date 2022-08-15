@@ -309,23 +309,20 @@ class ConversionHelper():
         arr = ConversionHelper.ToBcdBU(abs(value), len)
         return arr[::-1]
 
+    @staticmethod
+    def ToBinB(value : int, len : int) -> bytearray:
+        return value.to_bytes(len, 'big')
+
+    @staticmethod
+    def ToBinL(value : int, len : int) -> bytearray:
+        return value.to_bytes(len, 'little')
+
+    @staticmethod
+    def ToDPIcom(value : int, len : int) -> bytearray:
+        f = str(value / 1000000)
+        return ConversionHelper.ToText(f, len)
+
 """
-    @staticmethod
-    def ToBinB(value, len):
-        arr = ToBinL(value, len)
-        Array.Reverse(arr)
-        return arr
-    @staticmethod
-    def ToBinL(value, len):
-        bytes = BitConverter.GetBytes(value)
-        if BitConverter.IsLittleEndian:
-            Array.Reverse(bytes)
-        return bytes
-    @staticmethod
-    def ToDPIcom(value, len):
-        f = (value / 1000000)
-        s = "Convert.ToString(f).PadLeft(len, \'0\')"
-        return Encoding.UTF8.GetBytes(s)
     @staticmethod
     def ToYaesu(value, len):
         arr = ToBinB(Math.Abs(value), len)
