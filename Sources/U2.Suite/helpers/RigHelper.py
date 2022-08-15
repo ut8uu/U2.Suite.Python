@@ -71,14 +71,14 @@ class RigHelper():
         if RigHelper.AreEqual(entry_name, "validate"):
             if mask.Param != RigParameter.none:
                 raise MaskValidationException("Parameter name is not allowed")
-            startIndex = mask.Flags.Length - reply_end.Length
-            ending = mask.Flags.partition[startIndex:]
-            if not ending == reply_end:
+            startIndex = len(mask.Flags) - len(reply_end)
+            ending = mask.Flags[startIndex:]
+            if ending != reply_end:
                 raise MaskValidationException("Mask does not end with ReplyEnd")
         else:
             if mask.Param == RigParameter.none:
                 raise MaskValidationException("Parameter name is missing")
-            if mask.Mask.Length == 0:
+            if len(mask.Mask) == 0:
                 raise MaskValidationException("Mask is blank")
         
     
@@ -107,6 +107,7 @@ class RigHelper():
             raise EntryLoadErrorException('Failed loading the Validate section from {}'.format(section))
         
         RigHelper.ValidateMask('Validate', result.Validation, result.ReplyLength, result.ReplyEnd)
+        return result
     
     @staticmethod
     def LoadInitCommands(config_parser : configparser.ConfigParser) -> List[RigCommand]:

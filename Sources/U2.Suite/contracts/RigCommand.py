@@ -15,7 +15,9 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import sys
+from typing import List
+from contracts.BitMask import BitMask
+from contracts.ParameterValue import ParameterValue
 
 class RigCommand(object):
     def __init__(self):
@@ -28,49 +30,49 @@ class RigCommand(object):
         self._Flags = None
 
     @property
-    def Code(self):
+    def Code(self) -> bytearray:
         return self._Code
     @Code.setter
     def Code(self, value):
         self._Code = value
 
     @property
-    def Value(self):
+    def Value(self) -> ParameterValue:
         return self._Value
     @Value.setter
     def Value(self, value):
         self._Value = value
 
     @property
-    def ReplyLength(self):
+    def ReplyLength(self) -> int:
         return self._ReplyLength
     @ReplyLength.setter
     def ReplyLength(self, value):
         self._ReplyLength = value
 
     @property
-    def ReplyEnd(self):
+    def ReplyEnd(self) -> bytearray:
         return self._ReplyEnd
     @ReplyEnd.setter
     def ReplyEnd(self, value):
         self._ReplyEnd = value
 
     @property
-    def Validation(self):
+    def Validation(self) -> BitMask:
         return self._Validation
     @Validation.setter
     def Validation(self, value):
         self._Validation = value
 
     @property
-    def Values(self):
+    def Values(self) -> List[ParameterValue]:
         return self._Values
     @Values.setter
     def Values(self, value):
         self._Values = value
 
     @property
-    def Flags(self):
+    def Flags(self) -> List[BitMask]:
         return self._Flags
     @Flags.setter
     def Flags(self, value):
