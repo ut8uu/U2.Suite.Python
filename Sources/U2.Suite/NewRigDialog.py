@@ -26,8 +26,8 @@ from typing import List
 from ui.Ui_NewRigDialog import Ui_NewRigDialog
 
 class NewRigDialog(QDialog, Ui_NewRigDialog):
-    __all_rigs = FileSystemHelper.enumerateRigs()
-    __rig_type = __all_rigs[0]
+    __all_rigs = []
+    __rig_type = 'None'
     __baud_rate = '57600'
     __port = ''
     __parity = 'None'
@@ -41,23 +41,22 @@ class NewRigDialog(QDialog, Ui_NewRigDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
-        rigs = FileSystemHelper.enumerateRigs()
+        __all_rigs = FileSystemHelper.enumerateRigs()
         self.cbRigType.addItem('None')
-        self.cbRigType.addItems(rigs)
+        self.cbRigType.addItems(__all_rigs)
         self.cbRigType.setCurrentIndex(0)
         
-        self.cbPort.addItem('None')
         ports = ComPortHelper.serial_ports()
+        self.cbPort.addItem('None')
         self.cbPort.addItems(ports)
-        if len(ports) > 0:
-            self.cbPort.setCurrentIndex(0)
+        self.cbPort.setCurrentIndex(0)
         
     def debugPrint(self, msg:str):
         print(msg)
     
     @pyqtSlot()
     def rigTypeChanged(self):
-        self.__rig_type = self.cbRigType.currentText
+        self.__rig_type = self.cbRigType.currentText()
         self.debugPrint(f'Rig type {self.__rig_type} selected')
     
     @pyqtSlot()
