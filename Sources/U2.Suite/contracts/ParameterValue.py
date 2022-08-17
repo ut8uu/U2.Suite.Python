@@ -20,11 +20,11 @@ from contracts.ValueFormat import ValueFormat
 
 class ParameterValue(object):
     def __init__(self):
-        self._Start = None
-        self._Len = None
+        self._Start = 0
+        self._Len = 0
         self._Format = ValueFormat.none
-        self._Mult = None
-        self._Add = None
+        self._Mult = 1
+        self._Add = 0
         self._Param = RigParameter.none
     @property
     def Start(self) -> int:
