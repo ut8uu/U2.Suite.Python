@@ -20,10 +20,13 @@ import sys
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QApplication, QDialog
 
+from helpers.FileSystemHelper import FileSystemHelper
+from typing import List
 from ui.Ui_NewRigDialog import Ui_NewRigDialog
 
 class NewRigDialog(QDialog, Ui_NewRigDialog):
-    __rig_type = ''
+    __all_rigs = FileSystemHelper.enumerateRigs()
+    __rig_type = __all_rigs[0]
     __baud_rate = '57600'
     __port = ''
     __parity = 'None'
@@ -37,14 +40,17 @@ class NewRigDialog(QDialog, Ui_NewRigDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
+        rigs = FileSystemHelper.enumerateRigs()
+        self.cbRigType.addItems(rigs)
+        self.cbRigType.setCurrentIndex(0)
         
-    def debugPrint(self, msg):
+    def debugPrint(self, msg:str):
         print(msg)
     
     @pyqtSlot()
-    def rigTypeChanged(self, rig_type):
-        self.__rig_type = rig_type
-        self.debugPrint(f'Rig type {rig_type} selected')
+    def rigTypeChanged(self):
+        self.__rig_type = self.cbRigType.currentText
+        self.debugPrint(f'Rig type {self.__rig_type} selected')
     
     @pyqtSlot()
     def testRig(self):
@@ -62,7 +68,7 @@ class NewRigDialog(QDialog, Ui_NewRigDialog):
     def getSelectedParity(self):
         return self.__parity
 
-    def getSelectedDataBits(self):
+    def getSelectedDataBits(self) -> str:
         return self.__data_bits
 
     def getSelectedStopBits(self):
@@ -74,11 +80,14 @@ class NewRigDialog(QDialog, Ui_NewRigDialog):
     def getSelectedDtr(self):
         return self.__dtr
 
-    def getSelectedPollInterval(self):
+    def getSelectedPollInterval(self) -> int:
         return self.__poll_interval
 
     def getSelectedTimeout(self):
         return self.__timeout
+    
+    def setRigs(self, rigs:List[str]):
+        self.__all_rigs = rigs
 
     if __name__ == '__main__':
         from NewRigDialog import NewRigDialog

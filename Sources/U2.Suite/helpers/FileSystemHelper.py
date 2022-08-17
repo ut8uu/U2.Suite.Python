@@ -18,14 +18,23 @@
 import sys
 from os import listdir, getcwd
 from os.path import isfile, join
+from typing import List
 
 class FileSystemHelper():
     @staticmethod
-    def enumerateDirectory(path, ext):
+    def enumerateDirectory(path:str, ext:str) -> List[str]:
         return [f for f in listdir(path) if isfile(join(path, f)) & f.endswith(ext)]
     
     @staticmethod
-    def readFile(path):
+    def enumerateRigs() -> List[str]:
+        result = []
+        iniDirectory = FileSystemHelper.getIniFilesFolder()
+        files = FileSystemHelper.enumerateDirectory(iniDirectory, '.ini')
+        result = [f.removesuffix('.ini') for f in files]
+        return result
+    
+    @staticmethod
+    def readFile(path:str) -> List[str]:
         with open(path) as f: lines = f.readlines()
         return lines
     
@@ -34,6 +43,6 @@ class FileSystemHelper():
         return getcwd()
     
     @staticmethod
-    def getIniFilesFolder():
+    def getIniFilesFolder() -> str:
         return join(getcwd(), 'U2.Suite', 'ini')
     

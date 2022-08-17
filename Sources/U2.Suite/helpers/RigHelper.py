@@ -389,5 +389,5 @@ class RigHelper():
                 list.append(RigHelper.loadRigCommands(file))
             except IniFileLoadException as ex:
                 print('Error loading ini file {}. {}'.format(file, ex.Message))
-        return list        
+        return list   
     
