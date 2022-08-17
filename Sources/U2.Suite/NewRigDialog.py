@@ -44,7 +44,7 @@ class NewRigDialog(QDialog, Ui_NewRigDialog):
     @pyqtSlot()
     def rigTypeChanged(self, rig_type):
         self.__rig_type = rig_type
-        self.debugPrint('Rig type {rig_type} selected'.format(rig_type))
+        self.debugPrint(f'Rig type {rig_type} selected')
     
     @pyqtSlot()
     def testRig(self):
