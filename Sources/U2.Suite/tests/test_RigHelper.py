@@ -16,19 +16,23 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from audioop import mul
+import configparser
 import unittest
+
+from pyparsing import dict_of
 from contracts.RigCommand import RigCommand
 from contracts.RigParameter import RigParameter
 from contracts.ValueFormat import ValueFormat
+from exceptions.UnexpectedEntryException import UnexpectedEntryException
 from helpers.FileSystemHelper import FileSystemHelper as fsh
-from helpers.RigHelper import RigHelper as rh
+from helpers.RigHelper import RigHelper
 from os.path import join
 
 class RigHelperTests(unittest.TestCase):
     def test_LoadIC705(self):
         folder = fsh.getIniFilesFolder()
         ini_file_path = join(folder, 'IC-705.ini')
-        rig_commands = rh.loadRigCommands(ini_file_path)
+        rig_commands = RigHelper.loadRigCommands(ini_file_path)
         self.assertEqual(3, len(rig_commands.InitCmd))
         self.assertEqual(9, len(rig_commands.StatusCmd))
         
@@ -77,6 +81,28 @@ class RigHelperTests(unittest.TestCase):
        
         
     def test_are_equal(self):
-        assert rh.AreEqual('a', 'a')
-        assert not rh.AreEqual('a', 'b')
+        assert RigHelper.AreEqual('a', 'a')
+        assert not RigHelper.AreEqual('a', 'b')
         
+    def test_validate_entries(self):
+        allowed_entries = ['command', 'replylength', 'replyend', 'validate',]
+        entries = [('command', 'xxx')]
+        RigHelper.ValidateEntries(entries, allowed_entries)
+        
+        entries = [('yyy', 'xxx')]
+        with self.assertRaises(UnexpectedEntryException) as cm:
+            RigHelper.ValidateEntries(entries, allowed_entries)
+
+    def test_read_string_from_ini(self):
+        section = 'section1'
+
+        parser = configparser.ConfigParser()
+        parser.add_section(section)
+        parser[section]['xxx'] = 'xxx'        
+        parser[section]['yyy'] = '123'
+        
+        self.assertEqual('xxx', RigHelper.ReadStringFromIni(parser, section, 'xxx', 'default'))
+        self.assertEqual('default', RigHelper.ReadStringFromIni(parser, section, 'zzz', 'default'))
+
+        self.assertEqual(123, RigHelper.ReadIntFromIni(parser, section, 'yyy', 0))
+        self.assertEqual(0, RigHelper.ReadIntFromIni(parser, section, 'zzz', 0))

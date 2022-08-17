@@ -53,7 +53,7 @@ class RigHelper():
                 raise UnexpectedEntryException('Unexpected entry found: {}'.format(entry))
     
     @staticmethod
-    def ValidateMaskChecks(mask, length):
+    def ValidateMaskChecks(mask: BitMask, length:int):
         if len(mask.Mask) == 0 or len(mask.Flags) == 0:
             raise MaskValidationException("Incorrect mask length")
         if len(mask.Mask) != len(mask.Flags):
@@ -154,11 +154,10 @@ class RigHelper():
     @staticmethod
     def ReadStringFromIni(config_parser: configparser.ConfigParser, section : str,
         setting_name : str, default_value : str) -> str:
-        ini_setting = config_parser[section][setting_name]
-        if ini_setting != None:
-            return ini_setting
-
-        return default_value
+        try:
+            return config_parser[section][setting_name]
+        except:
+            return default_value
 
     @staticmethod
     def ReadIntFromIni(config_parser: configparser.ConfigParser, section : str,

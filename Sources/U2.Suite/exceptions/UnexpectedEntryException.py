@@ -18,5 +18,5 @@
 import sys
 
 class UnexpectedEntryException(Exception):
-    def __init__(self, message, innerException):
-        super(UnexpectedEntryException, self).__init__(message, innerException)
+    def __init__(self, message):
+        super(UnexpectedEntryException, self).__init__(message)
