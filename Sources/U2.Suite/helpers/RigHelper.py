@@ -28,6 +28,7 @@ from exceptions.EntryLoadErrorException import EntryLoadErrorException
 from exceptions.IniFileLoadException import IniFileLoadException
 from exceptions.LoadInitCommandsException import LoadInitCommandsException
 from exceptions.LoadStatusCommandsException import LoadStatusCommandsException
+from exceptions.LoadWriteCommandException import LoadWriteCommandException
 from exceptions.MaskValidationException import MaskValidationException
 from exceptions.UnexpectedEntryException import UnexpectedEntryException
 from exceptions.ValueLoadException import ValueLoadException
@@ -98,11 +99,11 @@ class RigHelper():
                 result.Code = ch.StrToBytes(option)
             else:
                 result.Code = ch.HexStrToBytes(option)
-        except:
-            raise EntryLoadErrorException('Failed loading the Common section from {}'.format(section))
+        except Exception:
+            raise EntryLoadErrorException(f'Failed loading the Common section from {section}')
         
         if (len(result.Code) == 0):
-            raise EntryLoadErrorException('Failed loading the Common section from {}'.format(section))
+            raise EntryLoadErrorException(f'Failed loading the Common section from {section}')
 
         result.ReplyLength = ih.ReadInt(config_parser, section, "replylength")
         result.ReplyEnd = ih.GetReplyEndOption(config_parser, section)
@@ -111,14 +112,19 @@ class RigHelper():
             mask_value = ih.GetValidateOption(config_parser, section)
             result.Validation = ch.StrToBitMask(mask_value)
         except Exception as ex:
-            raise EntryLoadErrorException('Failed loading the Validate section from {}'.format(section))
+            raise EntryLoadErrorException(f'Failed loading the Validate section from {section}')
         
         RigHelper.ValidateMask('Validate', result.Validation, result.ReplyLength, result.ReplyEnd)
         return result
     
     @staticmethod
+    def LoadAllSections(config_parser : configparser.ConfigParser) \
+        -> List[str]:
+        return [f for f in config_parser.sections()]
+    
+    @staticmethod
     def LoadSections(config_parser : configparser.ConfigParser, section_name : str) \
-        -> List[RigCommand]:
+        -> List[str]:
         return [f for f in config_parser.sections() if f.lower().find(section_name) > -1]
     
     @staticmethod
@@ -141,7 +147,7 @@ class RigHelper():
                 if len(command.Code) > 0:
                     result.append(command)
             except Exception as ex:
-                raise LoadInitCommandsException('Failed to load the INIT commands: ' + ex.message)
+                raise LoadInitCommandsException(f'Failed to load the INIT commands. {ex}')
             
         return result
     
@@ -206,6 +212,8 @@ class RigHelper():
         
         except ValueLoadException as ex:
             raise ex
+        except KeyError as ex:
+            return ParameterValue()
         except Exception as ex:
             raise ValueLoadException(ex.Message)
         
@@ -321,12 +329,54 @@ class RigHelper():
         return result
     
     @staticmethod
+    def ValidateWriteCommandEntries(config_parser: configparser.ConfigParser, section: str):
+        try:
+            allowed_entries = ['command', 'replylength', 'replyend', 'validate', 'value']
+            entries = config_parser.items(section)
+            RigHelper.ValidateEntries(entries, allowed_entries)
+        except UnexpectedEntryException as ex:
+            raise LoadWriteCommandException(ex)
+
+    
+    @staticmethod
+    def LoadWriteCommands(config_parser: configparser.ConfigParser):
+        result = {}
+        all_sections = RigHelper.LoadAllSections(config_parser)
+        sections = [f for f in all_sections 
+                    if f.lower().find('status') < 0 and f.lower().find('init') < 0]
+        
+        for section in sections:
+            try:
+                items = config_parser.items(section)
+                if len(items) == 0:
+                    continue
+                RigHelper.ValidateWriteCommandEntries(config_parser, section)
+                cmd = RigHelper.LoadCommon(config_parser, section)
+                parameterValue = RigHelper.LoadValue(config_parser, section, 'value')
+                RigHelper.ValidateValue(parameterValue, len(cmd.Code))
+                if parameterValue.Param != RigParameter.none:
+                    raise LoadWriteCommandException("parameter name is not allowed")
+                param = ch.StrToRigParameter(section)
+                parameterValue.Param = param
+                if RigHelper.NumericParameters.count(param) > 0 and parameterValue.Len == 0:
+                    raise LoadWriteCommandException("Value is missing")
+                if RigHelper.NumericParameters.count(param) == 0 and parameterValue.Len > 0:
+                    raise LoadWriteCommandException("parameter does not require a value")
+                cmd.Value = parameterValue
+                result[param] = cmd
+            except Exception as ex:
+                raise LoadWriteCommandException(ex.Message, ex)
+        return result
+
+    
+    @staticmethod
     def loadRigCommands(path : str) -> RigCommands:
         config_parser = ih.Create(path)
         
         rig_commands = RigCommands()
         rig_commands.InitCmd = RigHelper.LoadInitCommands(config_parser)
         rig_commands.StatusCmd = RigHelper.LoadStatusCommands(config_parser)
+        rig_commands.WriteCmd = RigHelper.LoadWriteCommands(config_parser)
         
         return rig_commands
     
