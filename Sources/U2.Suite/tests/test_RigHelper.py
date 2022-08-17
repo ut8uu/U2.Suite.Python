@@ -15,9 +15,11 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+from audioop import mul
 import unittest
-from contracts.RigCommands import RigCommands
+from contracts.RigCommand import RigCommand
 from contracts.RigParameter import RigParameter
+from contracts.ValueFormat import ValueFormat
 from helpers.FileSystemHelper import FileSystemHelper as fsh
 from helpers.RigHelper import RigHelper as rh
 from os.path import join
@@ -40,7 +42,21 @@ class RigHelperTests(unittest.TestCase):
             RigParameter.dig_u, RigParameter.dig_l, RigParameter.am, RigParameter.fm,
         ]
         self.assertEqual(len(parameters), len(rig_commands.WriteCmd));
+        
+        cmd = rig_commands.WriteCmd[RigParameter.freqa.value]
+        code = bytearray(b'\xFE\xFE\xA4\xE0\x25\x00\x00\x00\x00\x00\x00\xFD')
+        RigHelperTests.check_write_cmd(self, cmd, 18, 6, 5, 1, 0, ValueFormat.bcdlu, code)
 
+    def check_write_cmd(self, cmd:RigCommand, reply_len:int, start:int, len:int, mult:int, 
+                        add:int, format:ValueFormat, code:bytearray):
+        self.assertEqual(reply_len, cmd.ReplyLength)
+        self.assertEqual(code, cmd.Code)
+        self.assertEqual(start, cmd.Value.Start)
+        self.assertEqual(len, cmd.Value.Len)
+        self.assertEqual(mult, cmd.Value.Mult)
+        self.assertEqual(add, cmd.Value.Add)
+        self.assertEqual(format, cmd.Value.Format)
+       
         
     def test_are_equal(self):
         assert rh.AreEqual('a', 'a')
