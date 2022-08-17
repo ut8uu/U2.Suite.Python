@@ -363,7 +363,7 @@ class RigHelper():
                 if RigHelper.NumericParameters.count(param) == 0 and parameterValue.Len > 0:
                     raise LoadWriteCommandException("parameter does not require a value")
                 cmd.Value = parameterValue
-                result[param] = cmd
+                result[param.value] = cmd
             except Exception as ex:
                 raise LoadWriteCommandException(ex.Message, ex)
         return result
