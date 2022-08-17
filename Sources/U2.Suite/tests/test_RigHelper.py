@@ -41,16 +41,34 @@ class RigHelperTests(unittest.TestCase):
             RigParameter.cw_u, RigParameter.cw_l, RigParameter.ssb_u, RigParameter.ssb_l,
             RigParameter.dig_u, RigParameter.dig_l, RigParameter.am, RigParameter.fm,
         ]
-        self.assertEqual(len(parameters), len(rig_commands.WriteCmd));
+        self.assertEqual(len(parameters), len(rig_commands.WriteCmd))
         
         cmd = rig_commands.WriteCmd[RigParameter.freqa.value]
+        self.assertTrue(isinstance(cmd, RigCommand))
         code = bytearray(b'\xFE\xFE\xA4\xE0\x25\x00\x00\x00\x00\x00\x00\xFD')
-        RigHelperTests.check_write_cmd(self, cmd, 18, 6, 5, 1, 0, ValueFormat.bcdlu, code)
+        validation = bytearray(b'\xFE\xFE\xA4\xE0\x25\x00\x00\x00\x00\x00\x00\xFD\xFE\xFE\xE0\xA4\xFB\xFD')
+        RigHelperTests.check_write_cmd(self, cmd, 18, 6, 5, 1, 0, ValueFormat.bcdlu, code, validation)
+
+        cmd = rig_commands.WriteCmd[RigParameter.freqb.value]
+        code = bytearray(b'\xFE\xFE\xA4\xE0\x25\x01\x00\x00\x00\x00\x00\xFD')
+        validation = bytearray(b'\xFE\xFE\xA4\xE0\x25\x01\x00\x00\x00\x00\x00\xFD\xFE\xFE\xE0\xA4\xFB\xFD')
+        RigHelperTests.check_write_cmd(self, cmd, 18, 6, 5, 1, 0, ValueFormat.bcdlu, code, validation)
+
+        cmd = rig_commands.WriteCmd[RigParameter.rit0.value]
+        code = bytearray(b'\xFE\xFE\xA4\xE0\x21\x00\x00\x00\x00\xFD')
+        validation = bytearray(b'\xFE\xFE\xA4\xE0\x21\x00\x00\x00\x00\xFD\xFE\xFE\xE0\xA4\xFB\xFD')
+        RigHelperTests.check_write_cmd(self, cmd, 16, 0, 0, 1, 0, ValueFormat.none, code, validation)
+
+        cmd = rig_commands.WriteCmd[RigParameter.pitch.value]
+        code = bytearray(b'\xFE\xFE\xA4\xE0\x14\x09\x00\x00\xFD')
+        validation = bytearray(b'\xFE\xFE\xA4\xE0\x14\x09\x00\x00\xFD\xFE\xFE\xE0\xA4\xFB\xFD')
+        RigHelperTests.check_write_cmd(self, cmd, 15, 6, 2, 0.425, -127.5, ValueFormat.bcdbu, code, validation)
 
     def check_write_cmd(self, cmd:RigCommand, reply_len:int, start:int, len:int, mult:int, 
-                        add:int, format:ValueFormat, code:bytearray):
+                        add:int, format:ValueFormat, code:bytearray, validation:bytearray):
         self.assertEqual(reply_len, cmd.ReplyLength)
         self.assertEqual(code, cmd.Code)
+        self.assertEqual(validation, cmd.Validation.Flags)
         self.assertEqual(start, cmd.Value.Start)
         self.assertEqual(len, cmd.Value.Len)
         self.assertEqual(mult, cmd.Value.Mult)
