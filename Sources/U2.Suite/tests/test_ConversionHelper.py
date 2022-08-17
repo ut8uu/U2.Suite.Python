@@ -209,7 +209,7 @@ class RigParameterTests(unittest.TestCase):
         self.assertEqual(123, result)
         
     def test_to_text(self):
-        result = ch.ToText('123', 4)
+        result = ch.ToText(123, 4)
         self.assertEqual(bytearray(b'0123'), result)
         
     def test_to_bcdbu(self):

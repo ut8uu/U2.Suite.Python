@@ -290,7 +290,7 @@ class ConversionHelper():
 
     @staticmethod
     def ToBcdBU(value : int, len : int) -> bytearray:
-        chars = ConversionHelper.ToText(str(value), (len * 2))
+        chars = ConversionHelper.ToText(value, (len * 2))
         result = bytearray()
         i = 0
         while (i < len):
@@ -322,7 +322,7 @@ class ConversionHelper():
 
     @staticmethod
     def ToDPIcom(value : int, len : int) -> bytearray:
-        f = str(value / 1000000)
+        f = value / 1000000
         return ConversionHelper.ToText(f, len)
 
     @staticmethod
