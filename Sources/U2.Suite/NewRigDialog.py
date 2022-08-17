@@ -20,6 +20,7 @@ import sys
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QApplication, QDialog
 
+from helpers import ComPortHelper
 from helpers.FileSystemHelper import FileSystemHelper
 from typing import List
 from ui.Ui_NewRigDialog import Ui_NewRigDialog
@@ -41,8 +42,15 @@ class NewRigDialog(QDialog, Ui_NewRigDialog):
         super().__init__(parent)
         self.setupUi(self)
         rigs = FileSystemHelper.enumerateRigs()
+        self.cbRigType.addItem('None')
         self.cbRigType.addItems(rigs)
         self.cbRigType.setCurrentIndex(0)
+        
+        self.cbPort.addItem('None')
+        ports = ComPortHelper.serial_ports()
+        self.cbPort.addItems(ports)
+        if len(ports) > 0:
+            self.cbPort.setCurrentIndex(0)
         
     def debugPrint(self, msg:str):
         print(msg)
