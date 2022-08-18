@@ -61,7 +61,11 @@ class NewRigDialog(QDialog, Ui_NewRigDialog):
     
     @pyqtSlot()
     def testRig(self):
-        self.debugPrint('A testRig button clicked.')
+        self.debugPrint('Start testing the selected rig.')
+        if self.__rig_type == 'None':
+            print('None was selected. Testing not performed.')
+            return
+        
         
     def getSelectedRigType(self):
         return self.__rig_type
