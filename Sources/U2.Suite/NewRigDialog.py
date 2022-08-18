@@ -20,6 +20,7 @@ import sys
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QApplication, QDialog
 
+from contracts.Constants import Constants
 from helpers import ComPortHelper
 from helpers.FileSystemHelper import FileSystemHelper
 from typing import List
@@ -31,10 +32,10 @@ class NewRigDialog(QDialog, Ui_NewRigDialog):
     __baud_rate = '57600'
     __port = ''
     __parity = 'None'
-    __data_bits = '8'
-    __stop_bits = '1'
-    __dtr = 'High'
-    __rts = 'High'
+    __data_bits = 8
+    __stop_bits = 1
+    __dtr = False
+    __rts = False
     __poll_interval = 500
     __timeout = 2000
     
@@ -50,6 +51,12 @@ class NewRigDialog(QDialog, Ui_NewRigDialog):
         self.cbPort.addItem('None')
         self.cbPort.addItems(ports)
         self.cbPort.setCurrentIndex(0)
+        
+        parities = [ Constants.ParityNone, Constants.ParityEven, Constants.ParityOdd,
+                    Constants.ParityMark, Constants.ParitySpace ]
+        self.cbParity.clear()
+        self.cbParity.addItems(parities)
+        self.cbParity.setCurrentIndex(0)
         
     def debugPrint(self, msg:str):
         print(msg)
@@ -85,10 +92,10 @@ class NewRigDialog(QDialog, Ui_NewRigDialog):
     def getSelectedStopBits(self):
         return self.__stop_bits
 
-    def getSelectedRts(self):
+    def getSelectedRts(self) -> bool:
         return self.__rts
 
-    def getSelectedDtr(self):
+    def getSelectedDtr(self) -> bool:
         return self.__dtr
 
     def getSelectedPollInterval(self) -> int:
@@ -106,10 +113,10 @@ class NewRigDialog(QDialog, Ui_NewRigDialog):
         dialog = NewRigDialog()
         
         assert dialog.getSelectedBaudRate() == '57600'
-        assert dialog.getSelectedDataBits() == '8'
-        assert dialog.getSelectedStopBits() == '1'
-        assert dialog.getSelectedDtr() == 'High'
-        assert dialog.getSelectedRts() == 'High'
+        assert dialog.getSelectedDataBits() == 8
+        assert dialog.getSelectedStopBits() == 1
+        assert dialog.getSelectedDtr() == False
+        assert dialog.getSelectedRts() == False
         assert dialog.getSelectedTimeout() == 2000
         assert dialog.getSelectedPollInterval() == 500
         

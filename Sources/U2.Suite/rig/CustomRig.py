@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from RigControlType import RigControlType
+from enums.RigControlType import RigControlType
 
 class CustomRig(object):
     rig_control_type = RigControlType.guest    

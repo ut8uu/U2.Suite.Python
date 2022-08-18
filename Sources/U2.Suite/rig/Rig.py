@@ -17,7 +17,7 @@
 
 from contracts.RigCommands import RigCommands
 from CustomRig import CustomRig
-from RigControlType import RigControlType
+from enums.RigControlType import RigControlType
 
 class Rig(CustomRig):
 

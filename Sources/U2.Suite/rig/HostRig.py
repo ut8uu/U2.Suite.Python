@@ -16,7 +16,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from Rig import Rig
-from RigControlType import RigControlType
+from enums.RigControlType import RigControlType
 
 class HostRig(Rig):
     
