@@ -16,15 +16,18 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from unittest import result
+from contracts.Constants import Constants
 from contracts.ParameterValue import ParameterValue
 from contracts.RigParameter import RigParameter
 from contracts.ValueFormat import ValueFormat
 from exceptions.ArgumentOutOfRangeException import ArgumentOutOfRangeException
 from exceptions.FormatParseException import FormatParseException
 from exceptions.ParameterParseException import ParameterParseException
+from exceptions.ParityConversionException import ParityConversionException
 from exceptions.ValueConversionException import ValueConversionException
 from helpers.ConversionHelper import ConversionHelper as ch
 from pyrsistent import b
+from rig.enums.Parity import Parity
 import unittest
 
 class RigParameterTests(unittest.TestCase):
@@ -287,3 +290,20 @@ class RigParameterTests(unittest.TestCase):
         with self.assertRaises(ArgumentOutOfRangeException) as ex:
             ch.FormatValue(123, pv)
     
+    def test_string_to_parity(self):
+        self.assertEqual(Parity.PARITY_NONE, ch.string_to_parity(Constants.ParityNone))
+        self.assertEqual(Parity.PARITY_EVEN, ch.string_to_parity(Constants.ParityEven))
+        self.assertEqual(Parity.PARITY_ODD, ch.string_to_parity(Constants.ParityOdd))
+        self.assertEqual(Parity.PARITY_MARK, ch.string_to_parity(Constants.ParityMark))
+        self.assertEqual(Parity.PARITY_SPACE, ch.string_to_parity(Constants.ParitySpace))
+        
+        with self.assertRaises(ParityConversionException) as ex:
+            ch.string_to_parity('unknown')
+
+    def test_parity_to_string(self):
+        self.assertEqual(Constants.ParityNone, ch.parity_to_string(Parity.PARITY_NONE))
+        self.assertEqual(Constants.ParityEven, ch.parity_to_string(Parity.PARITY_EVEN))
+        self.assertEqual(Constants.ParityOdd, ch.parity_to_string(Parity.PARITY_ODD))
+        self.assertEqual(Constants.ParityMark, ch.parity_to_string(Parity.PARITY_MARK))
+        self.assertEqual(Constants.ParitySpace, ch.parity_to_string(Parity.PARITY_SPACE))
+        

@@ -19,6 +19,7 @@ import binascii, re, sys
 
 from pyrsistent import b
 from contracts.BitMask import BitMask
+from contracts.Constants import Constants
 from contracts.ParameterValue import ParameterValue
 from contracts.RigParameter import RigParameter
 from contracts.ValueFormat import ValueFormat
@@ -26,8 +27,10 @@ from exceptions.ArgumentOutOfRangeException import ArgumentOutOfRangeException
 from exceptions.FormatParseException import FormatParseException
 from exceptions.MaskParseException import MaskParseException
 from exceptions.ParameterParseException import ParameterParseException
+from exceptions.ParityConversionException import ParityConversionException
 from exceptions.ValueConversionException import ValueConversionException
 from exceptions.ValueValidationException import ValueValidationException
+from rig.enums.Parity import Parity
 from typing import List
 
 class ConversionHelper():
@@ -378,3 +381,37 @@ class ConversionHelper():
             return bytearray()
         else:
             raise ArgumentOutOfRangeException(f"{info.Format} not recognized.")
+
+    @staticmethod
+    def parity_to_string(parity: Parity) -> str:
+        match parity:
+            case Parity.PARITY_NONE:
+                return Constants.ParityNone
+            case Parity.PARITY_EVEN:
+                return Constants.ParityEven
+            case Parity.PARITY_ODD:
+                return Constants.ParityOdd
+            case Parity.PARITY_MARK:
+                return Constants.ParityMark
+            case Parity.PARITY_SPACE:
+                return Constants.ParitySpace
+            case _:
+                raise ParityConversionException(f'A parity {parity} not supported.')
+
+    @staticmethod
+    def string_to_parity(s: str) -> Parity:
+        match s:
+            case Constants.ParityNone:
+                return Parity.PARITY_NONE
+            case Constants.ParityEven:
+                return Parity.PARITY_EVEN
+            case Constants.ParityOdd:
+                return Parity.PARITY_ODD
+            case Constants.ParityMark:
+                return Parity.PARITY_MARK
+            case Constants.ParitySpace:
+                return Parity.PARITY_SPACE
+            case _:
+                raise ParityConversionException(f'Cannot convert "{s}" to parity.')
+            
+            
