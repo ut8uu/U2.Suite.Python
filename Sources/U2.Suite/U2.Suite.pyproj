@@ -4,13 +4,17 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>a7e8abe5-91bd-4fc5-a247-bf66b894b3c7</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>U2.Suite.py</StartupFile>
+    <StartupFile>
+    </StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>U2.Suite</Name>
     <RootNamespace>U2.Suite</RootNamespace>
+    <TestFramework>unittest</TestFramework>
+    <UnitTestPattern>test_*.py</UnitTestPattern>
+    <UnitTestRootDirectory>.</UnitTestRootDirectory>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,7 +25,238 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="U2.Suite.py" />
+    <Compile Include="app.py" />
+    <Compile Include="contracts\BitMask.py" />
+    <Compile Include="contracts\Constants.py" />
+    <Compile Include="contracts\Entry.py" />
+    <Compile Include="contracts\ParameterValue.py" />
+    <Compile Include="contracts\RigCommand.py" />
+    <Compile Include="contracts\RigCommands.py" />
+    <Compile Include="contracts\RigParameter.py" />
+    <Compile Include="contracts\RigSettings.py" />
+    <Compile Include="contracts\ValueFormat.py" />
+    <Compile Include="exceptions\ArgumentOutOfRangeException.py" />
+    <Compile Include="exceptions\DtrModeConversionException.py" />
+    <Compile Include="exceptions\EntryLoadErrorException.py" />
+    <Compile Include="exceptions\FormatParseException.py" />
+    <Compile Include="exceptions\IniFileLoadException.py" />
+    <Compile Include="exceptions\LoadInitCommandsException.py" />
+    <Compile Include="exceptions\LoadStatusCommandsException.py" />
+    <Compile Include="exceptions\LoadWriteCommandException.py" />
+    <Compile Include="exceptions\MaskParseException.py" />
+    <Compile Include="exceptions\MaskValidationException.py" />
+    <Compile Include="exceptions\ParameterParseException.py" />
+    <Compile Include="exceptions\ParityConversionException.py" />
+    <Compile Include="exceptions\UnexpectedEntryException.py" />
+    <Compile Include="exceptions\ValueConversionException.py" />
+    <Compile Include="exceptions\ValueLoadException.py" />
+    <Compile Include="exceptions\ValueValidationException.py" />
+    <Compile Include="helpers\ComPortHelper.py" />
+    <Compile Include="helpers\ConversionHelper.py" />
+    <Compile Include="helpers\FileSystemHelper.py" />
+    <Compile Include="helpers\IniFileHelper.py" />
+    <Compile Include="helpers\RigHelper.py" />
+    <Compile Include="MainWindow.py" />
+    <Compile Include="NewRigDialog.py" />
+    <Compile Include="RigSelectorDialog.py" />
+    <Compile Include="contracts/__init__.py" />
+    <Compile Include="exceptions/__init__.py" />
+    <Compile Include="helpers/__init__.py" />
+    <Compile Include="rig/__init__.py" />
+    <Compile Include="rig\CustomRig.py" />
+    <Compile Include="rig\enums\Parity.py" />
+    <Compile Include="rig\enums\RigControlType.py" />
+    <Compile Include="rig\GuestRig.py" />
+    <Compile Include="rig\HostRig.py" />
+    <Compile Include="rig\Rig.py" />
+    <Compile Include="tests/__init__.py" />
+    <Compile Include="tests\test_ConversionHelper.py" />
+    <Compile Include="tests\test_FileSystemHelper.py" />
+    <Compile Include="tests\test_NewRigDialog.py" />
+    <Compile Include="tests\test_RigHelper.py" />
+    <Compile Include="tests\test_RigParameter.py" />
+    <Compile Include="ui/__init__.py" />
+    <Compile Include="ui\Ui_MainWindow.py" />
+    <Compile Include="ui\Ui_NewRigDialog.py" />
+    <Compile Include="ui\Ui_RigSelectDialog.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="contracts\" />
+    <Folder Include="exceptions\" />
+    <Folder Include="helpers\" />
+    <Folder Include="ini\" />
+    <Folder Include="rig\" />
+    <Folder Include="rig\enums\" />
+    <Folder Include="tests\" />
+    <Folder Include="ui\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="ini\ADT-200A.ini" />
+    <Content Include="ini\AORAR5000.ini" />
+    <Content Include="ini\AR8600.ini" />
+    <Content Include="ini\Bearcat996x.ini" />
+    <Content Include="ini\CODAN-Comments.txt" />
+    <Content Include="ini\CODAN.ini" />
+    <Content Include="ini\DX-77-Comments.txt" />
+    <Content Include="ini\DX-77.ini" />
+    <Content Include="ini\Elad-FDMSW2.ini" />
+    <Content Include="ini\Elecraft K2.ini" />
+    <Content Include="ini\Elecraft K3.ini" />
+    <Content Include="ini\Elecraft K4.ini" />
+    <Content Include="ini\Elecraft KX2.ini" />
+    <Content Include="ini\Elecraft KX3.ini" />
+    <Content Include="ini\ExpertSDR.ini" />
+    <Content Include="ini\FRG-100.ini" />
+    <Content Include="ini\FT-100 D.ini" />
+    <Content Include="ini\FT-1000 MP.ini" />
+    <Content Include="ini\FT-1000.ini" />
+    <Content Include="ini\FT-2000.ini" />
+    <Content Include="ini\FT-2000PEPV3.ini" />
+    <Content Include="ini\FT-2KAFSKPEPV3.ini" />
+    <Content Include="ini\FT-2KFSKPEPV3.ini" />
+    <Content Include="ini\FT-2K_Readme.txt" />
+    <Content Include="ini\FT-450.ini" />
+    <Content Include="ini\FT-450Dmod.ini" />
+    <Content Include="ini\FT-747.ini" />
+    <Content Include="ini\FT-747GX.ini" />
+    <Content Include="ini\FT-747GX1.ini" />
+    <Content Include="ini\FT-747GX2.ini" />
+    <Content Include="ini\FT-757GXII.ini" />
+    <Content Include="ini\FT-817.ini" />
+    <Content Include="ini\FT-840.ini" />
+    <Content Include="ini\FT-847.ini" />
+    <Content Include="ini\FT-857.ini" />
+    <Content Include="ini\FT-891.ini" />
+    <Content Include="ini\FT-897.ini" />
+    <Content Include="ini\FT-900.ini" />
+    <Content Include="ini\FT-920.ini" />
+    <Content Include="ini\FT-950.ini" />
+    <Content Include="ini\FT-990.ini" />
+    <Content Include="ini\FT-991-DATA.ini" />
+    <Content Include="ini\FT-991.ini" />
+    <Content Include="ini\FTDX-1200-DATA.ini" />
+    <Content Include="ini\FTDX-1200.ini" />
+    <Content Include="ini\FTDX-3000-DATA.ini" />
+    <Content Include="ini\FTDX-3000.ini" />
+    <Content Include="ini\FTDX-5000MP-DATA.ini" />
+    <Content Include="ini\FTDX-5000MP.ini" />
+    <Content Include="ini\FTDX-9000.ini" />
+    <Content Include="ini\FTDX10.ini" />
+    <Content Include="ini\FTDX101D.ini" />
+    <Content Include="ini\FTDX_5000BETA.ini" />
+    <Content Include="ini\HRD.ini" />
+    <Content Include="ini\IC- 820.ini" />
+    <Content Include="ini\IC- 821.ini" />
+    <Content Include="ini\IC- 970D.ini" />
+    <Content Include="ini\IC-275H.ini" />
+    <Content Include="ini\IC-7000.ini" />
+    <Content Include="ini\IC-7000v2.ini" />
+    <Content Include="ini\IC-703.ini" />
+    <Content Include="ini\IC-703a.ini" />
+    <Content Include="ini\IC-705-DATA.ini" />
+    <Content Include="ini\IC-705.ini" />
+    <Content Include="ini\IC-706 MKII.ini" />
+    <Content Include="ini\IC-706 MKIIG.ini" />
+    <Content Include="ini\IC-706.ini" />
+    <Content Include="ini\IC-707.ini" />
+    <Content Include="ini\IC-7100-DATA-FIL1.ini" />
+    <Content Include="ini\IC-7100.ini" />
+    <Content Include="ini\IC-7100e4-DATA.ini" />
+    <Content Include="ini\IC-7100e4.ini" />
+    <Content Include="ini\IC-718.ini" />
+    <Content Include="ini\IC-7200.ini" />
+    <Content Include="ini\IC-7200v2.ini" />
+    <Content Include="ini\IC-7200v2_2.ini" />
+    <Content Include="ini\IC-725.ini" />
+    <Content Include="ini\IC-725a.ini" />
+    <Content Include="ini\IC-726.ini" />
+    <Content Include="ini\IC-728.ini" />
+    <Content Include="ini\IC-7300-DATA.ini" />
+    <Content Include="ini\IC-7300.ini" />
+    <Content Include="ini\IC-7315.ini" />
+    <Content Include="ini\IC-735.ini" />
+    <Content Include="ini\IC-736 %28untested%29.ini" />
+    <Content Include="ini\IC-737.ini" />
+    <Content Include="ini\IC-738.ini" />
+    <Content Include="ini\IC-7410 %281%29.ini" />
+    <Content Include="ini\IC-7410.ini" />
+    <Content Include="ini\IC-7410v2.ini" />
+    <Content Include="ini\IC-746 Pro.ini" />
+    <Content Include="ini\IC-746.ini" />
+    <Content Include="ini\IC-751.ini" />
+    <Content Include="ini\IC-756 Pro II.ini" />
+    <Content Include="ini\IC-756 Pro III.ini" />
+    <Content Include="ini\IC-756 Pro II_LSB.ini" />
+    <Content Include="ini\IC-756 Pro ini comments.txt" />
+    <Content Include="ini\IC-756 Pro.ini" />
+    <Content Include="ini\IC-756.ini" />
+    <Content Include="ini\IC-7600.ini" />
+    <Content Include="ini\IC-7600v2-DATA.ini" />
+    <Content Include="ini\IC-7600v2.ini" />
+    <Content Include="ini\IC-761.ini" />
+    <Content Include="ini\IC-7610-DATA-FIL1.ini" />
+    <Content Include="ini\IC-7610-DATA.ini" />
+    <Content Include="ini\IC-7610.ini" />
+    <Content Include="ini\IC-765.ini" />
+    <Content Include="ini\IC-77.ini" />
+    <Content Include="ini\IC-7700.ini" />
+    <Content Include="ini\IC-7700v2-DATA.ini" />
+    <Content Include="ini\IC-7700v2.ini" />
+    <Content Include="ini\IC-775.ini" />
+    <Content Include="ini\IC-78.ini" />
+    <Content Include="ini\IC-7800.ini" />
+    <Content Include="ini\IC-7800v3-DATA.ini" />
+    <Content Include="ini\IC-7800v3.ini" />
+    <Content Include="ini\IC-781.ini" />
+    <Content Include="ini\IC-781_2.ini" />
+    <Content Include="ini\IC-7850-DATA-FIL1.ini" />
+    <Content Include="ini\IC-7850-DATA.ini" />
+    <Content Include="ini\IC-7850.ini" />
+    <Content Include="ini\IC-7851-DATA-FIL1.ini" />
+    <Content Include="ini\IC-7851-DATA.ini" />
+    <Content Include="ini\IC-7851.ini" />
+    <Content Include="ini\IC-821PST.ini" />
+    <Content Include="ini\IC-910.ini" />
+    <Content Include="ini\IC-9100.ini" />
+    <Content Include="ini\IC-9100v2.ini" />
+    <Content Include="ini\IC-9700-DATA.ini" />
+    <Content Include="ini\IC-9700-SAT.ini" />
+    <Content Include="ini\IC-9700.ini" />
+    <Content Include="ini\IC-M710.ini" />
+    <Content Include="ini\IC-R75-chromos.ini" />
+    <Content Include="ini\IC-R75.ini" />
+    <Content Include="ini\IC-R8500.ini" />
+    <Content Include="ini\IC-R9000.ini" />
+    <Content Include="ini\IC-R9500.ini" />
+    <Content Include="ini\ID-5100A.ini" />
+    <Content Include="ini\JST-245.ini" />
+    <Content Include="ini\JST-245n.ini" />
+    <Content Include="ini\Kenwood.ini" />
+    <Content Include="ini\NRD-535DG.ini" />
+    <Content Include="ini\Perseus.ini" />
+    <Content Include="ini\PowerRX2.ini" />
+    <Content Include="ini\PowerSDR.ini" />
+    <Content Include="ini\SmartSDR.ini" />
+    <Content Include="ini\TenTec Eagle.ini" />
+    <Content Include="ini\TenTec Jupiter.ini" />
+    <Content Include="ini\TenTec Omni VII.ini" />
+    <Content Include="ini\TenTec Omni VI_plus.ini" />
+    <Content Include="ini\TenTec Orion.ini" />
+    <Content Include="ini\TenTec Paragon II.ini" />
+    <Content Include="ini\TenTec RX-350.ini" />
+    <Content Include="ini\TH-F6A.ini" />
+    <Content Include="ini\TH-F7E.ini" />
+    <Content Include="ini\TS-2000.ini" />
+    <Content Include="ini\TS-440.ini" />
+    <Content Include="ini\TS-480.ini" />
+    <Content Include="ini\TS-590.ini" />
+    <Content Include="ini\TS-690.ini" />
+    <Content Include="ini\TS-870.ini" />
+    <Content Include="ini\TS-930.ini" />
+    <Content Include="ini\ZS-1.ini" />
+    <Content Include="ui\MainWindow.ui" />
+    <Content Include="ui\NewRigDialog.ui" />
+    <Content Include="ui\RigSelectDialog.ui" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
