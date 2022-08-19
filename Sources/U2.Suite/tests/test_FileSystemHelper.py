@@ -19,14 +19,18 @@ from locale import locale_alias
 import sys
 from helpers.FileSystemHelper import FileSystemHelper as fh
 from os.path import join
+import unittest
 
-def test_get_local_folder():
-    folder = fh.getLocalFolder()
-    assert folder.find('U2.Suite') > -1
-    
-def test_enumerate_files():
-    local_folder = fh.getLocalFolder()
-    path = join(local_folder, 'U2.Suite', 'ini')
-    files = fh.enumerateDirectory(path, '.ini')
-    assert files.count('IC-705.ini') == 1
+class FileSystemHelperTests(unittest.TestCase):
+    def test_get_local_folder(self):
+        folder = fh.getLocalFolder()
+        assert folder.find('U2.Suite') > -1
+        
+    def test_enumerate_files(self):
+        local_folder = fh.getLocalFolder()
+        if local_folder.endswith('U2.Suite'):
+            local_folder = local_folder.removesuffix('U2.Suite')
+        path = join(local_folder, 'U2.Suite', 'ini')
+        files = fh.enumerateDirectory(path, '.ini')
+        assert files.count('IC-705.ini') == 1
     

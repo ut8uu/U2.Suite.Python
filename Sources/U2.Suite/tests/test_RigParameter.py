@@ -15,6 +15,10 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from contracts.RigParameter import RigParameter as rp
-from helpers.ConversionHelper import ConversionHelper as ch
+from contracts.RigParameter import RigParameter
+from helpers.ConversionHelper import ConversionHelper
+import unittest
 
+class RigParameterTests(unittest.TestCase):
+    def test_parameter(self):
+        self.assertEqual(1, 1)
