@@ -16,7 +16,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import sys
-from os import listdir, getcwd
+from os import listdir, getcwd, path
 from os.path import isfile, join
 from typing import List
 
@@ -40,9 +40,12 @@ class FileSystemHelper():
     
     @staticmethod
     def getLocalFolder():
+        # we are in ./helpers directory
+        dir = path.dirname(path.dirname(path.abspath(__file__)))
+        assert not dir.endswith('helpers')
         return getcwd()
     
     @staticmethod
     def getIniFilesFolder() -> str:
-        return join(getcwd(), 'U2.Suite', 'ini')
+        return join(FileSystemHelper.getLocalFolder(), 'ini')
     
