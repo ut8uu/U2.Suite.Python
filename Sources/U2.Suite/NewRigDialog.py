@@ -23,6 +23,7 @@ from PyQt5.QtWidgets import QApplication, QDialog
 from contracts.Constants import Constants
 from helpers import ComPortHelper
 from helpers.FileSystemHelper import FileSystemHelper
+from rig import HostRig
 from typing import List
 from ui.Ui_NewRigDialog import Ui_NewRigDialog
 
@@ -66,14 +67,6 @@ class NewRigDialog(QDialog, Ui_NewRigDialog):
         self.__rig_type = self.cbRigType.currentText()
         self.debugPrint(f'Rig type {self.__rig_type} selected')
     
-    @pyqtSlot()
-    def testRig(self):
-        self.debugPrint('Start testing the selected rig.')
-        if self.__rig_type == 'None':
-            print('None was selected. Testing not performed.')
-            return
-        
-        
     def getSelectedRigType(self):
         return self.__rig_type
 
@@ -107,18 +100,29 @@ class NewRigDialog(QDialog, Ui_NewRigDialog):
     def setRigs(self, rigs:List[str]):
         self.__all_rigs = rigs
 
-    if __name__ == '__main__':
-        from NewRigDialog import NewRigDialog
-        app = QApplication(sys.argv)
-        dialog = NewRigDialog()
+    @pyqtSlot()
+    def testRig(self):
+        self.debugPrint('Start testing the selected rig.')
+        if self.__rig_type == 'None':
+            print('None was selected. Testing not performed.')
+            return
         
-        assert dialog.getSelectedBaudRate() == '57600'
-        assert dialog.getSelectedDataBits() == 8
-        assert dialog.getSelectedStopBits() == 1
-        assert dialog.getSelectedDtr() == False
-        assert dialog.getSelectedRts() == False
-        assert dialog.getSelectedTimeout() == 2000
-        assert dialog.getSelectedPollInterval() == 500
+        host_rig = HostRig()
         
-        dialog.exec()
-        sys.exit(0)
+
+
+if __name__ == '__main__':
+    from NewRigDialog import NewRigDialog
+    app = QApplication(sys.argv)
+    dialog = NewRigDialog()
+    
+    assert dialog.getSelectedBaudRate() == '57600'
+    assert dialog.getSelectedDataBits() == 8
+    assert dialog.getSelectedStopBits() == 1
+    assert dialog.getSelectedDtr() == False
+    assert dialog.getSelectedRts() == False
+    assert dialog.getSelectedTimeout() == 2000
+    assert dialog.getSelectedPollInterval() == 500
+    
+    dialog.exec()
+    sys.exit(0)

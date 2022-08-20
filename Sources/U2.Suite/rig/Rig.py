@@ -20,8 +20,6 @@ from CustomRig import CustomRig
 from enums.RigControlType import RigControlType
 
 class Rig(CustomRig):
-
-    __rig_commands: RigCommands
     
     def __init__(self, control_type: RigControlType):
         super().__init__(control_type)
