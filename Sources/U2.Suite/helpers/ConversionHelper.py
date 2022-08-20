@@ -24,6 +24,7 @@ from contracts.ParameterValue import ParameterValue
 from contracts.RigParameter import RigParameter
 from contracts.ValueFormat import ValueFormat
 from exceptions.ArgumentOutOfRangeException import ArgumentOutOfRangeException
+from exceptions.ConversionException import ConversionException
 from exceptions.FormatParseException import FormatParseException
 from exceptions.MaskParseException import MaskParseException
 from exceptions.ParameterParseException import ParameterParseException
@@ -413,4 +414,18 @@ class ConversionHelper():
                 return serial.PARITY_SPACE
             case _:
                 raise ParityConversionException(f'Cannot convert "{s}" to parity.')
+            
+    @staticmethod
+    def int_to_databits(value: int) -> str:
+        match value:
+            case 5:
+                return serial.FIVEBITS
+            case 6:
+                return serial.SIXBITS
+            case 7:
+                return serial.SEVENBITS
+            case 8:
+                return serial.EIGHTBITS
+            case _:
+                raise ConversionException(f'A value "{value}" cannot be converted to serail.StopBits.')
             

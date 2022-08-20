@@ -21,6 +21,7 @@ from contracts.ParameterValue import ParameterValue
 from contracts.RigParameter import RigParameter
 from contracts.ValueFormat import ValueFormat
 from exceptions.ArgumentOutOfRangeException import ArgumentOutOfRangeException
+from exceptions.ConversionException import ConversionException
 from exceptions.FormatParseException import FormatParseException
 from exceptions.ParameterParseException import ParameterParseException
 from exceptions.ParityConversionException import ParityConversionException
@@ -308,3 +309,11 @@ class RigParameterTests(unittest.TestCase):
         self.assertEqual(Constants.ParityMark, ch.parity_to_string(serial.PARITY_MARK))
         self.assertEqual(Constants.ParitySpace, ch.parity_to_string(serial.PARITY_SPACE))
         
+    def test_int_to_databits(self):
+        self.assertEqual(serial.FIVEBITS, ch.int_to_databits(5))
+        self.assertEqual(serial.SIXBITS, ch.int_to_databits(6))
+        self.assertEqual(serial.SEVENBITS, ch.int_to_databits(7))
+        self.assertEqual(serial.EIGHTBITS, ch.int_to_databits(8))
+        
+        with self.assertRaises(ConversionException) as ex:
+            ch.int_to_databits('unknown')
