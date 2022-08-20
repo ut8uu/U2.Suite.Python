@@ -15,23 +15,12 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from Rig import Rig
-from contracts.RigCommands import RigCommands
-from contracts.RigSettings import RigSettings
-from enums.RigControlType import RigControlType
-
-class HostRig(Rig):
-    __application_id: int
-    __rig_commands: RigCommands
-    __rig_number: int
-    __rig_settings: RigSettings
-
-    def __init__(self, rig_number:int, application_id:int, 
-                 rig_settings:RigSettings, rig_commands:RigCommands):
-        __rig_number = rig_number
-        __application_id = application_id
-        __rig_settings = rig_settings
-        __rig_commands = rig_commands
-        super().__init__(RigControlType.host)
-        
+class KnownIdentifiers():
+    U2MultiRig = 0
+    U2MultiRigDemo = 1
+    U2MultiRigEmulatorInstance = 2
+    U2MultiRigEmulatorGui = 3
+    U2Logger = 10
+    U2QslManager = 20
+    MultiCast = 32768
         

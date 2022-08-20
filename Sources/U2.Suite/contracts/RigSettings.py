@@ -23,7 +23,7 @@ class RigSettings(object):
     StopBits = [ 1.0, 1.5, 2.0 ]
     
     def __init__(self):
-        self._RigId = str.Empty
+        self._RigNumber = str.Empty
         self._Enabled = False
         self._RigType = ''
         self._Port = ''
@@ -31,8 +31,8 @@ class RigSettings(object):
         self._DataBits = 8
         self._Parity = 0
         self._StopBits = 1.0
-        self._RtsMode = 'High'
-        self._DtrMode = 'High'
+        self._RtsMode = False
+        self._DtrMode = False
         self._PollMs = 500
         self._TimeoutMs = 3000
         
