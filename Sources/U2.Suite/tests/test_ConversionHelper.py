@@ -28,6 +28,7 @@ from exceptions.ValueConversionException import ValueConversionException
 from helpers.ConversionHelper import ConversionHelper as ch
 from pyrsistent import b
 from rig.enums.Parity import Parity
+import serial
 import unittest
 
 class RigParameterTests(unittest.TestCase):
@@ -291,19 +292,19 @@ class RigParameterTests(unittest.TestCase):
             ch.FormatValue(123, pv)
     
     def test_string_to_parity(self):
-        self.assertEqual(Parity.PARITY_NONE, ch.string_to_parity(Constants.ParityNone))
-        self.assertEqual(Parity.PARITY_EVEN, ch.string_to_parity(Constants.ParityEven))
-        self.assertEqual(Parity.PARITY_ODD, ch.string_to_parity(Constants.ParityOdd))
-        self.assertEqual(Parity.PARITY_MARK, ch.string_to_parity(Constants.ParityMark))
-        self.assertEqual(Parity.PARITY_SPACE, ch.string_to_parity(Constants.ParitySpace))
+        self.assertEqual(serial.PARITY_NONE, ch.string_to_parity(Constants.ParityNone))
+        self.assertEqual(serial.PARITY_EVEN, ch.string_to_parity(Constants.ParityEven))
+        self.assertEqual(serial.PARITY_ODD, ch.string_to_parity(Constants.ParityOdd))
+        self.assertEqual(serial.PARITY_MARK, ch.string_to_parity(Constants.ParityMark))
+        self.assertEqual(serial.PARITY_SPACE, ch.string_to_parity(Constants.ParitySpace))
         
         with self.assertRaises(ParityConversionException) as ex:
             ch.string_to_parity('unknown')
 
     def test_parity_to_string(self):
-        self.assertEqual(Constants.ParityNone, ch.parity_to_string(Parity.PARITY_NONE))
-        self.assertEqual(Constants.ParityEven, ch.parity_to_string(Parity.PARITY_EVEN))
-        self.assertEqual(Constants.ParityOdd, ch.parity_to_string(Parity.PARITY_ODD))
-        self.assertEqual(Constants.ParityMark, ch.parity_to_string(Parity.PARITY_MARK))
-        self.assertEqual(Constants.ParitySpace, ch.parity_to_string(Parity.PARITY_SPACE))
+        self.assertEqual(Constants.ParityNone, ch.parity_to_string(serial.PARITY_NONE))
+        self.assertEqual(Constants.ParityEven, ch.parity_to_string(serial.PARITY_EVEN))
+        self.assertEqual(Constants.ParityOdd, ch.parity_to_string(serial.PARITY_ODD))
+        self.assertEqual(Constants.ParityMark, ch.parity_to_string(serial.PARITY_MARK))
+        self.assertEqual(Constants.ParitySpace, ch.parity_to_string(serial.PARITY_SPACE))
         

@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import binascii, re, sys
+import binascii, re, serial, sys
 
 from pyrsistent import b
 from contracts.BitMask import BitMask
@@ -383,35 +383,34 @@ class ConversionHelper():
             raise ArgumentOutOfRangeException(f"{info.Format} not recognized.")
 
     @staticmethod
-    def parity_to_string(parity: Parity) -> str:
+    def parity_to_string(parity: str) -> str:
         match parity:
-            case Parity.PARITY_NONE:
+            case serial.PARITY_NONE:
                 return Constants.ParityNone
-            case Parity.PARITY_EVEN:
+            case serial.PARITY_EVEN:
                 return Constants.ParityEven
-            case Parity.PARITY_ODD:
+            case serial.PARITY_ODD:
                 return Constants.ParityOdd
-            case Parity.PARITY_MARK:
+            case serial.PARITY_MARK:
                 return Constants.ParityMark
-            case Parity.PARITY_SPACE:
+            case serial.PARITY_SPACE:
                 return Constants.ParitySpace
             case _:
                 raise ParityConversionException(f'A parity {parity} not supported.')
 
     @staticmethod
-    def string_to_parity(s: str) -> Parity:
+    def string_to_parity(s: str) -> str:
         match s:
             case Constants.ParityNone:
-                return Parity.PARITY_NONE
+                return serial.PARITY_NONE
             case Constants.ParityEven:
-                return Parity.PARITY_EVEN
+                return serial.PARITY_EVEN
             case Constants.ParityOdd:
-                return Parity.PARITY_ODD
+                return serial.PARITY_ODD
             case Constants.ParityMark:
-                return Parity.PARITY_MARK
+                return serial.PARITY_MARK
             case Constants.ParitySpace:
-                return Parity.PARITY_SPACE
+                return serial.PARITY_SPACE
             case _:
                 raise ParityConversionException(f'Cannot convert "{s}" to parity.')
-            
             
