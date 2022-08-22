@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from dialogs.NewRigDialog import NewRigDialog
+from NewRigDialog import NewRigDialog
 import unittest
 
 class test_NewRigDialog(unittest.TestCase):
