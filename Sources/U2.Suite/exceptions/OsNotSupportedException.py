@@ -15,11 +15,6 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from contracts.RigCommands import RigCommands
-from rig.CustomRig import CustomRig
-from rig.enums.RigControlType import RigControlType
-
-class Rig(CustomRig):
-    
-    def __init__(self, control_type: RigControlType):
-        super().__init__(control_type)
+class OsNotSupportedException(Exception):
+    def __init__(self, *args: object) -> None:
+        super().__init__(*args)

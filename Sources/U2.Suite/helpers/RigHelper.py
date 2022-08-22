@@ -380,7 +380,7 @@ class RigHelper():
         return rig_commands
     
     @staticmethod
-    def loadAllRigCommands(path) -> List[RigCommands]:
+    def loadAllRigCommands(path: str) -> List[RigCommands]:
         list = List[RigCommands]()
         iniDirectory = fsh.getIniFilesFolder()
         files = fsh.enumerateDirectory(iniDirectory, '.ini')

@@ -427,5 +427,16 @@ class ConversionHelper():
             case 8:
                 return serial.EIGHTBITS
             case _:
-                raise ConversionException(f'A value "{value}" cannot be converted to serail.StopBits.')
-            
+                raise ConversionException(f'A value "{value}" cannot be converted to serail.StopBits. Expected range is [5..8].')
+    
+    @staticmethod
+    def float_to_stopbits(value: float) -> str:
+        match value:
+            case 1.0:
+                return serial.STOPBITS_ONE
+            case 1.5:
+                return serial.STOPBITS_ONE_POINT_FIVE
+            case 2.0:
+                return serial.STOPBITS_TWO
+            case _:
+                raise ConversionException(f'A value "{value}" cannot be converted to serial.StopBits. Expected 1.0, 1.5, 2.0.')

@@ -15,9 +15,12 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from NewRigDialog import NewRigDialog
+from dialogs.NewRigDialog import NewRigDialog
+import unittest
 
-def test_initial_values():
-    #dialog = NewRigDialog()
-    #assert dialog.getSelectedBaudRate() == '57600'
-    assert 1 == 1
+class test_NewRigDialog(unittest.TestCase):
+
+    def test_initial_values(self):
+        #dialog = NewRigDialog()
+        #assert dialog.getSelectedBaudRate() == '57600'
+        assert 1 == 1

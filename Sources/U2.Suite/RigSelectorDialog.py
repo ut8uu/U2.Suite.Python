@@ -21,7 +21,7 @@ from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QDialog, QTableWidgetItem
 
 from ui.Ui_RigSelectDialog import Ui_RigSelector
-from NewRigDialog import NewRigDialog
+from dialogs.NewRigDialog import NewRigDialog
 
 class RigSelectorDialog(QDialog, Ui_RigSelector):
     __selected_rig = 0

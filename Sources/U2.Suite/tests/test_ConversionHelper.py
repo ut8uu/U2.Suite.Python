@@ -317,3 +317,12 @@ class RigParameterTests(unittest.TestCase):
         
         with self.assertRaises(ConversionException) as ex:
             ch.int_to_databits('unknown')
+
+    def test_float_to_stopbits(self):
+        self.assertEqual(serial.STOPBITS_ONE, ch.float_to_stopbits(1.0))
+        self.assertEqual(serial.STOPBITS_ONE_POINT_FIVE, ch.float_to_stopbits(1.5))
+        self.assertEqual(serial.STOPBITS_TWO, ch.float_to_stopbits(2.0))
+
+        with self.assertRaises(ConversionException) as ex:
+            ch.float_to_stopbits(3.0)
+        

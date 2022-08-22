@@ -15,10 +15,10 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from Rig import Rig
+from rig.Rig import Rig
 from contracts.RigCommands import RigCommands
 from contracts.RigSettings import RigSettings
-from enums.RigControlType import RigControlType
+from rig.enums.RigControlType import RigControlType
 
 class HostRig(Rig):
     __application_id: int

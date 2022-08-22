@@ -23,7 +23,7 @@ from PyQt5.QtWidgets import QApplication, QDialog
 from contracts.Constants import Constants
 from helpers import ComPortHelper
 from helpers.FileSystemHelper import FileSystemHelper
-from rig import HostRig
+from rig.HostRig import HostRig
 from typing import List
 from ui.Ui_NewRigDialog import Ui_NewRigDialog
 

@@ -15,11 +15,12 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from contracts.RigCommands import RigCommands
-from rig.CustomRig import CustomRig
-from rig.enums.RigControlType import RigControlType
+from exceptions.OsNotSupportedException import OsNotSupportedException
+from rig.listeners.IC705Listener import IC705Listener
+import os, unittest
 
-class Rig(CustomRig):
+class test_IC705Listener(unittest.TestCase):
     
-    def __init__(self, control_type: RigControlType):
-        super().__init__(control_type)
+    def test_001(self):
+        self.assertNotEqual('nt', os.name, 'This test cannot be run under the Windows')
+        IC705Listener.test_listener()
