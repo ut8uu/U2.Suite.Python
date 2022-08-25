@@ -16,11 +16,13 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from exceptions.OsNotSupportedException import OsNotSupportedException
+from helpers.RigHelper import RigHelper
 from rig.listeners.IC705Listener import IC705Listener
 import os, unittest
 
 class test_IC705Listener(unittest.TestCase):
     
     def test_001(self):
+        #RigHelper.loadAllRigCommands()
         self.assertNotEqual('nt', os.name, 'This test cannot be run under the Windows')
-        IC705Listener.test_listener()
+        IC705Listener.test_serial()

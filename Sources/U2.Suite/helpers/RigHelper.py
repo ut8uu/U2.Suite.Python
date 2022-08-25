@@ -36,7 +36,7 @@ from exceptions.ValueValidationException import ValueValidationException
 from helpers.ConversionHelper import ConversionHelper as ch
 from helpers.IniFileHelper import IniFileHelper as ih
 from helpers.FileSystemHelper import FileSystemHelper as fsh
-from os.path import join
+from os import path
 from typing import List, Tuple
 
 class RigHelper():
@@ -125,6 +125,7 @@ class RigHelper():
     @staticmethod
     def LoadSections(config_parser : configparser.ConfigParser, section_name : str) \
         -> List[str]:
+        s = config_parser.sections()
         return [f for f in config_parser.sections() if f.lower().find(section_name) > -1]
     
     @staticmethod
@@ -369,8 +370,11 @@ class RigHelper():
 
     
     @staticmethod
-    def loadRigCommands(path : str) -> RigCommands:
-        config_parser = ih.Create(path)
+    def loadRigCommands(ini_file_path : str) -> RigCommands:
+        if not path.exists(ini_file_path):
+            raise FileNotFoundError(f'Ini file {ini_file_path} does not exist.')
+            
+        config_parser = ih.Create(ini_file_path)
         
         rig_commands = RigCommands()
         rig_commands.InitCmd = RigHelper.LoadInitCommands(config_parser)
@@ -380,7 +384,7 @@ class RigHelper():
         return rig_commands
     
     @staticmethod
-    def loadAllRigCommands(path: str) -> List[RigCommands]:
+    def loadAllRigCommands() -> List[RigCommands]:
         list = List[RigCommands]()
         iniDirectory = fsh.getIniFilesFolder()
         files = fsh.enumerateDirectory(iniDirectory, '.ini')

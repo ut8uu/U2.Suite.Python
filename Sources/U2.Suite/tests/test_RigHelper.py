@@ -26,12 +26,12 @@ from contracts.ValueFormat import ValueFormat
 from exceptions.UnexpectedEntryException import UnexpectedEntryException
 from helpers.FileSystemHelper import FileSystemHelper as fsh
 from helpers.RigHelper import RigHelper
-from os.path import join
+from os import path
 
 class RigHelperTests(unittest.TestCase):
     def test_LoadIC705(self):
         folder = fsh.getIniFilesFolder()
-        ini_file_path = join(folder, 'IC-705.ini')
+        ini_file_path = path.join(folder, 'IC-705.ini')
         rig_commands = RigHelper.loadRigCommands(ini_file_path)
         self.assertEqual(3, len(rig_commands.InitCmd))
         self.assertEqual(9, len(rig_commands.StatusCmd))
