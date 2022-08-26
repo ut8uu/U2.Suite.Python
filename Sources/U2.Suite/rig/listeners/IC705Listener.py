@@ -27,51 +27,6 @@ if os.name.lower().find('posix') > -1:
     import pty
 
 class IC705Listener():
-    @staticmethod
-    def can_parse_request(buffer: str, port: str, commands: List[RigCommand]) -> bool:
-        arr = bytearray(buffer)
-        for cmd in commands:
-            if arr == cmd.Code:
-                return True
-        
-        return False
-
-    @staticmethod
-    def ic705_listener(port: int, commands: RigCommands):
-        while 1:
-            buffer = b''
-            
-            while 1:
-                # read one byte
-                buffer += os.read(port, 1)
-                
-                if buffer == b'exit':
-                    return
-                
-                # try to recognize the request
-                if IC705Listener.can_parse_request(buffer, port, commands):
-                    break
-                
-    @staticmethod
-    def test_listener():
-        """Start the testing"""
-        master,slave = pty.openpty() #open the pseudoterminal
-        s_name = os.ttyname(slave) #translate the slave fd to a filename
-
-        # load commands from the INI file
-        path = os.path.join(FileSystemHelper.getIniFilesFolder(), 'IC-705.ini')
-        commands = RigHelper.loadRigCommands(path)
-
-        #create a separate thread that listens on the master device for commands
-        thread = threading.Thread(target=IC705Listener.ic705_listener, args=[master, commands])
-        thread.start()
-        
-        #open a pySerial connection to the slave
-        ser = serial.Serial(s_name, 2400, timeout=1)
-        
-        ser.write('exit')
-
-    @staticmethod
     def listener(port: int, commands: RigCommands):
         #continuously listen to commands on the master device
         res = b''
@@ -100,7 +55,6 @@ class IC705Listener():
                 continue
 
 
-    @staticmethod
     def test_serial():
         """Start the testing"""
         master,slave = pty.openpty() #open the pseudoterminal
