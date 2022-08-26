@@ -19,8 +19,8 @@ import sys
 
 from PyQt5.QtWidgets import QApplication
 
-from dialogs.RigSelectorDialog import RigSelectorDialog
-from dialogs.MainWindow import MainWindow
+from RigSelectorDialog import RigSelectorDialog
+from MainWindow import MainWindow
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
