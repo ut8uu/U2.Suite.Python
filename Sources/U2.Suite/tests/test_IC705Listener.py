@@ -15,9 +15,8 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from exceptions.OsNotSupportedException import OsNotSupportedException
-from helpers.RigHelper import RigHelper
 from rig.listeners.IC705Listener import IC705Listener
+from rig.listeners.ListenerBase import ListenerBase
 import os, unittest
 
 class test_IC705Listener(unittest.TestCase):
