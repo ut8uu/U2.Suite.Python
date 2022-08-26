@@ -16,13 +16,11 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from rig.listeners.IC705Listener import IC705Listener
-from rig.listeners.ListenerBase import ListenerBase
 import os, unittest
 
 class test_IC705Listener(unittest.TestCase):
     
     def test_001(self):
-        #RigHelper.loadAllRigCommands()
         self.assertNotEqual('nt', os.name, 'This test cannot be run under the Windows')
         listener = IC705Listener()
         listener.test_serial()
