@@ -28,6 +28,8 @@ if os.name.lower().find('posix') > -1:
 
 class IC705Listener():
     __prefix = b'\xfe\xfe'
+    __freqa = 14200000
+    __freqb = 145500250
 
     def listener(self, port: int, commands: RigCommands):
         #continuously listen to commands on the master device
@@ -48,7 +50,7 @@ class IC705Listener():
                     command_found = True
                     break
 
-            if res == b'exit':
+            if res.find(b'exit') > -1:
                 return
 
             if command_found:
@@ -79,6 +81,7 @@ class IC705Listener():
             assert response == init_command.Validation.Flags
 
         ser.write(b'exit')
-
         ser.close()
+
+        thread.join(5)
         
