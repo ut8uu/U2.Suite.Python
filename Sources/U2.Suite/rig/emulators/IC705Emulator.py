@@ -15,8 +15,8 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from rig.listeners.ListenerBase import ListenerBase
+from rig.emulators.EmulatorBase import EmulatorBase
 
-class IC705Listener(ListenerBase):
+class IC705Emulator(EmulatorBase):
     def __init__(self):
         super().__init__('IC-705.ini', b'\xfe\xfe')

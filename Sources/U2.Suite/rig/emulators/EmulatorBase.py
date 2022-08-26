@@ -25,8 +25,12 @@ from typing import List, Tuple
 if os.name.lower().find('posix') > -1:
     import pty
 
-class ListenerBase():
+class EmulatorBase():
+    __serial_port : serial.Serial
+    __started = False
+    __tread : threading.Thread
     __ini_file_name : str
+    __commands : RigCommands
     __prefix : str
     __freqa = 14200000
     __freqb = 145500250
@@ -39,6 +43,35 @@ class ListenerBase():
         self.__ini_file_name = ini_file_name
         self.__prefix = prefix
     # end alternate ini_file_name
+
+    def start(self):
+        if self.__started:
+            return
+
+        master,slave = pty.openpty() #open the pseudoterminal
+        s_name = os.ttyname(slave) #translate the slave fd to a filename
+
+        # load commands from the INI file
+        path = os.path.join(FileSystemHelper.getIniFilesFolder(), self.__ini_file_name)
+        self.__commands = RigHelper.loadRigCommands(path)
+
+        #create a separate thread that listens on the master device for commands
+        self.__thread = threading.Thread(target=EmulatorBase.listener, args=[self, master, self.__commands])
+        self.__thread.start()
+
+        #open a pySerial connection to the slave
+        self.__serial_port = serial.Serial(s_name, 2400, timeout=1)
+        self.__started = True
+
+    def stop(self):
+        if self.__started:
+            return
+
+        self.__started = False
+        self.__serial_port.write(b'exit')
+        self.__serial_port.close()
+
+        self.__thread.join(5)
 
     def listener(self, port: int, commands: RigCommands):
         #continuously listen to commands on the master device
@@ -53,7 +86,7 @@ class ListenerBase():
 
             command_found = False
 
-            for init_command in commands.InitCmd:
+            for init_command in self.__commands.InitCmd:
                 if init_command.Code == res:
                     os.write(port, init_command.Validation.Flags)
                     command_found = True
@@ -69,28 +102,13 @@ class ListenerBase():
 
     def test_serial(self):
         """Start the testing"""
-        master,slave = pty.openpty() #open the pseudoterminal
-        s_name = os.ttyname(slave) #translate the slave fd to a filename
-
-        # load commands from the INI file
-        path = os.path.join(FileSystemHelper.getIniFilesFolder(), self.__ini_file_name)
-        commands = RigHelper.loadRigCommands(path)
-
-        #create a separate thread that listens on the master device for commands
-        thread = threading.Thread(target=ListenerBase.listener, args=[self, master, commands])
-        thread.start()
-
-        #open a pySerial connection to the slave
-        ser = serial.Serial(s_name, 2400, timeout=1)
+        self.start()
         
-        for init_command in commands.InitCmd:
+        for init_command in self.__commands.InitCmd:
             print(f'Testing command {init_command.Code}')
-            ser.write(init_command.Code)
-            response = ser.read(init_command.ReplyLength)
+            self.__serial_port.write(init_command.Code)
+            response = self.__serial_port.read(init_command.ReplyLength)
             assert response == init_command.Validation.Flags
 
-        ser.write(b'exit')
-        ser.close()
-
-        thread.join(5)
+        self.stop()
         

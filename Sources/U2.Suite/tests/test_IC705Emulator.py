@@ -15,12 +15,12 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from rig.listeners.IC705Listener import IC705Listener
+from rig.emulators.IC705Emulator import IC705Emulator
 import os, unittest
 
-class test_IC705Listener(unittest.TestCase):
+class test_IC705Emulator(unittest.TestCase):
     
     def test_001(self):
         self.assertNotEqual('nt', os.name, 'This test cannot be run under the Windows')
-        listener = IC705Listener()
+        listener = IC705Emulator()
         listener.test_serial()
