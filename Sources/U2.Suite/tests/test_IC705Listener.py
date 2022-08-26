@@ -25,4 +25,5 @@ class test_IC705Listener(unittest.TestCase):
     def test_001(self):
         #RigHelper.loadAllRigCommands()
         self.assertNotEqual('nt', os.name, 'This test cannot be run under the Windows')
-        IC705Listener.test_serial()
+        listener = IC705Listener()
+        listener.test_serial()

@@ -27,16 +27,17 @@ if os.name.lower().find('posix') > -1:
     import pty
 
 class IC705Listener():
-    def listener(port: int, commands: RigCommands):
+    __prefix = b'\xfe\xfe'
+
+    def listener(self, port: int, commands: RigCommands):
         #continuously listen to commands on the master device
         res = b''
-        fefe = b'\xfe\xfe'
         while 1:
             res += os.read(port, 1)
             print("command: %s" % res)
 
-            if res.endswith(fefe):
-                res = fefe # reset the command
+            if res.endswith(self.__prefix):
+                res = self.__prefix # reset the command
                 continue # resume reading
 
             command_found = False
@@ -55,7 +56,7 @@ class IC705Listener():
                 continue
 
 
-    def test_serial():
+    def test_serial(self):
         """Start the testing"""
         master,slave = pty.openpty() #open the pseudoterminal
         s_name = os.ttyname(slave) #translate the slave fd to a filename
@@ -65,7 +66,7 @@ class IC705Listener():
         commands = RigHelper.loadRigCommands(path)
 
         #create a separate thread that listens on the master device for commands
-        thread = threading.Thread(target=IC705Listener.listener, args=[master, commands])
+        thread = threading.Thread(target=IC705Listener.listener, args=[self, master, commands])
         thread.start()
 
         #open a pySerial connection to the slave
