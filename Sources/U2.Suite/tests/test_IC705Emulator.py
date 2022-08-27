@@ -18,9 +18,9 @@
 import os, unittest
 from rig.emulators.IC705Emulator import IC705Emulator
 
-class test_IC705Emulator(unittest.TestCase):
-    
-    def test_emulator(self):
-        self.assertNotEqual('nt', os.name, 'This test cannot be run under the Windows')
-        emulator = IC705Emulator()
-        emulator.test_serial()
+if os.name != 'nt':
+    class test_IC705Emulator(unittest.TestCase):
+        
+        def test_emulator(self):
+            emulator = IC705Emulator()
+            emulator.test_serial()
