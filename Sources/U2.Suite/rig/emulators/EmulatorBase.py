@@ -80,23 +80,18 @@ class EmulatorBase():
             if not self.__started:
                 return
 
-            x = os.read(port, 0)
-            if len(x) == 0:
-                continue
-
-            res += x
+            res += os.read(port, 1)
             print("command: %s" % res)
 
             if res.endswith(self.__prefix):
                 res = self.__prefix # reset the command
                 continue # resume reading
 
-            command_found = False
-
             for init_command in self.__commands.InitCmd:
                 if init_command.Code == res:
+                    print('Command found')
                     os.write(port, init_command.Validation.Flags)
-                    command_found = True
+                    res = b''
                     break
 
             if not self.__started:
@@ -104,10 +99,6 @@ class EmulatorBase():
 
             if res.find(b'exit') > -1:
                 return
-
-            if command_found:
-                res = b''
-                continue
 
 
     def test_serial(self):
@@ -118,7 +109,8 @@ class EmulatorBase():
             print(f'Testing command {init_command.Code}')
             self.__serial_port.write(init_command.Code)
             response = self.__serial_port.read(init_command.ReplyLength)
-            assert response == init_command.Validation.Flags
-
-        self.stop()
+            if response != init_command.Validation.Flags:
+                self.stop()
+                assert False
         
+        self.stop()
