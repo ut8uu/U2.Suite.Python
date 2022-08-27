@@ -77,7 +77,14 @@ class EmulatorBase():
         #continuously listen to commands on the master device
         res = b''
         while 1:
-            res += os.read(port, 1)
+            if not self.__started:
+                return
+
+            x = os.read(port, 0)
+            if len(x) == 0:
+                continue
+
+            res += x
             print("command: %s" % res)
 
             if res.endswith(self.__prefix):
@@ -91,6 +98,9 @@ class EmulatorBase():
                     os.write(port, init_command.Validation.Flags)
                     command_found = True
                     break
+
+            if not self.__started:
+                return
 
             if res.find(b'exit') > -1:
                 return
