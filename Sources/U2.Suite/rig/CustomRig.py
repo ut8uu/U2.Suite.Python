@@ -29,12 +29,12 @@ class CustomRig(object):
     _freqB = 0
     _pitch = 0
     _ritOffset = 0
-    _vfo = 0
-    _rit = 0
-    _xit = 0
-    _tx = 0
-    _mode = None
-    _split = 0
+    _vfo = RigParameter.none
+    _rit = RigParameter.none
+    _xit = RigParameter.none
+    _tx = RigParameter.none
+    _mode = RigParameter.none
+    _split = RigParameter.none
     _online = None
 
     def __init__(self, 
