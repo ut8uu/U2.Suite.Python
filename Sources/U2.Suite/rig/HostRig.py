@@ -32,6 +32,6 @@ class HostRig(Rig):
         __application_id = application_id
         __rig_settings = rig_settings
         __rig_commands = rig_commands
-        super().__init__(RigControlType.host)
+        super().__init__(RigControlType.host, rig_number, application_id)
         
         

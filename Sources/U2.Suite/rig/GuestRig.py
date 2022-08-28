@@ -20,5 +20,5 @@ from enums.RigControlType import RigControlType
 
 class GuesRig(Rig):
     
-    def __init__(self):
-        super().__init__(RigControlType.guest)
+    def __init__(self, rig_number:int, application_id:int):
+        super().__init__(RigControlType.guest, rig_number, application_id)
