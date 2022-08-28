@@ -21,5 +21,8 @@ from rig.enums.RigControlType import RigControlType
 
 class Rig(CustomRig):
     
-    def __init__(self, control_type: RigControlType):
+    def __init__(self, 
+        control_type: RigControlType, 
+        rig_number: int,
+        application_id: str):
         super().__init__(control_type)

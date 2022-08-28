@@ -22,7 +22,12 @@ from rig.enums.RigControlType import RigControlType
 
 class CustomRigTests(unittest.TestCase):
     def test_setters(self):
-        rig = CustomRig(RigControlType.host)
+        rig = CustomRig(RigControlType.host, 1001, 1002)
+
+        rig.RigNumber = 1
+        self.assertEqual(1, rig._rig_number)
+        rig.ApplicationId = 2
+        self.assertEqual(2, rig._application_id)
 
         rig.SetFreq(101)
         self.assertEqual(101, rig._freq)

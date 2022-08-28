@@ -20,6 +20,8 @@ from rig.enums.RigControlType import RigControlType
 from rig.enums.RigControlStatus import RigControlStatus
 
 class CustomRig(object):
+    _application_id : str
+    _rig_number = 0
     _rig_control_type = RigControlType.guest  
     _enabled = False  
     _freq = 0
@@ -35,8 +37,27 @@ class CustomRig(object):
     _split = 0
     _online = None
 
-    def __init__(self, control_type: RigControlType):
+    def __init__(self, 
+        control_type: RigControlType, 
+        rig_number: int,
+        application_id: str):
         _rig_control_type = control_type
+        _rig_number = rig_number
+        _application_id = application_id
+
+    @property
+    def ApplicationId(self) -> int:
+        return self._application_id
+    @ApplicationId.setter
+    def ApplicationId(self, value : int):
+        self._application_id = value
+
+    @property
+    def RigNumber(self) -> int:
+        return self._rig_number
+    @RigNumber.setter
+    def RigNumber(self, value : int):
+        self._rig_number = value
 
     @property
     def Enabled(self) -> bool:
