@@ -39,6 +39,10 @@ class EmulatorBase():
         path = os.path.join(FileSystemHelper.getIniFilesFolder(), self.__ini_file_name)
         self.__commands = RigHelper.loadRigCommands(path)
 
+    @property
+    def SerialPortName(self) -> int:
+        return self.__serial_port_name
+
     def start(self):
         if self.__started:
             return
@@ -50,6 +54,7 @@ class EmulatorBase():
         if not self.__started:
             return
         self.__started = False
+        self.__thread.join(1)
 
     def start_listener(self):
         """Start the testing"""
@@ -139,7 +144,7 @@ class EmulatorBase():
         self.read_from_serial(ser, count)
 
     def test_serial(self):
-        self.start()
+        #an emulator is expected to be started by the moment 
 
         #open a pySerial connection to the slave
         ser = Serial(self.__serial_port_name, 2400, timeout=1)
@@ -149,10 +154,10 @@ class EmulatorBase():
         for cmd in self.__commands.InitCmd:
             self.send_receive(ser, cmd.Code, cmd.ReplyLength)
 
-        self.send_receive(ser, b'exit', 7)
-        self.__thread.join(1)
-        self.stop()
+        ser.close()
 
 if __name__=='__main__':
     x = EmulatorBase('IC-705.ini', b'\xfe\xfe')
+    x.start()
     x.test_serial()
+    x.stop()

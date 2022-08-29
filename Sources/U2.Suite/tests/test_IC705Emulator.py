@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import os, unittest
+import os, unittest, serial
 from rig.emulators.IC705Emulator import IC705Emulator
 
 if os.name != 'nt':
@@ -23,4 +23,14 @@ if os.name != 'nt':
         
         def test_emulator(self):
             emulator = IC705Emulator()
+            emulator.start()
+
+            # test using internal stuff
             emulator.test_serial()
+
+            ser = serial.Serial(emulator.SerialPortName, 2400, timeout=1)
+            ser.write(b'\xfe\xfecmd1')
+            result = ser.read(5)
+            self.assertEqual(b'resp1', result)
+
+            emulator.stop()
