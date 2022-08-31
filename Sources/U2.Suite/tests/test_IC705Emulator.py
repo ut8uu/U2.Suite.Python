@@ -28,9 +28,12 @@ if os.name != 'nt':
             # test using internal stuff
             emulator.test_serial()
 
+            prefix = b'\xfe\xfe'
+
             ser = serial.Serial(emulator.SerialPortName, 2400, timeout=1)
-            ser.write(b'\xfe\xfecmd1')
+            ser.write(prefix + b'cmd1')
             result = ser.read(5)
             self.assertEqual(b'resp1', result)
 
+            ser.write(prefix + b'exit')
             emulator.stop()
