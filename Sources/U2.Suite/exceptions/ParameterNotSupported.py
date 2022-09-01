@@ -15,10 +15,8 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import enum
+import sys
 
-@enum.unique
-class RigControlType(enum.Enum):
-    host = 1
-    guest = 2
-    emulator = 3
+class ParameterNotSupported(Exception):
+    def __init__(self, message):
+        super(ParameterNotSupported, self).__init__(message)

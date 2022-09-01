@@ -52,6 +52,22 @@ class ConversionHelper():
 
         return result
         
+    @staticmethod
+    def BytesOr(array1 : bytearray, array2 : bytearray) -> bytearray:
+        result = bytearray()
+
+        max_index = min(len(array1), len(array2))
+        array1_1 = array1[:max_index]
+        array2_1 = array2[:max_index]
+        
+        index = 0
+        for x in array1_1:
+            value = x | array2_1[index]
+            result.append(value)
+            index = index + 1
+
+        return result
+        
     
     @staticmethod
     def HexStrToBytes(s : str) -> bytearray:

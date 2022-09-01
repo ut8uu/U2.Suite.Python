@@ -16,12 +16,19 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os, pty, threading
+from contracts.KnownIdentifiers import KnownIdentifiers
 from contracts.RigCommand import RigCommand
 from contracts.RigCommands import RigCommands
+from contracts.RigParameter import RigParameter
+from exceptions.ParameterNotSupported import ParameterNotSupported
+from helpers.ConversionHelper import ConversionHelper
 from helpers.RigHelper import RigHelper
 from helpers.FileSystemHelper import FileSystemHelper
+from rig.CustomRig import CustomRig
 from serial import Serial
 from typing import Tuple
+
+from rig.enums.RigControlType import RigControlType
 
 class EmulatorBase():
     __prefix = b''
@@ -29,19 +36,61 @@ class EmulatorBase():
     __ini_file_name = ''
     __thread : threading.Thread
     __serial_port_name = ''
-    __commands : RigCommands
-    __freqa = 14200000
-    __freqb = 145500250
+    _commands : RigCommands
+    __rig : CustomRig
 
     def __init__(self, ini_file_name, prefix) -> None:
         self.__ini_file_name = ini_file_name
         self.__prefix = prefix
         path = os.path.join(FileSystemHelper.getIniFilesFolder(), self.__ini_file_name)
-        self.__commands = RigHelper.loadRigCommands(path)
+        self._commands = RigHelper.loadRigCommands(path)
+        self.init_rig()
 
     @property
     def SerialPortName(self) -> int:
         return self.__serial_port_name
+
+    def init_rig(self):
+        self.__rig = CustomRig(RigControlType.emulator, 1, KnownIdentifiers.U2RigEmulator)
+        self.__rig.Enabled = True
+        self.__rig.FreqA = 14150400
+        self.__rig.FreqB = 432800000
+        self.__rig.Mode = RigParameter.ssb_u
+        self.__rig.Tx = RigParameter.rx
+        self.__rig.Pitch = 0
+        self.__rig.Split = RigParameter.splitoff
+        self.__rig.Vfo = RigParameter.vfoaa # no split
+
+    def try_prepare_response(self, command : RigCommand) -> bytearray:
+        response = command.Validation.Flags
+
+        rig = self.__rig
+        match command.Values[0].Param:
+            case RigParameter.freq:
+                return self.try_inject_value(command, rig.Freq)
+            case RigParameter.freqa:
+                return self.try_inject_value(command, rig.FreqA)
+            case RigParameter.freqb:
+                return self.try_inject_value(command, rig.FreqB)
+            case RigParameter.pitch:
+                return self.try_inject_value(command, rig.Pitch)
+            case RigParameter.ritoffset:
+                return self.try_inject_value(command, rig.RitOffset)
+
+        all_parameters = { rig.Mode, rig.Vfo, rig.Rit, rig.Xit, rig.Tx, rig.Split }
+
+        for parameter in all_parameters:
+            if parameter == RigParameter.none:
+                continue
+
+            for mode_flag in command.Flags:
+                if mode_flag.Param == parameter:
+                    return ConversionHelper.BytesOr(command.Validation.Flags, mode_flag)
+
+        raise ParameterNotSupported(f"Parameter {command.Value.Param} not supported.");
+
+    def try_inject_value(self, command: RigCommand, value: int) -> bytearray:
+        raise NotImplementedError()
 
     def start(self):
         if self.__started:
@@ -70,7 +119,7 @@ class EmulatorBase():
         if len(cmd) == 0:
             return False
 
-        init0 = self.__commands.InitCmd[0]
+        init0 = self._commands.InitCmd[0]
 
         #custom commands
         match cmd:
@@ -84,51 +133,71 @@ class EmulatorBase():
         return (False, b'')
 
     def parse_rig_command(self, command : bytearray) -> Tuple[bool, RigCommand]:
-        if len(command) == 0:
-            return False
+        if len(command) < 3:
+            return (False, None, 'none')
 
-        for init_cmd in self.__commands.InitCmd:
+        for init_cmd in self._commands.InitCmd:
             if bytes(init_cmd.Code) == command:
-                return (True, init_cmd)
+                return (True, init_cmd, 'init')
 
-        return (False, None)
+        for status_cmd in self._commands.StatusCmd:
+            if bytes(status_cmd.Code) == command:
+                return (True, status_cmd, 'status')
+
+        for write_cmd_id in self._commands.WriteCmd:
+            write_cmd = self._commands.WriteCmd[write_cmd_id]
+            if bytes(write_cmd.Code) == command:
+                return (True, write_cmd, 'write')
+
+        return (False, None, 'unknown')
 
     def listener(self, port):
         #continuously listen to commands on the master device
-        while 1:
+        while True:
             res = b''
-            while True:
-                res += os.read(port, 1)
-                if res == self.__prefix:
-                    continue
-                if res.endswith(self.__prefix):
-                    if len(res) > 2:
-                        print('command reset')
-                    res = self.__prefix
-                    continue
-                (parsed, command) = self.parse_custom_command(res)
-                if parsed:
-                    break
-                (rig_command_parsed, rig_command) = self.parse_rig_command(res)
-                if rig_command_parsed:
-                    break
-            print("command: %s" % res.removeprefix(self.__prefix))
-
-            if parsed:
-                match command:
-                    case b'cmd1':
-                        os.write(port, b'resp1')
-                    case b'cmd2':
-                        os.write(port, b'resp2')
-                    case b'exit':
-                        os.write(port, b'exiting')
+            try:
+                while True:
+                    res += os.read(port, 1)
+                    if res == self.__prefix:
+                        continue
+                    if res.endswith(self.__prefix):
+                        if len(res) > 2:
+                            print('command reset')
+                        res = self.__prefix
+                        continue
+                    (parsed, command) = self.parse_custom_command(res)
+                    if parsed:
                         break
-                    case _:
-                        os.write(port, b"I dont understand\r\n")
+                    (rig_command_parsed, rig_command, rig_command_type) = self.parse_rig_command(res)
+                    if rig_command_parsed:
+                        break
+                print("command: %s" % res.removeprefix(self.__prefix))
 
-            elif rig_command_parsed:
-                if rig_command.ReplyLength > 0:
-                    os.write(port, rig_command.Validation.Flags)
+                if parsed:
+                    match command:
+                        case b'cmd1':
+                            os.write(port, b'resp1')
+                        case b'cmd2':
+                            os.write(port, b'resp2')
+                        case b'exit':
+                            os.write(port, b'exiting')
+                            break
+                        case _:
+                            os.write(port, b"I dont understand\r\n")
+
+                elif rig_command_parsed:
+                    if rig_command.ReplyLength > 0:
+                        match rig_command_type:
+                            case 'init':
+                                os.write(port, rig_command.Validation.Flags)
+                            case 'status':
+                                response = self.try_prepare_response(rig_command)
+                                if response != None:
+                                    os.write(port, response)
+                            case 'write':
+                                raise NotImplementedError()
+            except:
+                continue
 
     def read_from_serial(self, ser : Serial, count: int) -> str:
         res = b''
@@ -137,27 +206,44 @@ class EmulatorBase():
             res += ser.read()
         print("result: %s" % res.strip())
 
-    def send_receive(self, ser : Serial, data: bytes, count: int):
+    def send_receive_command(self, ser: Serial, command : RigCommand) -> str:
+        return self.send_receive(ser, command.Code, command.ReplyLength)
+
+    def send_receive(self, ser : Serial, data: bytes, count: int) -> str:
         if not data.startswith(self.__prefix):
             ser.write(self.__prefix)
         ser.write(data)
-        self.read_from_serial(ser, count)
+        return self.read_from_serial(ser, count)
 
-    def test_serial(self):
+    def test_self(self):
         #an emulator is expected to be started by the moment 
 
         #open a pySerial connection to the slave
         ser = Serial(self.__serial_port_name, 2400, timeout=1)
-        self.send_receive(ser, b'cmd1', 5)
-        self.send_receive(ser, b'cmd2', 5)
 
-        for cmd in self.__commands.InitCmd:
-            self.send_receive(ser, cmd.Code, cmd.ReplyLength)
+        self.send_receive(ser, b'cmd1', 5)
+        #self.send_receive(ser, b'cmd2', 5)
+
+        #for cmd in self._commands.InitCmd:
+        #    self.send_receive(ser, cmd)
+
+        freqa_command = self.get_status_command(RigParameter.freqa)
+        assert freqa_command != None
+        freq_a = self.send_receive_command(ser, freqa_command)
+        assert freq_a == self.__rig.FreqA
 
         ser.close()
+
+    def get_status_command(self, command_parameter : RigParameter) -> RigCommand:
+        for command in self._commands.StatusCmd:
+            if command.Value != None and command.Value.Param == command_parameter:
+                return command
+            for value in command.Values:
+                if value.Param == command_parameter:
+                    return command
 
 if __name__=='__main__':
     x = EmulatorBase('IC-705.ini', b'\xfe\xfe')
     x.start()
-    x.test_serial()
+    x.test_self()
     x.stop()

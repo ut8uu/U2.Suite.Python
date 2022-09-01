@@ -26,7 +26,7 @@ if os.name != 'nt':
             emulator.start()
 
             # test using internal stuff
-            emulator.test_serial()
+            emulator.test_self()
 
             prefix = b'\xfe\xfe'
 

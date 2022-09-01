@@ -16,11 +16,12 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class KnownIdentifiers():
-    U2MultiRig = 0
-    U2MultiRigDemo = 1
-    U2MultiRigEmulatorInstance = 2
-    U2MultiRigEmulatorGui = 3
-    U2Logger = 10
-    U2QslManager = 20
+    U2RigEmulator = 1
+    U2MultiRig = 100
+    U2MultiRigDemo = 101
+    U2MultiRigEmulatorInstance = 102
+    U2MultiRigEmulatorGui = 103
+    U2Logger = 200
+    U2QslManager = 300
     MultiCast = 32768
         
