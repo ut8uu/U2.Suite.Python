@@ -41,9 +41,25 @@ from typing import List, Tuple
 
 class RigHelper():
     
-    NumericParameters = [ RigParameter.freq, RigParameter.freqa, 
-                         RigParameter.freqb, RigParameter.pitch, ]
+    NumericParameters = { RigParameter.freq, RigParameter.freqa, 
+                         RigParameter.freqb, RigParameter.pitch, }
     
+    VfoParams = {
+        RigParameter.vfoaa, RigParameter.vfoab, RigParameter.vfoba,
+        RigParameter.vfobb, RigParameter.vfoa, RigParameter.vfob,
+        RigParameter.vfoequal, RigParameter.vfoswap,
+    }
+
+    SplitParams = { RigParameter.spliton, RigParameter.splitoff, }
+    RitOnParams = { RigParameter.riton, RigParameter.ritoff, }
+    XitOnParams = { RigParameter.xiton, RigParameter.xitoff, }
+    TxParams = { RigParameter.rx, RigParameter.tx, }
+
+    ModeParams = {
+        RigParameter.cw_u, RigParameter.cw_l, RigParameter.ssb_u, RigParameter.ssb_l,
+        RigParameter.dig_u, RigParameter.dig_l, RigParameter.am, RigParameter.fm,
+    }
+
     @staticmethod
     def ValidateEntries(entries:List[Tuple[str,str]], allowed_entries:List[str]):
         if (len(entries) == 0):
