@@ -139,10 +139,6 @@ class CustomRig(object):
     def Mode(self, value : RigParameter):
         return self.SetMode(value)
 
-    def DisplayMessage(self, messageMode, message : str):
-        if self.MessageDisplayModes.HasFlag(messageMode):
-            print(message)
-
     def GetStatus(self) -> RigControlStatus:
         if (self._rigControlType == RigControlType.Guest):
             return self.RigControlStatus.OnLine
