@@ -27,6 +27,7 @@ from helpers.FileSystemHelper import FileSystemHelper
 from rig.CustomRig import CustomRig
 from serial import Serial
 from typing import Tuple
+from rig.enums.MessageDisplayModes import MessageDisplayModes
 
 from rig.enums.RigControlType import RigControlType
 
@@ -90,7 +91,18 @@ class EmulatorBase():
         raise ParameterNotSupported(f"Parameter {command.Value.Param} not supported.");
 
     def try_inject_value(self, command: RigCommand, value: int) -> bytearray:
-        raise NotImplementedError()
+        response = command.Validation.Flags
+
+        info = command.Values[0]
+        bytes = ConversionHelper.FormatValue(value, info)
+        if (len(bytes) == 0):
+            return False
+
+        assert len(bytes) == info.Len
+        for i in range(0, info.Len):
+            response[info.Start + i] = bytes[i]
+        # end for
+        return response
 
     def start(self):
         if self.__started:
@@ -199,17 +211,18 @@ class EmulatorBase():
             except:
                 continue
 
-    def read_from_serial(self, ser : Serial, count: int) -> str:
+    def read_from_serial(self, ser : Serial, count: int) -> bytes:
         res = b''
         while len(res) < count:
             #read the response
             res += ser.read()
         print("result: %s" % res.strip())
+        return res
 
-    def send_receive_command(self, ser: Serial, command : RigCommand) -> str:
+    def send_receive_command(self, ser: Serial, command : RigCommand) -> bytes:
         return self.send_receive(ser, command.Code, command.ReplyLength)
 
-    def send_receive(self, ser : Serial, data: bytes, count: int) -> str:
+    def send_receive(self, ser : Serial, data: bytes, count: int) -> bytes:
         if not data.startswith(self.__prefix):
             ser.write(self.__prefix)
         ser.write(data)
@@ -221,7 +234,7 @@ class EmulatorBase():
         #open a pySerial connection to the slave
         ser = Serial(self.__serial_port_name, 2400, timeout=1)
 
-        self.send_receive(ser, b'cmd1', 5)
+        #self.send_receive(ser, b'cmd1', 5)
         #self.send_receive(ser, b'cmd2', 5)
 
         #for cmd in self._commands.InitCmd:
@@ -229,7 +242,7 @@ class EmulatorBase():
 
         freqa_command = self.get_status_command(RigParameter.freqa)
         assert freqa_command != None
-        freq_a = self.send_receive_command(ser, freqa_command)
+        response = self.send_receive_command(ser, freqa_command)
         assert freq_a == self.__rig.FreqA
 
         ser.close()
