@@ -21,14 +21,14 @@ from rig.enums.RigControlStatus import RigControlStatus
 
 class CustomRig(object):
     _application_id : str
-    _rig_number = 0
+    _rig_number : int = 0
     _rig_control_type = RigControlType.guest  
-    _enabled = False  
-    _freq = 0
-    _freqA = 0
-    _freqB = 0
-    _pitch = 0
-    _ritOffset = 0
+    _enabled : bool = False  
+    _freq : int = 0
+    _freqA : int = 0
+    _freqB : int = 0
+    _pitch : int = 0
+    _ritOffset : int = 0
     _vfo = RigParameter.none
     _rit = RigParameter.none
     _xit = RigParameter.none

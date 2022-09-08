@@ -20,6 +20,7 @@ from contracts.BitMask import BitMask
 from contracts.RigCommands import RigCommands
 from contracts.RigParameter import RigParameter
 from contracts.RigSettings import RigSettings
+from events.OnRigParameterChangedEvent import OnRigParameterChangedEvent
 from exceptions.ArgumentOutOfRangeException import ArgumentOutOfRangeException
 from exceptions.ValueValidationException import ValueValidationException
 from helpers.ConversionHelper import ConversionHelper
@@ -43,6 +44,7 @@ class HostRig(Rig):
         __application_id = application_id
         __rig_settings = rig_settings
         __rig_commands = rig_commands
+        self.OnRigParameterChanged = OnRigParameterChangedEvent()
         super().__init__(RigControlType.host, rig_number, application_id)
         
     def ValidateReply(self, inputData : bytes, mask : BitMask):
@@ -217,4 +219,4 @@ class HostRig(Rig):
                 parameterValue = "FM"
             else:
                 parameterValue = 0
-            #OnRigParameterChanged(RigNumber, parameter, parameterValue)
+            self.OnRigParameterChanged(self._rig_number, parameter, parameterValue)
