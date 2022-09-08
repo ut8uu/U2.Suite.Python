@@ -23,6 +23,7 @@ from contracts.RigSettings import RigSettings
 from exceptions.ArgumentOutOfRangeException import ArgumentOutOfRangeException
 from exceptions.ValueValidationException import ValueValidationException
 from helpers.ConversionHelper import ConversionHelper
+from helpers.DebugHelper import DebugHelper
 from helpers.RigHelper import RigHelper
 from rig.enums.MessageDisplayModes import MessageDisplayModes
 from rig.enums.RigControlType import RigControlType
@@ -58,13 +59,13 @@ class HostRig(Rig):
 
     def ProcessStatusReply(self, statusCommandIndex : int, data : bytes) -> Tuple[bool, int]:
         #validate reply
-        cmd = self.__rig_commands.StatusCmd[statusCommandIndex];
+        cmd = self.__rig_commands.StatusCmd[statusCommandIndex]
 
         reply = ConversionHelper.BytesToHexStr(data)
         self.DisplayMessage(MessageDisplayModes.Diagnostics3,
             f"Processing the Status ({cmd.Value.Param}) reply: {reply}")
 
-        self.ValidateReply(data, cmd.Validation);
+        RigHelper.validate_reply(data, cmd.Validation)
 
         #extract numeric values
         for index in range(0, len(cmd.Values)):
@@ -154,7 +155,8 @@ class HostRig(Rig):
 
         if changed:
             self.__changed_params.append(parameter)
-            #DisplayMessage(MessageDisplayModes.Debug, "RIG{} status changed: {} = {}".format(RigNumber, parameter.ToString(), Convert.ToString(parameterValue)))
+            DebugHelper.DisplayMessage(MessageDisplayModes.Debug, 
+                "RIG{} status changed: {} = {}".format(self._rig_number, parameter, parameter_value))
             #packet = UdpPacketFactory.CreateSingleParameterReportingPacket(RigNumber, senderId = ApplicationId, receiverId = KnownIdentifiers.MultiCast, parameter, parameterValue)
             #UdpMessenger.SendMultiCastMessage(packet)
 
