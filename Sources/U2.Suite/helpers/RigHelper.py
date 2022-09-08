@@ -16,6 +16,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import configparser
+import logging
 
 from pyparsing import empty
 
@@ -33,16 +34,19 @@ from exceptions.MaskValidationException import MaskValidationException
 from exceptions.UnexpectedEntryException import UnexpectedEntryException
 from exceptions.ValueLoadException import ValueLoadException
 from exceptions.ValueValidationException import ValueValidationException
-from helpers.ConversionHelper import ConversionHelper as ch
+from helpers.ConversionHelper import ConversionHelper
+from helpers.DebugHelper import DebugHelper
 from helpers.IniFileHelper import IniFileHelper as ih
 from helpers.FileSystemHelper import FileSystemHelper as fsh
 from os import path
 from typing import List, Tuple
 
+from rig.enums.MessageDisplayModes import MessageDisplayModes
+
 class RigHelper():
     
-    NumericParameters = { RigParameter.freq, RigParameter.freqa, 
-                         RigParameter.freqb, RigParameter.pitch, }
+    NumericParameters = [ RigParameter.freq, RigParameter.freqa, 
+                         RigParameter.freqb, RigParameter.pitch, ]
     
     VfoParams = {
         RigParameter.vfoaa, RigParameter.vfoab, RigParameter.vfoba,
@@ -76,7 +80,7 @@ class RigHelper():
             raise MaskValidationException("Incorrect mask length")
         if length > 0 and len(mask.Mask) != length:
             raise MaskValidationException("Mask length <> ReplyLength")
-        if not ch.BytesAnd(mask.Flags, mask.Flags) == mask.Flags:
+        if not ConversionHelper.BytesAnd(mask.Flags, mask.Flags) == mask.Flags:
             raise MaskValidationException("Mask hides valid bits")
 
     @staticmethod
@@ -104,7 +108,6 @@ class RigHelper():
                 raise MaskValidationException("Parameter name is missing")
             if len(mask.Mask) == 0:
                 raise MaskValidationException("Mask is blank")
-        
     
     @staticmethod
     def LoadCommon(config_parser:configparser.ConfigParser, section: str) -> RigCommand:
@@ -112,9 +115,9 @@ class RigHelper():
         try:
             option = ih.GetCommandOption(config_parser, section)
             if (option.startswith('(')):
-                result.Code = ch.StrToBytes(option)
+                result.Code = ConversionHelper.StrToBytes(option)
             else:
-                result.Code = ch.HexStrToBytes(option)
+                result.Code = ConversionHelper.HexStrToBytes(option)
         except Exception:
             raise EntryLoadErrorException(f'Failed loading the Common section from {section}')
         
@@ -126,7 +129,7 @@ class RigHelper():
         
         try:
             mask_value = ih.GetValidateOption(config_parser, section)
-            result.Validation = ch.StrToBitMask(mask_value)
+            result.Validation = ConversionHelper.StrToBitMask(mask_value)
         except Exception as ex:
             raise EntryLoadErrorException(f'Failed loading the Validate section from {section}')
         
@@ -196,7 +199,7 @@ class RigHelper():
         result = ParameterValue()
         
         if len(elements) == 6:
-            result.Param = ch.StrToRigParameter(elements[5])
+            result.Param = ConversionHelper.StrToRigParameter(elements[5])
         try:
             result.Start = int(elements[0])
         except Exception:
@@ -207,7 +210,7 @@ class RigHelper():
         except Exception:
             raise ValueLoadException(f"Invalid Length value in '{value}'")
         
-        result.Format = ch.StrToValueFormat(elements[2])
+        result.Format = ConversionHelper.StrToValueFormat(elements[2])
         try:
             result.Mult = float(elements[3])
         except Exception as ex:
@@ -280,7 +283,7 @@ class RigHelper():
             return False, None
 
         try:
-            flag = ch.StrToBitMask(ini_setting[1])
+            flag = ConversionHelper.StrToBitMask(ini_setting[1])
             RigHelper.ValidateMask(ini_setting[0], flag, cmd.ReplyLength, cmd.ReplyEnd)
             return True, flag
         except MaskValidationException:
@@ -353,7 +356,6 @@ class RigHelper():
         except UnexpectedEntryException as ex:
             raise LoadWriteCommandException(ex)
 
-    
     @staticmethod
     def LoadWriteCommands(config_parser: configparser.ConfigParser):
         result = {}
@@ -372,7 +374,7 @@ class RigHelper():
                 RigHelper.ValidateValue(parameterValue, len(cmd.Code))
                 if parameterValue.Param != RigParameter.none:
                     raise LoadWriteCommandException("parameter name is not allowed")
-                param = ch.StrToRigParameter(section)
+                param = ConversionHelper.StrToRigParameter(section)
                 parameterValue.Param = param
                 if RigHelper.NumericParameters.count(param) > 0 and parameterValue.Len == 0:
                     raise LoadWriteCommandException("Value is missing")
@@ -384,7 +386,6 @@ class RigHelper():
                 raise LoadWriteCommandException(ex.Message, ex)
         return result
 
-    
     @staticmethod
     def loadRigCommands(ini_file_path : str) -> RigCommands:
         if not path.exists(ini_file_path):
@@ -411,3 +412,43 @@ class RigHelper():
                 print('Error loading ini file {}. {}'.format(file, ex.Message))
         return list   
     
+    @staticmethod
+    def validate_reply(inputData : bytes, mask : BitMask):
+        if len(inputData) != len(mask.Flags):
+            raise ValueValidationException(f"Incorrect input data length. Expected {len(mask.Flags)}, actual {len(inputData)}.")
+
+        data = ConversionHelper.BytesAnd(inputData, mask.Mask)
+        if data == mask.Flags:
+            return
+
+        expected_string = ConversionHelper.BytesToHexStr(mask.Flags)
+        actual_string = ConversionHelper.BytesToHexStr(inputData)
+        raise ValueValidationException(f"Invalid input data. Expected {expected_string}, actual {actual_string}.")
+
+    @staticmethod
+    def process_status_reply(self, rig_number: int, cmd: RigCommand, data : bytes) -> Tuple[bool, int]:
+        reply = ConversionHelper.BytesToHexStr(data)
+        DebugHelper.DisplayMessage(MessageDisplayModes.Diagnostics3,
+            f"Processing the Status ({cmd.Value.Param}) reply: {reply}")
+
+        RigHelper.validate_reply(data, cmd.Validation)
+
+        #extract numeric values
+        for index in range(0, len(cmd.Values)):
+            try:
+                value = ConversionHelper.UnformatValue(data, cmd.Values[index])
+                self.StoreParam(cmd.Values[index].Param, value)
+            except (Exception) as ex:
+                logging.error(ex)
+
+        #extract bit flags
+        for index in range(0, len(cmd.Flags)):
+            if len(data) != len(cmd.Flags[index].Mask) or \
+                len(data) != len(cmd.Flags[index].Flags):
+                DebugHelper.DisplayMessage(MessageDisplayModes.Error, f"RIG{rig_number}: incorrect reply length")
+            elif cmd.Flags[index].Flags == ConversionHelper.BytesAnd(data, cmd.Flags[index].Mask):
+                parameter = cmd.Flags[index].Param
+                if self.StoreParam(parameter):
+                    DebugHelper.DisplayMessage(MessageDisplayModes.Diagnostics2, 
+                        f"Found changed parameter: {parameter}")
+                    self.__changed_params.append(parameter)
