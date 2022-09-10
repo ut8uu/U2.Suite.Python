@@ -23,7 +23,7 @@ class RigSettings(object):
     StopBits = [ 1.0, 1.5, 2.0 ]
     
     def __init__(self):
-        self._RigNumber = str.Empty
+        self._RigNumber = ''
         self._Enabled = False
         self._RigType = ''
         self._Port = ''
