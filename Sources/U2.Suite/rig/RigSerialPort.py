@@ -15,8 +15,10 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import pty
 import os, serial, threading
 from contracts.RigSettings import RigSettings
+from exceptions.TimeoutException import TimeoutException
 from helpers.ConversionHelper import ConversionHelper
 
 class RigSerialPort():
@@ -26,10 +28,11 @@ class RigSerialPort():
     def __init__(self) -> None:
         pass
     
-    def is_connected(self):
+    @property
+    def IsConnected(self):
         return self._serial_port.is_open()
     
-    def connect(self):
+    def Connect(self):
         if not self._serial_port == None and self._serial_port.is_open:
             return
         
@@ -39,7 +42,16 @@ class RigSerialPort():
             parity = ConversionHelper.string_to_parity(self._rig_settings),
             bytesize = ConversionHelper.int_to_databits(self._rig_settings.DataBits),
             stopbits = ConversionHelper.float_to_stopbits(self._rig_settings.StopBits))
+        self._serial_port.timeout = self._rig_settings.TimeoutMs / 1000
+        self._serial_port.write_timeout = self._rig_settings.TimeoutMs / 1000
         
+    def SendMessage(self, data: bytearray) -> None:
+        """sends a data to the port"""
+        try:
+            self._serial_port.write(data)
+        except serial.SerialTimeoutException:
+            raise TimeoutException(f'Timeout occured while sending data to {self._rig_settings.Port}')
+
 def test_serial():
     """Start the testing"""
     master,slave = pty.openpty() #open the pseudoterminal
