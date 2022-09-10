@@ -18,17 +18,18 @@
 import sys
 
 from contracts.RigCommand import RigCommand
+from contracts.RigParameter import RigParameter
 from typing import List
 
 class RigCommands(object):
     def __init__(self):
         self._RigType = None
-        self._InitCmd = []
+        self._InitCmd : List[RigCommand] = []
         self._WriteCmd = []
-        self._StatusCmd = []
-        self._ReadableParams = None
-        self._WriteableParams = None
-        self._Title = None
+        self._StatusCmd : List[RigCommand] = []
+        self._ReadableParams : List[RigParameter] = []
+        self._WriteableParams : List[RigParameter] = []
+        self._Title = str
     @property
     def RigType(self):
         return self._RigType
