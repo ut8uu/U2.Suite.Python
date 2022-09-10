@@ -48,7 +48,7 @@ class RigHelper():
     NumericParameters = [ RigParameter.freq, RigParameter.freqa, 
                          RigParameter.freqb, RigParameter.pitch, ]
     
-    VfoParams = {
+    VfoParams : Tuple[RigParameter] = {
         RigParameter.vfoaa, RigParameter.vfoab, RigParameter.vfoba,
         RigParameter.vfobb, RigParameter.vfoa, RigParameter.vfob,
         RigParameter.vfoequal, RigParameter.vfoswap,
@@ -63,6 +63,14 @@ class RigHelper():
         RigParameter.cw_u, RigParameter.cw_l, RigParameter.ssb_u, RigParameter.ssb_l,
         RigParameter.dig_u, RigParameter.dig_l, RigParameter.am, RigParameter.fm,
     }
+
+    @staticmethod
+    def CollectionContainsValue(collection : Tuple[RigParameter], value: RigParameter) -> bool:
+        try:
+            index = collection.index(value)
+            return True
+        except:
+            return False
 
     @staticmethod
     def ValidateEntries(entries:List[Tuple[str,str]], allowed_entries:List[str]):
