@@ -63,3 +63,8 @@ class CommandQueue(List[QueueItem]):
         if len(self) > 0:
             return self[0]
         return None
+
+    @property
+    def IsEmpty(self):
+        return len(self) == 0
+        

@@ -52,4 +52,10 @@ class CommandQueueTests(unittest.TestCase):
 
         queue.Add()
         self.assertNotEqual(None, queue.CurrentCmd)
-        
+    
+    def test_IsEmpty(self):
+        queue = CommandQueue()
+        self.assertTrue(queue.IsEmpty)
+
+        queue.Add()
+        self.assertFalse(queue.IsEmpty)
