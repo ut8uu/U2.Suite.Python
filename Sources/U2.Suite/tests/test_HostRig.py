@@ -18,6 +18,7 @@
 import os, unittest
 
 from contracts.RigSettings import RigSettings
+from exceptions.ArgumentException import ArgumentException
 from helpers.FileSystemHelper import FileSystemHelper
 from helpers.RigHelper import RigHelper
 from rig.HostRig import HostRig
@@ -34,3 +35,6 @@ class HostRigTests(unittest.TestCase):
         
         rig.SetFreqA(1)
         self.assertEqual(1, rig.FreqA)
+
+        with self.assertRaises(ArgumentException) as ex:
+            rig.SetFreq(1)
