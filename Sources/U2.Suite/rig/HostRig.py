@@ -17,17 +17,25 @@
 
 import logging
 from contracts.BitMask import BitMask
+from contracts.CommandQueue import CommandQueue
 from contracts.RigCommands import RigCommands
 from contracts.RigParameter import RigParameter
 from contracts.RigSettings import RigSettings
-from events.OnRigParameterChangedEvent import OnRigParameterChangedEvent
+from contracts.QueueItem import QueueItem
+from contracts.ValueFormat import ValueFormat
+from exceptions.ArgumentException import ArgumentException
 from exceptions.ArgumentOutOfRangeException import ArgumentOutOfRangeException
+from exceptions.TimeoutException import TimeoutException
 from exceptions.ValueValidationException import ValueValidationException
 from helpers.ConversionHelper import ConversionHelper
 from helpers.DebugHelper import DebugHelper
 from helpers.RigHelper import RigHelper
+from rig.RigSerialPort import RigSerialPort
+from rig.enums.CommandKind import CommandKind
+from rig.enums.ExchangePhase import ExchangePhase
 from rig.enums.MessageDisplayModes import MessageDisplayModes
 from rig.enums.RigControlType import RigControlType
+from rig.events.OnRigParameterChangedEvent import OnRigParameterChangedEvent
 from rig.Rig import Rig
 from typing import List, Tuple
 
@@ -37,6 +45,8 @@ class HostRig(Rig):
     __rig_number: int
     __rig_settings: RigSettings
     __changed_params : List[RigParameter]
+    __queue : CommandQueue
+    __serialPort : RigSerialPort
 
     def __init__(self, rig_number:int, application_id:int, 
                  rig_settings:RigSettings, rig_commands:RigCommands):
@@ -45,7 +55,7 @@ class HostRig(Rig):
         __rig_settings = rig_settings
         __rig_commands = rig_commands
         self.OnRigParameterChanged = OnRigParameterChangedEvent()
-        super().__init__(RigControlType.host, rig_number, application_id)
+        super(Rig, self).__init__(RigControlType.host, rig_number, application_id)
         
     def ValidateReply(self, inputData : bytes, mask : BitMask):
         if len(inputData) != len(mask.Flags):
@@ -220,3 +230,138 @@ class HostRig(Rig):
             else:
                 parameterValue = 0
             self.OnRigParameterChanged(self._rig_number, parameter, parameterValue)
+
+    def SetFreq(self, value):
+        if not self.Enabled or self.Freq == value:
+            return
+        super(HostRig, self).SetFreq(value)
+        self.AddWriteCommand(RigParameter.freq, value)
+
+    def SetFreqA(self, value):
+        if not self.Enabled or value == self.FreqA:
+            return
+        super(HostRig, self).SetFreqA(value)
+        self.AddWriteCommand(RigParameter.freqa, value)
+
+    def SetFreqB(self, value):
+        if not self.Enabled or value == self.FreqB:
+            return
+        super(HostRig, self).SetFreqB(value)
+        self.AddWriteCommand(RigParameter.freqb, value)
+
+    def SetPitch(self, value):
+        if not self.Enabled or self.Pitch == value:
+            return
+        if not RigHelper.CollectionContainsValue(self.__rig_commands.ReadableParams, RigParameter.Pitch):
+            super(HostRig, self).SetPitch(value)
+        self.AddWriteCommand(RigParameter.pitch, value)
+
+    def SetRitOffset(self, value):
+        if not self.Enabled or self.RitOffset == value:
+            return
+        super(HostRig, self).SetRitOffset(value)
+        self.AddWriteCommand(RigParameter.ritoffset, value)
+
+    def SetVfo(self, value):
+        if not self.Enabled \
+            or self.Vfo == value \
+            or not RigHelper.CollectionContainsValue(RigHelper.VfoParams, value):
+            return
+        super(HostRig, self).SetVfo(value)
+        self.AddWriteCommand(value)
+
+    def SetRit(self, value):
+        if not self.Enabled or value == self.Rit \
+            or not RigHelper.CollectionContainsValue(RigHelper.RitOnParams, value):
+            return
+        super(HostRig, self).SetRit(value)
+        self.AddWriteCommand(value)
+
+    def SetXit(self, value):
+        if not self.Enabled \
+            or not RigHelper.CollectionContainsValue(RigHelper.XitOnParams, value) \
+            or (value == self.Xit):
+            return
+        super(HostRig, self).SetXit(value)
+        self.AddWriteCommand(value)
+
+    def SetTx(self, value):
+        if not self.Enabled \
+            or not RigHelper.CollectionContainsValue(RigHelper.TxParams, value):
+            return
+        super(HostRig, self).SetTx(value)
+        self.AddWriteCommand(value)
+
+    def SetMode(self, value):
+        if not self.Enabled \
+            or not RigHelper.CollectionContainsValue(RigHelper.ModeParams, value):
+            return
+        super(HostRig, self).SetMode(value)
+        self.AddWriteCommand(value)
+
+    def SetSplit(self, value):
+        if not self.Enabled \
+            and not RigHelper.CollectionContainsValue(RigHelper.SplitParams, value):
+            return
+        if RigHelper.CollectionContainsValue(self.__rig_commands.WriteableParams, value) \
+            and (value != self.Split):
+            self.AddWriteCommand(value)
+        elif (value == RigParameter.SplitOn):
+            if self.Vfo == RigParameter.vfoaa:
+                self.SetVfo(RigParameter.vfoab)
+            elif self.Vfo == RigParameter.vfobb:
+                self.SetVfo(RigParameter.vfoba)
+        else:
+            if self.Vfo == RigParameter.vfoab:
+                self.SetVfo(RigParameter.vfoaa)
+            elif self.Vfo == RigParameter.vfoba:
+                self.SetVfo(RigParameter.vfobb)
+        super(HostRig, self).SetSplit(value)
+
+    def AddWriteCommand(self, param, value = 0):
+        if (self.__rig_commands == None):
+            return
+        if (not self.__rig_commands.WriteCmd.ContainsKey(param)):
+            raise ArgumentException(f"A parameter {param} does not support writing to the RIG.")
+        cmd = self.__rig_commands.WriteCmd[int(param)]
+        if (cmd.Code == None):
+            logging.Error(f"RIG{self._rig_number} Write command not supported for {param}")
+            return
+        newCode = cmd.Code
+        if cmd.Value.Format != ValueFormat.none:
+            try:
+                fmtValue = ConversionHelper.FormatValue(value, cmd.Value)
+                if (cmd.Value.Start + cmd.Value.Len) > newCode.Length:
+                    raise ValueValidationException("Value {} too long".format(ConversionHelper.BytesToHexStr(cmd.Code)))
+                Array.Copy(fmtValue, 0, newCode, cmd.Value.Start, cmd.Value.Len)
+            except Exception as e:
+                logging.Error("RIG{0}: Generating command: {1}", self._rig_number, e.Message)
+        
+        queueItem = QueueItem()
+        queueItem.Code = newCode
+        queueItem.Param = param
+        queueItem.Kind = CommandKind.Write
+        queueItem.ReplyLength = cmd.ReplyLength
+        queueItem.ReplyEnd = ConversionHelper.BytesToHexStr(cmd.ReplyEnd)
+        self.__queue.AddBeforeStatusCommands(queueItem)
+        self.CheckQueue()
+
+    def CheckQueue(self):
+        if self.__queue.IsEmpty:
+            return
+
+        if not self.Enabled \
+            or not self.__serialPort.IsConnected \
+            or self.__queue.Phase != ExchangePhase.Idle \
+            or self.__queue.IsEmpty:
+            return
+
+        try:
+            self.__serialPort.SendMessage(self.__queue.CurrentCmd.Code)
+        except TimeoutException as ex:
+            logging.error(ex.args[0])
+
+        if self.__queue.CurrentCmd.NeedsReply:
+            self.__queue.Phase = ExchangePhase.Receiving
+        else:
+            self.__queue.RemoveAt(0)
