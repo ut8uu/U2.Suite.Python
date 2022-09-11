@@ -24,15 +24,22 @@ from helpers.ConversionHelper import ConversionHelper
 class RigSerialPort():
     _rig_settings: RigSettings
     _serial_port: serial.Serial
+    _connected : bool = False
     
-    def __init__(self) -> None:
+    def __init__(self, settings : RigSettings) -> None:
+        self._rig_settings = settings
         pass
     
     @property
     def IsConnected(self):
-        return self._serial_port.is_open()
+        if not self._connected or self._serial_port == None:
+            return False
+        self._connected = self._serial_port.isOpen
+        return self._connected
     
     def Connect(self):
+        self._connected = False # reset the flag first
+
         if not self._serial_port == None and self._serial_port.is_open:
             return
         
@@ -44,6 +51,8 @@ class RigSerialPort():
             stopbits = ConversionHelper.float_to_stopbits(self._rig_settings.StopBits))
         self._serial_port.timeout = self._rig_settings.TimeoutMs / 1000
         self._serial_port.write_timeout = self._rig_settings.TimeoutMs / 1000
+
+        self._connected = self._serial_port.isOpen()
         
     def SendMessage(self, data: bytearray) -> None:
         """sends a data to the port"""
