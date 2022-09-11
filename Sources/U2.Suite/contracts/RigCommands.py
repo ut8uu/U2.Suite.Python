@@ -19,13 +19,13 @@ import sys
 
 from contracts.RigCommand import RigCommand
 from contracts.RigParameter import RigParameter
-from typing import List
+from typing import Dict, List
 
 class RigCommands(object):
     def __init__(self):
         self._RigType = None
         self._InitCmd : List[RigCommand] = []
-        self._WriteCmd = []
+        self._WriteCmd : Dict[RigParameter, RigCommand]
         self._StatusCmd : List[RigCommand] = []
         self._ReadableParams : List[RigParameter] = []
         self._WriteableParams : List[RigParameter] = []
@@ -43,7 +43,7 @@ class RigCommands(object):
     def InitCmd(self, value):
         self._InitCmd = value
     @property
-    def WriteCmd(self) -> List[RigCommand]:
+    def WriteCmd(self) -> Dict[RigParameter, RigCommand]:
         return self._WriteCmd
     @WriteCmd.setter
     def WriteCmd(self, value):
