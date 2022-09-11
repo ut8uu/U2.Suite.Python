@@ -40,22 +40,21 @@ from rig.Rig import Rig
 from typing import List, Tuple
 
 class HostRig(Rig):
-    __application_id: int
-    __rig_commands: RigCommands
-    __rig_number: int
-    __rig_settings: RigSettings
-    __changed_params : List[RigParameter]
-    __queue : CommandQueue
-    __serialPort : RigSerialPort
+
+    _rig_commands : RigCommands
+    _rig_settings : RigSettings
+    _serial_port : RigSerialPort
+    _queue : CommandQueue = CommandQueue()
 
     def __init__(self, rig_number:int, application_id:int, 
                  rig_settings:RigSettings, rig_commands:RigCommands):
-        __rig_number = rig_number
-        __application_id = application_id
-        __rig_settings = rig_settings
-        __rig_commands = rig_commands
+        self._rig_number = rig_number
+        self._application_id = application_id
+        self._rig_settings = rig_settings
+        self._rig_commands = rig_commands
         self.OnRigParameterChanged = OnRigParameterChangedEvent()
         super(Rig, self).__init__(RigControlType.host, rig_number, application_id)
+        self._serial_port = RigSerialPort(rig_settings)
         
     def ValidateReply(self, inputData : bytes, mask : BitMask):
         if len(inputData) != len(mask.Flags):
@@ -71,7 +70,7 @@ class HostRig(Rig):
 
     def ProcessStatusReply(self, statusCommandIndex : int, data : bytes) -> Tuple[bool, int]:
         #validate reply
-        cmd = self.__rig_commands.StatusCmd[statusCommandIndex]
+        cmd = self._rig_commands.StatusCmd[statusCommandIndex]
 
         reply = ConversionHelper.BytesToHexStr(data)
         self.DisplayMessage(MessageDisplayModes.Diagnostics3,
@@ -97,13 +96,13 @@ class HostRig(Rig):
                 if self.StoreParam(parameter):
                     self.DisplayMessage(MessageDisplayModes.Diagnostics2, 
                         f"Found changed parameter: {parameter}")
-                    self.__changed_params.append(parameter);
+                    self._changed_params.append(parameter);
 
-        self.ReportChangedParameters(self.__changed_params)
-        self.__changed_params.clear()
+        self.ReportChangedParameters(self._changed_params)
+        self._changed_params.clear()
 
         #tell clients
-        #if len(self.__changed_params) > 0:
+        #if len(self._changed_params) > 0:
         #    packet = UdpPacketFactory.CreateMultipleParametersReportingPacket(RigNumber,
         #        senderId: ApplicationId, receiverId: KnownIdentifiers.MultiCast, _changedParams);
         #    UdpMessenger.SendMultiCastMessage(packet);
@@ -166,7 +165,7 @@ class HostRig(Rig):
             raise ArgumentOutOfRangeException(f"Parameter {parameter} not supported.")
 
         if changed:
-            self.__changed_params.append(parameter)
+            self._changed_params.append(parameter)
             DebugHelper.DisplayMessage(MessageDisplayModes.Debug, 
                 "RIG{} status changed: {} = {}".format(self._rig_number, parameter, parameter_value))
             #packet = UdpPacketFactory.CreateSingleParameterReportingPacket(RigNumber, senderId = ApplicationId, receiverId = KnownIdentifiers.MultiCast, parameter, parameterValue)
@@ -252,7 +251,7 @@ class HostRig(Rig):
     def SetPitch(self, value):
         if not self.Enabled or self.Pitch == value:
             return
-        if not RigHelper.CollectionContainsValue(self.__rig_commands.ReadableParams, RigParameter.Pitch):
+        if not RigHelper.CollectionContainsValue(self._rig_commands.ReadableParams, RigParameter.Pitch):
             super(HostRig, self).SetPitch(value)
         self.AddWriteCommand(RigParameter.pitch, value)
 
@@ -303,7 +302,7 @@ class HostRig(Rig):
         if not self.Enabled \
             and not RigHelper.CollectionContainsValue(RigHelper.SplitParams, value):
             return
-        if RigHelper.CollectionContainsValue(self.__rig_commands.WriteableParams, value) \
+        if RigHelper.CollectionContainsValue(self._rig_commands.WriteableParams, value) \
             and (value != self.Split):
             self.AddWriteCommand(value)
         elif (value == RigParameter.SplitOn):
@@ -318,22 +317,27 @@ class HostRig(Rig):
                 self.SetVfo(RigParameter.vfobb)
         super(HostRig, self).SetSplit(value)
 
-    def AddWriteCommand(self, param, value = 0):
-        if (self.__rig_commands == None):
+    def AddWriteCommand(self, param : RigParameter, value : int = 0):
+        if (self._rig_commands == None):
             return
-        if (not self.__rig_commands.WriteCmd.ContainsKey(param)):
+
+        cmd_id = next((c for c in self._rig_commands.WriteCmd if c == param.value), None)
+        if cmd_id == None:
             raise ArgumentException(f"A parameter {param} does not support writing to the RIG.")
-        cmd = self.__rig_commands.WriteCmd[int(param)]
+
+        cmd = self._rig_commands.WriteCmd[param.value]
         if (cmd.Code == None):
             logging.Error(f"RIG{self._rig_number} Write command not supported for {param}")
             return
-        newCode = cmd.Code
+
+        newCode = cmd.Code.copy()
         if cmd.Value.Format != ValueFormat.none:
             try:
                 fmtValue = ConversionHelper.FormatValue(value, cmd.Value)
-                if (cmd.Value.Start + cmd.Value.Len) > newCode.Length:
+                if (cmd.Value.Start + cmd.Value.Len) > len(newCode):
                     raise ValueValidationException("Value {} too long".format(ConversionHelper.BytesToHexStr(cmd.Code)))
-                Array.Copy(fmtValue, 0, newCode, cmd.Value.Start, cmd.Value.Len)
+                for index in range(0, cmd.Value.Len):
+                    newCode[cmd.Value.Start + index] = fmtValue[index]
             except Exception as e:
                 logging.Error("RIG{0}: Generating command: {1}", self._rig_number, e.Message)
         
@@ -343,25 +347,25 @@ class HostRig(Rig):
         queueItem.Kind = CommandKind.Write
         queueItem.ReplyLength = cmd.ReplyLength
         queueItem.ReplyEnd = ConversionHelper.BytesToHexStr(cmd.ReplyEnd)
-        self.__queue.AddBeforeStatusCommands(queueItem)
+        self._queue.AddBeforeStatusCommands(queueItem)
         self.CheckQueue()
 
     def CheckQueue(self):
-        if self.__queue.IsEmpty:
+        if self._queue.IsEmpty:
             return
 
         if not self.Enabled \
-            or not self.__serialPort.IsConnected \
-            or self.__queue.Phase != ExchangePhase.Idle \
-            or self.__queue.IsEmpty:
+            or not self._serial_port.IsConnected \
+            or self._queue.Phase != ExchangePhase.Idle \
+            or self._queue.IsEmpty:
             return
 
         try:
-            self.__serialPort.SendMessage(self.__queue.CurrentCmd.Code)
+            self._serial_port.SendMessage(self._queue.CurrentCmd.Code)
         except TimeoutException as ex:
             logging.error(ex.args[0])
 
-        if self.__queue.CurrentCmd.NeedsReply:
-            self.__queue.Phase = ExchangePhase.Receiving
+        if self._queue.CurrentCmd.NeedsReply:
+            self._queue.Phase = ExchangePhase.Receiving
         else:
-            self.__queue.RemoveAt(0)
+            self._queue.RemoveAt(0)

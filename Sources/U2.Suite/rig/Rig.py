@@ -25,4 +25,4 @@ class Rig(CustomRig):
         control_type: RigControlType, 
         rig_number: int,
         application_id: str):
-        super().__init__(control_type)
+        super().__init__(control_type, rig_number, application_id)
