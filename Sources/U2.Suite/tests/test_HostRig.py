@@ -16,6 +16,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os, unittest
+import time
 
 from contracts.RigSettings import RigSettings
 from exceptions.ArgumentException import ArgumentException
@@ -72,6 +73,8 @@ class HostRigTests(unittest.TestCase):
 
         freq = 14200120
         rig.FreqA = freq
+
+        time.sleep(5)  # wait for some time
         self.assertEqual(freq, emulator._rig.FreqA)
 
         emulator.stop()

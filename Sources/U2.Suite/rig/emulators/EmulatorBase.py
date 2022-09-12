@@ -144,7 +144,7 @@ class EmulatorBase():
 
         return (False, b'')
 
-    def parse_rig_command(self, command : bytearray) -> Tuple[bool, RigCommand]:
+    def parse_rig_command(self, command : bytes) -> Tuple[bool, RigCommand]:
         if len(command) < 3:
             return (False, None, 'none')
 
@@ -156,9 +156,16 @@ class EmulatorBase():
             if bytes(status_cmd.Code) == command:
                 return (True, status_cmd, 'status')
 
+        cmd_len = len(command)
         for write_cmd_id in self._commands.WriteCmd:
             write_cmd = self._commands.WriteCmd[write_cmd_id]
-            if bytes(write_cmd.Code) == command:
+            if cmd_len != len(write_cmd.Code):
+                continue
+            command_empty = bytearray(command)
+            v = write_cmd.Value
+            for index in range(0, v.Len):
+                command_empty[v.Start + index] = 0x00
+            if bytes(write_cmd.Code) == command_empty:
                 return (True, write_cmd, 'write')
 
         return (False, None, 'unknown')
@@ -207,9 +214,24 @@ class EmulatorBase():
                                 if response != None:
                                     os.write(port, response)
                             case 'write':
-                                raise NotImplementedError()
-            except:
+                                raw_value = bytearray()
+                                v = rig_command.Value
+                                value = ConversionHelper.UnformatValue(bytearray(res), rig_command.Value)
+                                self.SetValue(v.Param, value)
+                                formatted_value = ConversionHelper.FormatValue(value, v)
+                                response = bytearray(rig_command.Validation.Flags)
+                                for index in range(0, v.Len):
+                                    response[v.Start + index] = formatted_value[index]
+                                os.write(port, response)
+            except Exception as ex:
                 continue
+
+    def SetValue(self, param: RigParameter, value: int):
+        match param:
+            case RigParameter.freqa:
+                self._rig.FreqA = value
+            case RigParameter.freqb:
+                self._rig.FreqB = value
 
     def read_from_serial(self, ser : Serial, count: int) -> bytes:
         res = b''
