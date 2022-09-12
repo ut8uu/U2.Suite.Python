@@ -46,7 +46,7 @@ class RigSerialPort():
         self._serial_port = serial.Serial(
             port = self._rig_settings.Port,
             baudrate = self._rig_settings.BaudRate,
-            parity = ConversionHelper.string_to_parity(self._rig_settings),
+            parity = ConversionHelper.string_to_parity(self._rig_settings.Parity),
             bytesize = ConversionHelper.int_to_databits(self._rig_settings.DataBits),
             stopbits = ConversionHelper.float_to_stopbits(self._rig_settings.StopBits))
         self._serial_port.timeout = self._rig_settings.TimeoutMs / 1000
