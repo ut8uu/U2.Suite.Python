@@ -17,16 +17,17 @@
 
 from contracts.QueueItem import QueueItem
 from rig.enums.CommandKind import CommandKind
+from rig.enums.ExchangePhase import ExchangePhase
 from typing import List
 
 class CommandQueue(List[QueueItem]):
 
     def __init__(self):
-        self._Phase = None
+        self._Phase = ExchangePhase.Idle
         super(CommandQueue, self).__init__()
 
     @property
-    def Phase(self):
+    def Phase(self) -> ExchangePhase:
         return self._Phase
 
     @Phase.setter
