@@ -22,19 +22,56 @@ from exceptions.ArgumentException import ArgumentException
 from helpers.FileSystemHelper import FileSystemHelper
 from helpers.RigHelper import RigHelper
 from rig.HostRig import HostRig
+from rig.emulators.IC705Emulator import IC705Emulator
 
 class HostRigTests(unittest.TestCase):
-    def test_set_properties(self) -> None:
+
+    def GetEmulator(self) -> IC705Emulator:
+        emulator = IC705Emulator()
+        return emulator
+
+    def GetSettings(self) -> RigSettings:
+        settings = RigSettings()
+        settings.BaudRate = 9600
+        settings.DataBits = 8
+        settings.DtrMode = False
+        settings.RtsMode = False
+        settings.Parity = 'None'
+        settings.StopBits = 1
+        settings.TimeoutMs = 500
+        settings.PollMs = 2000
+
+        return settings
+
+    def GetHostRig(self, enabled: bool, emulator : IC705Emulator) -> HostRig:
         path = os.path.join(FileSystemHelper.getIniFilesFolder(), 'IC-705.ini')
         self.assertTrue(os.path.isfile(path))
 
         commands = RigHelper.loadRigCommands(path)
-        settings = RigSettings()
+        settings = self.GetSettings()
+        settings.Port = emulator.SerialPortName
+
         rig = HostRig(1, 1, settings, commands)
-        rig.Enabled = True
-        
+        rig.Enabled = enabled
+
+        return rig
+
+    def test_set_properties(self) -> None:
+        emulator = self.GetEmulator()
+        rig = self.GetHostRig(True, emulator)
         rig.SetFreqA(1)
         self.assertEqual(1, rig.FreqA)
 
         with self.assertRaises(ArgumentException) as ex:
             rig.SetFreq(1)
+
+    def test_CanGetFreqAViaSerialPort(self):
+        emulator = IC705Emulator()
+        emulator.start()
+        rig = self.GetHostRig(True, emulator)
+
+        freq = 14200120
+        rig.FreqA = freq
+        self.assertEqual(freq, emulator._rig.FreqA)
+
+        emulator.stop()
