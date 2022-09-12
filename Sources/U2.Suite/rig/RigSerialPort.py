@@ -24,6 +24,7 @@ from helpers.ConversionHelper import ConversionHelper
 class RigSerialPort():
     _rig_settings: RigSettings
     _serial_port: serial.Serial
+    _serial_port_initialized : bool = False
     _connected : bool = False
     
     def __init__(self, settings : RigSettings) -> None:
@@ -40,7 +41,7 @@ class RigSerialPort():
     def Connect(self):
         self._connected = False # reset the flag first
 
-        if not self._serial_port == None and self._serial_port.is_open:
+        if self._serial_port_initialized and self._serial_port.is_open:
             return
         
         self._serial_port = serial.Serial(
@@ -52,6 +53,7 @@ class RigSerialPort():
         self._serial_port.timeout = self._rig_settings.TimeoutMs / 1000
         self._serial_port.write_timeout = self._rig_settings.TimeoutMs / 1000
 
+        self._serial_port_initialized = True
         self._connected = self._serial_port.isOpen()
         
     def SendMessage(self, data: bytearray) -> None:
