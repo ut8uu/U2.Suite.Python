@@ -55,6 +55,7 @@ class HostRig(Rig):
         self.OnRigParameterChanged = OnRigParameterChangedEvent()
         super(Rig, self).__init__(RigControlType.host, rig_number, application_id)
         self._serial_port = RigSerialPort(rig_settings)
+        self._serial_port.Connect()
         
     def ValidateReply(self, inputData : bytes, mask : BitMask):
         if len(inputData) != len(mask.Flags):
