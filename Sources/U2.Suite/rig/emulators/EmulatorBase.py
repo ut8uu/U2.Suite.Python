@@ -32,40 +32,40 @@ from rig.enums.MessageDisplayModes import MessageDisplayModes
 from rig.enums.RigControlType import RigControlType
 
 class EmulatorBase():
-    __prefix = b''
-    __started = False
-    __ini_file_name = ''
-    __thread : threading.Thread
-    __serial_port_name = ''
+    _prefix = b''
+    _started = False
+    _ini_file_name = ''
+    _thread : threading.Thread
+    _serial_port_name = ''
     _commands : RigCommands
-    __rig : CustomRig
+    _rig : CustomRig
 
     def __init__(self, ini_file_name, prefix) -> None:
-        self.__ini_file_name = ini_file_name
-        self.__prefix = prefix
-        path = os.path.join(FileSystemHelper.getIniFilesFolder(), self.__ini_file_name)
+        self._ini_file_name = ini_file_name
+        self._prefix = prefix
+        path = os.path.join(FileSystemHelper.getIniFilesFolder(), self._ini_file_name)
         self._commands = RigHelper.loadRigCommands(path)
         self.init_rig()
 
     @property
-    def SerialPortName(self) -> int:
-        return self.__serial_port_name
+    def SerialPortName(self) -> str:
+        return self._serial_port_name
 
     def init_rig(self):
-        self.__rig = CustomRig(RigControlType.emulator, 1, KnownIdentifiers.U2RigEmulator)
-        self.__rig.Enabled = True
-        self.__rig.FreqA = 14150400
-        self.__rig.FreqB = 432800000
-        self.__rig.Mode = RigParameter.ssb_u
-        self.__rig.Tx = RigParameter.rx
-        self.__rig.Pitch = 0
-        self.__rig.Split = RigParameter.splitoff
-        self.__rig.Vfo = RigParameter.vfoaa # no split
+        self._rig = CustomRig(RigControlType.emulator, 1, KnownIdentifiers.U2RigEmulator)
+        self._rig.Enabled = True
+        self._rig.FreqA = 14150400
+        self._rig.FreqB = 432800000
+        self._rig.Mode = RigParameter.ssb_u
+        self._rig.Tx = RigParameter.rx
+        self._rig.Pitch = 0
+        self._rig.Split = RigParameter.splitoff
+        self._rig.Vfo = RigParameter.vfoaa # no split
 
     def try_prepare_response(self, command : RigCommand) -> bytearray:
         response = command.Validation.Flags
 
-        rig = self.__rig
+        rig = self._rig
         match command.Values[0].Param:
             case RigParameter.freq:
                 return self.try_inject_value(command, rig.Freq)
@@ -105,29 +105,29 @@ class EmulatorBase():
         return response
 
     def start(self):
-        if self.__started:
+        if self._started:
             return
 
         self.start_listener()
-        self.__started = True
+        self._started = True
 
     def stop(self):
-        if not self.__started:
+        if not self._started:
             return
-        self.__started = False
-        self.__thread.join(1)
+        self._started = False
+        self._thread.join(1)
 
     def start_listener(self):
         """Start the testing"""
         master,slave = pty.openpty() #open the pseudoterminal
-        self.__serial_port_name = os.ttyname(slave) #translate the slave fd to a filename
+        self._serial_port_name = os.ttyname(slave) #translate the slave fd to a filename
 
         #create a separate thread that listens on the master device for commands
-        self.__thread = threading.Thread(target=self.listener, args=[master])
-        self.__thread.start()
+        self._thread = threading.Thread(target=self.listener, args=[master])
+        self._thread.start()
 
     def parse_custom_command(self, command : bytearray) -> Tuple[bool, str]:
-        cmd = command.removeprefix(self.__prefix)
+        cmd = command.removeprefix(self._prefix)
         if len(cmd) == 0:
             return False
 
@@ -170,12 +170,12 @@ class EmulatorBase():
             try:
                 while True:
                     res += os.read(port, 1)
-                    if res == self.__prefix:
+                    if res == self._prefix:
                         continue
-                    if res.endswith(self.__prefix):
+                    if res.endswith(self._prefix):
                         if len(res) > 2:
                             print('command reset')
-                        res = self.__prefix
+                        res = self._prefix
                         continue
                     (parsed, command) = self.parse_custom_command(res)
                     if parsed:
@@ -183,7 +183,7 @@ class EmulatorBase():
                     (rig_command_parsed, rig_command, rig_command_type) = self.parse_rig_command(res)
                     if rig_command_parsed:
                         break
-                print("command: %s" % res.removeprefix(self.__prefix))
+                print("command: %s" % res.removeprefix(self._prefix))
 
                 if parsed:
                     match command:
@@ -223,8 +223,8 @@ class EmulatorBase():
         return self.send_receive(ser, command.Code, command.ReplyLength)
 
     def send_receive(self, ser : Serial, data: bytes, count: int) -> bytes:
-        if not data.startswith(self.__prefix):
-            ser.write(self.__prefix)
+        if not data.startswith(self._prefix):
+            ser.write(self._prefix)
         ser.write(data)
         return self.read_from_serial(ser, count)
 
@@ -232,7 +232,7 @@ class EmulatorBase():
         #an emulator is expected to be started by the moment 
 
         #open a pySerial connection to the slave
-        ser = Serial(self.__serial_port_name, 2400, timeout=1)
+        ser = Serial(self._serial_port_name, 2400, timeout=1)
 
         #self.send_receive(ser, b'cmd1', 5)
         #self.send_receive(ser, b'cmd2', 5)
@@ -243,7 +243,7 @@ class EmulatorBase():
         freqa_command = self.get_status_command(RigParameter.freqa)
         assert freqa_command != None
         response = self.send_receive_command(ser, freqa_command)
-        assert freq_a == self.__rig.FreqA
+        assert freq_a == self._rig.FreqA
 
         ser.close()
 
