@@ -66,6 +66,7 @@ class HostRigTests(unittest.TestCase):
         with self.assertRaises(ArgumentException) as ex:
             rig.SetFreq(1)
 
+    @unittest.skipIf(os.name != 'posix', "not supported on the current platform")
     def test_CanGetFreqAViaSerialPort(self):
         emulator = IC705Emulator()
         emulator.start()
@@ -73,8 +74,10 @@ class HostRigTests(unittest.TestCase):
 
         freq = 14200120
         rig.FreqA = freq
+        rig.FreqB = freq + 1
 
-        time.sleep(5)  # wait for some time
+        time.sleep(1)  # wait for some time
         self.assertEqual(freq, emulator._rig.FreqA)
+        self.assertEqual(freq + 1, emulator._rig.FreqB)
 
         emulator.stop()
