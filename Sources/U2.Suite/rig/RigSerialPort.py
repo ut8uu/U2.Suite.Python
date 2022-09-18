@@ -20,16 +20,22 @@ import os, serial, threading
 from contracts.RigSettings import RigSettings
 from exceptions.TimeoutException import TimeoutException
 from helpers.ConversionHelper import ConversionHelper
+from rig.events.SerialPortMessageReceivedEvent import SerialPortMessageReceivedEvent
 
 class RigSerialPort():
     _rig_settings: RigSettings
     _serial_port: serial.Serial
     _serial_port_initialized : bool = False
     _connected : bool = False
+    OnSerialPortMessageReceived : SerialPortMessageReceivedEvent
     
     def __init__(self, settings : RigSettings) -> None:
         self._rig_settings = settings
+        self.OnSerialPortMessageReceivedEvent = SerialPortMessageReceivedEvent()
         pass
+
+    def AddSubscriberForSerialPortMessageReceived(self, method):
+        self.OnSerialPortMessageReceived += method
     
     @property
     def IsConnected(self):
@@ -57,11 +63,28 @@ class RigSerialPort():
         self._connected = self._serial_port.isOpen()
         
     def SendMessage(self, data: bytearray) -> None:
-        """sends a data to the port"""
+        """sends data to the port"""
         try:
             self._serial_port.write(data)
         except serial.SerialTimeoutException:
             raise TimeoutException(f'Timeout occured while sending data to {self._rig_settings.Port}')
+
+    def SendMessageAndReadBytes(self, data: bytearray, expected_bytes: int) -> bytes:
+        """sends data to the port"""
+        outputCharacters = []
+        try:
+            self._serial_port.write(data)
+            while 1:
+                ch = self.ser.read()
+                if len(ch) == 0:
+                    break
+                outputCharacters += ch
+                if outputCharacters[-len(expected_bytes):] == expected_bytes:
+                    break
+
+        except serial.SerialTimeoutException:
+            '''Do nothing in case of the timeout, just return what was fetched'''
+        return bytes(''.join(outputCharacters))
 
 def test_serial():
     """Start the testing"""
