@@ -18,6 +18,7 @@
 import logging
 from contracts.BitMask import BitMask
 from contracts.CommandQueue import CommandQueue
+from contracts.RigCommand import RigCommand
 from contracts.RigCommands import RigCommands
 from contracts.RigParameter import RigParameter
 from contracts.RigSettings import RigSettings
@@ -38,6 +39,8 @@ from rig.enums.RigControlType import RigControlType
 from rig.events.OnRigParameterChangedEvent import OnRigParameterChangedEvent
 from rig.Rig import Rig
 from typing import List, Tuple
+
+from rig.events.SerialPortMessageReceivedEvent import SerialPortMessageReceivedEvent
 
 class HostRig(Rig):
 
@@ -361,12 +364,40 @@ class HostRig(Rig):
             or self._queue.IsEmpty:
             return
 
+        response = []
         try:
-            self._serial_port.SendMessage(self._queue.CurrentCmd.Code)
+            cmd = self._queue.CurrentCmd
+            if cmd.NeedsReply:
+                response = self._serial_port.SendMessageAndReadBytes(cmd.Code, cmd.ReplyLength)
+                if len(response) == cmd.ReplyLength:
+                    self.OnSerialPortMessageReceived(response)
+            else:
+                self._serial_port.SendMessage(cmd.Code)
         except TimeoutException as ex:
             logging.error(ex.args[0])
 
-        if self._queue.CurrentCmd.NeedsReply:
-            self._queue.Phase = ExchangePhase.Receiving
-        else:
-            self._queue.RemoveAt(0)
+        # a command is sent and response is received (if any)
+        self._queue.RemoveAt(0)
+
+    def ProcessReceivedData(self, cmd: QueueItem, data: bytes) -> None:
+        '''Processes a reply for the given command'''
+        if not cmd.NeedsReply or cmd.ReplyLength != len(data):
+            return
+        if cmd.Kind == CommandKind.Init:
+            self.ProcessInitReply(cmd, data)
+        elif cmd.Kind == CommandKind.Status:
+            self.ProcessStatusReply(cmd.Number, data)
+        elif cmd.Kind == CommandKind.Write:
+            self.ProcessWriteReply(cmd, data)
+        elif cmd.Kind == CommandKind.Custom:
+            self.ProcessCustomReply(cmd, data)
+
+    def ProcessInitReply(self, cmd: QueueItem, data: bytes):
+        '''Processes a reply for the Init command'''
+
+    def ProcessWriteReply(self, cmd: QueueItem, data: bytes):
+        '''Processes a reply for the Write command'''
+
+    def OnSerialPortMessageReceived(self, data: bytes):
+        """A handler for the MessageReceived"""
+        x = len(data)
