@@ -75,16 +75,16 @@ class RigSerialPort():
         try:
             self._serial_port.write(data)
             while 1:
-                ch = self.ser.read()
+                ch = self._serial_port.read()
                 if len(ch) == 0:
                     break
                 outputCharacters += ch
-                if outputCharacters[-len(expected_bytes):] == expected_bytes:
+                if outputCharacters[-expected_bytes:] == expected_bytes:
                     break
 
         except serial.SerialTimeoutException:
             '''Do nothing in case of the timeout, just return what was fetched'''
-        return bytes(''.join(outputCharacters))
+        return outputCharacters
 
 def test_serial():
     """Start the testing"""
