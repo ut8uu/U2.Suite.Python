@@ -59,6 +59,8 @@ class HostRigTests(unittest.TestCase):
 
     def test_set_properties(self) -> None:
         emulator = self.GetEmulator()
+        emulator.start()
+
         rig = self.GetHostRig(True, emulator)
         rig.SetFreqA(1)
         self.assertEqual(1, rig.FreqA)
@@ -70,6 +72,7 @@ class HostRigTests(unittest.TestCase):
     def test_CanGetFreqAViaSerialPort(self):
         emulator = IC705Emulator()
         emulator.start()
+        
         rig = self.GetHostRig(True, emulator)
 
         freq = 14200120
