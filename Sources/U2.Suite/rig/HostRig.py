@@ -377,7 +377,7 @@ class HostRig(Rig):
             logging.error(ex.args[0])
 
         # a command is sent and response is received (if any)
-        self._queue.RemoveAt(0)
+        self._queue.remove(self._queue.CurrentCmd)
 
     def ProcessReceivedData(self, cmd: QueueItem, data: bytes) -> None:
         '''Processes a reply for the given command'''
@@ -394,10 +394,26 @@ class HostRig(Rig):
 
     def ProcessInitReply(self, cmd: QueueItem, data: bytes):
         '''Processes a reply for the Init command'''
+        DebugHelper.DisplayMessage(MessageDisplayModes.Diagnostics3, f'Processing the Init command: {ConversionHelper.BytesToHexStr(data)}')
+        self.ValidateReply(data, self._rig_commands.InitCmd[cmd.Number].Validation)
 
     def ProcessWriteReply(self, cmd: QueueItem, data: bytes):
         '''Processes a reply for the Write command'''
+        DebugHelper.DisplayMessage(MessageDisplayModes.Diagnostics3, f'Processing the Write command: {ConversionHelper.BytesToHexStr(data)}')
+        self.ValidateReply(data, self._rig_commands.WriteCmd[cmd.Number].Validation)
 
     def OnSerialPortMessageReceived(self, data: bytes):
         """A handler for the MessageReceived"""
-        x = len(data)
+        if len(data) == 0:
+            return
+
+        if len(self._queue) == 0:
+            return
+            
+        if not self._queue.CurrentCmd.NeedsReply:
+            return
+
+        if self._queue.CurrentCmd.ReplyLength != len(data):
+            DebugHelper.DisplayMessage(MessageDisplayModes.Error, f'Serial port message length mismatch. Expected {self._queue.CurrentCmd.ReplyLength} bytes, received {len(data)} bytes.')
+            return
+        
