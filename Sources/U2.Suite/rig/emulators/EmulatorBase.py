@@ -190,7 +190,7 @@ class EmulatorBase():
                     (rig_command_parsed, rig_command, rig_command_type) = self.parse_rig_command(res)
                     if rig_command_parsed:
                         break
-                print("command: %s" % res.removeprefix(self._prefix))
+                #print("command: %s" % res.removeprefix(self._prefix))
 
                 if parsed:
                     match command:
@@ -232,6 +232,9 @@ class EmulatorBase():
                 self._rig.FreqA = value
             case RigParameter.freqb:
                 self._rig.FreqB = value
+        
+        if RigHelper.CollectionContainsValue(RigHelper.ModeParams, param):
+            self._rig.Mode = param.value
 
     def read_from_serial(self, ser : Serial, count: int) -> bytes:
         res = b''

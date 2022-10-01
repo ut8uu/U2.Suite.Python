@@ -67,8 +67,10 @@ class RigHelper():
     @staticmethod
     def CollectionContainsValue(collection : Tuple[RigParameter], value: RigParameter) -> bool:
         try:
-            index = collection.index(value)
-            return True
+            for x in collection:
+                if x.value == value.value:
+                    return True
+            return False
         except:
             return False
 

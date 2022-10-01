@@ -17,6 +17,7 @@
 
 import os, unittest
 import time
+from contracts.RigParameter import RigParameter
 
 from contracts.RigSettings import RigSettings
 from exceptions.ArgumentException import ArgumentException
@@ -65,6 +66,7 @@ class HostRigTests(unittest.TestCase):
         rig.SetFreqA(1)
         self.assertEqual(1, rig.FreqA)
 
+        # SetFreq raises an exception
         with self.assertRaises(ArgumentException) as ex:
             rig.SetFreq(1)
 
@@ -82,5 +84,20 @@ class HostRigTests(unittest.TestCase):
         time.sleep(1)  # wait for some time
         self.assertEqual(freq, emulator._rig.FreqA)
         self.assertEqual(freq + 1, emulator._rig.FreqB)
+
+        emulator.stop()
+
+    @unittest.skipIf(os.name != 'posix', "not supported on the current platform")
+    def test_CanGetModeViaSerialPort(self):
+        emulator = IC705Emulator()
+        emulator.start()
+        
+        rig = self.GetHostRig(True, emulator)
+
+        rig.Mode = RigParameter.fm
+        self.assertEqual(RigParameter.fm.value, emulator._rig.Mode)
+
+        rig.Mode = RigParameter.am
+        self.assertEqual(RigParameter.am.value, emulator._rig.Mode)
 
         emulator.stop()
