@@ -309,7 +309,7 @@ class HostRig(Rig):
         if RigHelper.CollectionContainsValue(self._rig_commands.WriteableParams, value) \
             and (value != self.Split):
             self.AddWriteCommand(value)
-        elif (value == RigParameter.SplitOn):
+        elif (value == RigParameter.spliton):
             if self.Vfo == RigParameter.vfoaa:
                 self.SetVfo(RigParameter.vfoab)
             elif self.Vfo == RigParameter.vfobb:

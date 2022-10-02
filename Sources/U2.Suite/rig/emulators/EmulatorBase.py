@@ -232,9 +232,23 @@ class EmulatorBase():
                 self._rig.FreqA = value
             case RigParameter.freqb:
                 self._rig.FreqB = value
+            case RigParameter.freq:
+                self._rig.Freq = value
+            case RigParameter.pitch:
+                self._rig.Pitch = value
         
         if RigHelper.CollectionContainsValue(RigHelper.ModeParams, param):
             self._rig.Mode = param.value
+        elif RigHelper.CollectionContainsValue(RigHelper.SplitParams, param):
+            self._rig.Split = param.value
+        elif RigHelper.CollectionContainsValue(RigHelper.RitOnParams, param):
+            self._rig.Rit = param.value
+        elif RigHelper.CollectionContainsValue(RigHelper.XitOnParams, param):
+            self._rig.Xit = param.value
+        elif RigHelper.CollectionContainsValue(RigHelper.TxParams, param):
+            self._rig.Tx = param.value
+        elif RigHelper.CollectionContainsValue(RigHelper.VfoParams, param):
+            self._rig.Vfo = param.value
 
     def read_from_serial(self, ser : Serial, count: int) -> bytes:
         res = b''
