@@ -314,11 +314,17 @@ class HostRig(Rig):
                 self.SetVfo(RigParameter.vfoab)
             elif self.Vfo == RigParameter.vfobb:
                 self.SetVfo(RigParameter.vfoba)
+            else:
+                # consider unknown value as vfoaa
+                self.SetVfo(RigParameter.vfoab)
         else:
             if self.Vfo == RigParameter.vfoab:
                 self.SetVfo(RigParameter.vfoaa)
             elif self.Vfo == RigParameter.vfoba:
                 self.SetVfo(RigParameter.vfobb)
+            else:
+                # consider unknown value as vfoaa
+                self.SetVfo(RigParameter.vfoaa)
         super(HostRig, self).SetSplit(value)
 
     def AddWriteCommand(self, param : RigParameter, value : int = 0):

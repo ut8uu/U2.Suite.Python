@@ -71,7 +71,7 @@ class HostRigTests(unittest.TestCase):
             rig.SetFreq(1)
 
     @unittest.skipIf(os.name != 'posix', "not supported on the current platform")
-    def test_CanGetFreqAViaSerialPort(self):
+    def test_CanSetFreqAViaSerialPort(self):
         emulator = IC705Emulator()
         emulator.start()
         
@@ -88,7 +88,7 @@ class HostRigTests(unittest.TestCase):
         emulator.stop()
 
     @unittest.skipIf(os.name != 'posix', "not supported on the current platform")
-    def test_CanGetModeViaSerialPort(self):
+    def test_CanSetModeViaSerialPort(self):
         emulator = IC705Emulator()
         emulator.start()
         
@@ -99,5 +99,61 @@ class HostRigTests(unittest.TestCase):
 
         rig.Mode = RigParameter.am
         self.assertEqual(RigParameter.am.value, emulator._rig.Mode)
+
+        emulator.stop()
+
+    def test_GanSetSplitViaSerialPort(self):
+        emulator = IC705Emulator()
+        emulator.start()
+        
+        rig = self.GetHostRig(True, emulator)
+
+        rig.Split = RigParameter.spliton
+        self.assertEqual(RigParameter.spliton.value, emulator._rig.Split)
+
+        rig.Split = RigParameter.splitoff
+        self.assertEqual(RigParameter.splitoff.value, emulator._rig.Split)
+
+        emulator.stop()
+
+    def test_GanSetTxViaSerialPort(self):
+        emulator = IC705Emulator()
+        emulator.start()
+        
+        rig = self.GetHostRig(True, emulator)
+
+        rig.Tx = RigParameter.tx
+        self.assertEqual(RigParameter.tx.value, emulator._rig.Tx)
+
+        rig.Tx = RigParameter.rx
+        self.assertEqual(RigParameter.rx.value, emulator._rig.Tx)
+
+        emulator.stop()
+
+    def test_GanSetRitViaSerialPort(self):
+        emulator = IC705Emulator()
+        emulator.start()
+        
+        rig = self.GetHostRig(True, emulator)
+
+        rig.Rit = RigParameter.ritoff
+        self.assertEqual(RigParameter.ritoff.value, emulator._rig.Rit)
+
+        rig.Rit = RigParameter.riton
+        self.assertEqual(RigParameter.riton.value, emulator._rig.Rit)
+
+        emulator.stop()
+
+    def test_GanSetXitViaSerialPort(self):
+        emulator = IC705Emulator()
+        emulator.start()
+        
+        rig = self.GetHostRig(True, emulator)
+
+        rig.Xit = RigParameter.xitoff
+        self.assertEqual(RigParameter.xitoff.value, emulator._rig.Xit)
+
+        rig.Xit = RigParameter.xiton
+        self.assertEqual(RigParameter.xiton.value, emulator._rig.Xit)
 
         emulator.stop()
