@@ -16,6 +16,9 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+import sched
+import threading
+import time
 from contracts.BitMask import BitMask
 from contracts.CommandQueue import CommandQueue
 from contracts.RigCommand import RigCommand
@@ -48,6 +51,8 @@ class HostRig(Rig):
     _rig_settings : RigSettings
     _serial_port : RigSerialPort
     _queue : CommandQueue = CommandQueue()
+    _poll_scheduler : sched.scheduler
+    _changed_params : List[RigParameter]
 
     def __init__(self, rig_number:int, application_id:int, 
                  rig_settings:RigSettings, rig_commands:RigCommands):
@@ -55,11 +60,41 @@ class HostRig(Rig):
         self._application_id = application_id
         self._rig_settings = rig_settings
         self._rig_commands = rig_commands
+        self._changed_params = []
         self.OnRigParameterChanged = OnRigParameterChangedEvent()
         super(Rig, self).__init__(RigControlType.host, rig_number, application_id)
         self._serial_port = RigSerialPort(rig_settings)
         self._serial_port.Connect()
+
+        self._poll_scheduler = sched.scheduler(time.time, time.sleep)
+
+        self._poll_scheduler.enter(self._rig_settings.PollMs / 1000, 1, self.PollQueue, (self._poll_scheduler,))
+        self._poll_scheduler.run(False)
         
+    def PollQueue(self, sc): 
+        print("Polling the RIG...")
+
+        if not self._queue.HasStatusCommands:
+            self.AddCommands(self._rig_commands.StatusCmd, CommandKind.Status)
+        self.CheckQueue()
+
+        sc.enter(self._rig_settings.PollMs / 1000, 1, self.PollQueue, (sc,))
+
+    def AddCommands(self, commands : List[RigCommand], kind : CommandKind) -> None:
+        index = 0
+        for command in commands:
+            item = QueueItem()
+            item.Code = command.Code
+            item.Number = index
+            item.ReplyLength = command.ReplyLength
+            item.ReplyEnd = ConversionHelper.BytesToHexStr(command.ReplyEnd)
+            item.Kind = kind
+            self.AddCommand(item)
+            index += 1
+
+    def AddCommand(self, item : QueueItem) -> None:
+        self._queue.Add(item)
+
     def ValidateReply(self, inputData : bytes, mask : BitMask):
         if len(inputData) != len(mask.Flags):
             raise ValueValidationException(f"Incorrect input data length. Expected {len(mask.Flags)}, actual {len(inputData)}.")
@@ -71,48 +106,6 @@ class HostRig(Rig):
         expectedString = ConversionHelper.BytesToHexStr(mask.Flags)
         actualString = ConversionHelper.BytesToHexStr(inputData)
         raise ValueValidationException(f"Invalid input data. Expected {expectedString}, actual {actualString}.")
-
-    def ProcessStatusReply(self, statusCommandIndex : int, data : bytes) -> Tuple[bool, int]:
-        #validate reply
-        cmd = self._rig_commands.StatusCmd[statusCommandIndex]
-
-        reply = ConversionHelper.BytesToHexStr(data)
-        self.DisplayMessage(MessageDisplayModes.Diagnostics3,
-            f"Processing the Status ({cmd.Value.Param}) reply: {reply}")
-
-        RigHelper.validate_reply(data, cmd.Validation)
-
-        #extract numeric values
-        for index in range(0, len(cmd.Values)):
-            try:
-                value = ConversionHelper.UnformatValue(data, cmd.Values[index]);
-                self.StoreParam(cmd.Values[index].Param, value);
-            except (Exception) as ex:
-                logging.Error(ex.Message);
-
-        #extract bit flags
-        for index in range(0, len(cmd.Flags)):
-            if len(data) != len(cmd.Flags[index].Mask) or \
-                len(data) != len(cmd.Flags[index].Flags):
-                self.DisplayMessage(MessageDisplayModes.Error, f"RIG{self._rig_number}: incorrect reply length")
-            elif cmd.Flags[index].Flags == ConversionHelper.BytesAnd(data, cmd.Flags[index].Mask):
-                parameter = cmd.Flags[index].Param
-                if self.StoreParam(parameter):
-                    self.DisplayMessage(MessageDisplayModes.Diagnostics2, 
-                        f"Found changed parameter: {parameter}")
-                    self._changed_params.append(parameter);
-
-        self.ReportChangedParameters(self._changed_params)
-        self._changed_params.clear()
-
-        #tell clients
-        #if len(self._changed_params) > 0:
-        #    packet = UdpPacketFactory.CreateMultipleParametersReportingPacket(RigNumber,
-        #        senderId: ApplicationId, receiverId: KnownIdentifiers.MultiCast, _changedParams);
-        #    UdpMessenger.SendMultiCastMessage(packet);
-        #    logging.debug(f"Multiple parameters changed. A multicast message sent: {ConversionHelper.BytesToHexStr(packet.GetBytes())}");
-        
-        return True
 
     def StoreParam(self, parameter):
         if RigHelper.VfoParams.Contains(parameter):
@@ -150,55 +143,65 @@ class HostRig(Rig):
 
     def StoreParam(self, parameter : RigParameter, parameter_value : int):
         changed = False
-        if parameter == RigParameter.freqa and self.FreqA != parameter_value:
-            self.FreqA = parameter_value
-            changed = True
-        elif parameter == RigParameter.freqb:
-            self.FreqB = parameter_value
-            changed = True
-        elif parameter == RigParameter.freq:
-            self.Freq = parameter_value
-            changed = True
-        elif parameter == RigParameter.pitch:
-            self.Pitch = parameter_value
-            changed = True
-        elif parameter == RigParameter.ritoffset:
-            self.RitOffset = parameter_value
-            changed = True
+        pname = parameter.name
+        if parameter == RigParameter.freqa:
+            if self.FreqA != parameter_value:
+                self._freqA = parameter_value
+                changed = True
+        if pname == RigParameter.freqa.name:
+            if self.FreqA != parameter_value:
+                self._freqA = parameter_value
+                changed = True
+        elif pname == RigParameter.freqb.name:
+            if self.FreqB != parameter_value:
+                self.FreqB = parameter_value
+                changed = True
+        elif pname == RigParameter.freq.name:
+            if self.Freq != parameter_value:
+                self.Freq = parameter_value
+                changed = True
+        elif pname == RigParameter.pitch.name:
+            if self.FreqA != parameter_value:
+                self.Pitch = parameter_value
+                changed = True
+        elif pname == RigParameter.ritoffset.name:
+            if self.RitOffset != parameter_value:
+                self.RitOffset = parameter_value
+                changed = True
         else:
-            raise ArgumentOutOfRangeException(f"Parameter {parameter} not supported.")
+            raise ArgumentOutOfRangeException(f"Parameter {parameter.name} not supported.")
 
         if changed:
             self._changed_params.append(parameter)
             DebugHelper.DisplayMessage(MessageDisplayModes.Debug, 
-                "RIG{} status changed: {} = {}".format(self._rig_number, parameter, parameter_value))
+                "RIG{} status changed: {} = {}".format(self._rig_number, parameter.name, parameter_value))
             #packet = UdpPacketFactory.CreateSingleParameterReportingPacket(RigNumber, senderId = ApplicationId, receiverId = KnownIdentifiers.MultiCast, parameter, parameterValue)
             #UdpMessenger.SendMultiCastMessage(packet)
 
-    def ReportChangedParameters(self, parameters):
+    def ReportChangedParameters(self, parameters : List[RigParameter]):
         for parameter in parameters:
-            if parameter == RigParameter.FreqA:
+            if parameter == RigParameter.freqa:
                 parameterValue = self.FreqA
             elif parameter == RigParameter.none:
                 parameterValue = 0
-            elif parameter == RigParameter.Freq:
+            elif parameter == RigParameter.freq:
                 parameterValue = self.Freq
-            elif parameter == RigParameter.FreqB:
+            elif parameter == RigParameter.freqb:
                 parameterValue = self.FreqB
-            elif parameter == RigParameter.Pitch:
+            elif parameter == RigParameter.pitch:
                 parameterValue = self.Pitch
-            elif parameter == RigParameter.RitOffset:
+            elif parameter == RigParameter.ritoffset:
                 parameterValue = self.RitOffset
-            elif parameter == RigParameter.Rit0:
+            elif parameter == RigParameter.rit0:
                 parameterValue = self.Rit
-            elif parameter == RigParameter.VfoAA \
-                or parameter == RigParameter.VfoAB \
-                or parameter == RigParameter.VfoBA \
-                or parameter == RigParameter.VfoBB \
-                or parameter == RigParameter.VfoA \
-                or parameter == RigParameter.VfoB \
-                or parameter == RigParameter.VfoEqual \
-                or parameter == RigParameter.VfoSwap:
+            elif parameter == RigParameter.vfoaa \
+                or parameter == RigParameter.vfoab \
+                or parameter == RigParameter.vfoba \
+                or parameter == RigParameter.vfobb \
+                or parameter == RigParameter.vfoa \
+                or parameter == RigParameter.vfob \
+                or parameter == RigParameter.vfoequal \
+                or parameter == RigParameter.vfoswap:
                 parameterValue = 0
             elif parameter == RigParameter.spliton:
                 parameterValue = 1
@@ -349,7 +352,7 @@ class HostRig(Rig):
                 for index in range(0, cmd.Value.Len):
                     newCode[cmd.Value.Start + index] = fmtValue[index]
             except Exception as e:
-                logging.Error("RIG{0}: Generating command: {1}", self._rig_number, e.Message)
+                logging.Error("RIG{0}: Generating command: {1}", self._rig_number, e.args[0])
         
         queueItem = QueueItem()
         queueItem.Code = newCode
@@ -381,6 +384,8 @@ class HostRig(Rig):
                 self._serial_port.SendMessage(cmd.Code)
         except TimeoutException as ex:
             logging.error(ex.args[0])
+        except Exception as ex:
+            logging.error(ex.args[0])
 
         # a command is sent and response is received (if any)
         self._queue.remove(self._queue.CurrentCmd)
@@ -408,6 +413,48 @@ class HostRig(Rig):
         DebugHelper.DisplayMessage(MessageDisplayModes.Diagnostics3, f'Processing the Write command: {ConversionHelper.BytesToHexStr(data)}')
         self.ValidateReply(data, self._rig_commands.WriteCmd[cmd.Number].Validation)
 
+    def ProcessStatusReply(self, statusCommandIndex : int, data : bytes) -> Tuple[bool, int]:
+        #validate reply
+        cmd = self._rig_commands.StatusCmd[statusCommandIndex]
+
+        #reply = ConversionHelper.BytesToHexStr(data)
+        #self.DisplayMessage(MessageDisplayModes.Diagnostics3,
+        #    f"Processing the Status ({cmd.Value.Param}) reply: {reply}")
+
+        RigHelper.validate_reply(data, cmd.Validation)
+
+        #extract numeric values
+        for index in range(0, len(cmd.Values)):
+            try:
+                value = ConversionHelper.UnformatValue(data, cmd.Values[index]);
+                self.StoreParam(cmd.Values[index].Param, value);
+            except (Exception) as ex:
+                logging.Error(ex.args[0]);
+
+        #extract bit flags
+        for index in range(0, len(cmd.Flags)):
+            if len(data) != len(cmd.Flags[index].Mask) or \
+                len(data) != len(cmd.Flags[index].Flags):
+                self.DisplayMessage(MessageDisplayModes.Error, f"RIG{self._rig_number}: incorrect reply length")
+            elif cmd.Flags[index].Flags == ConversionHelper.BytesAnd(data, cmd.Flags[index].Mask):
+                parameter = cmd.Flags[index].Param
+                if self.StoreParam(parameter):
+                    self.DisplayMessage(MessageDisplayModes.Diagnostics2, 
+                        f"Found changed parameter: {parameter}")
+                    self._changed_params.append(parameter);
+
+        self.ReportChangedParameters(self._changed_params)
+        self._changed_params.clear()
+
+        #tell clients
+        #if len(self._changed_params) > 0:
+        #    packet = UdpPacketFactory.CreateMultipleParametersReportingPacket(RigNumber,
+        #        senderId: ApplicationId, receiverId: KnownIdentifiers.MultiCast, _changedParams);
+        #    UdpMessenger.SendMultiCastMessage(packet);
+        #    logging.debug(f"Multiple parameters changed. A multicast message sent: {ConversionHelper.BytesToHexStr(packet.GetBytes())}");
+        
+        return True
+
     def OnSerialPortMessageReceived(self, data: bytes):
         """A handler for the MessageReceived"""
         if len(data) == 0:
@@ -422,4 +469,6 @@ class HostRig(Rig):
         if self._queue.CurrentCmd.ReplyLength != len(data):
             DebugHelper.DisplayMessage(MessageDisplayModes.Error, f'Serial port message length mismatch. Expected {self._queue.CurrentCmd.ReplyLength} bytes, received {len(data)} bytes.')
             return
-        
+
+        self.ProcessReceivedData(self._queue.CurrentCmd, data)
+

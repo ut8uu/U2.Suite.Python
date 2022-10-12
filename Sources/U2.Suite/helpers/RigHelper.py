@@ -244,7 +244,7 @@ class RigHelper():
         except KeyError as ex:
             return ParameterValue()
         except Exception as ex:
-            raise ValueLoadException(ex.Message)
+            raise ValueLoadException(ex.args[0])
         
     @staticmethod
     def ValidateValue(value : ParameterValue, size: int):
@@ -393,7 +393,7 @@ class RigHelper():
                 cmd.Value = parameterValue
                 result[param.value] = cmd
             except Exception as ex:
-                raise LoadWriteCommandException(ex.Message, ex)
+                raise LoadWriteCommandException(ex.args[0], ex)
         return result
 
     @staticmethod

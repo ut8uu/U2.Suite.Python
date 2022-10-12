@@ -70,10 +70,10 @@ class RigParameterTests(unittest.TestCase):
             ch.StrToRigParameter('non-existent-parameter')
 
     def test_bytes_and(self):
-        arr1 = bytearray(b'\x10\x22\x80\x55')
-        arr2 = bytearray(b'\x30\xff\x00\xa9')
+        arr1 = bytes(b'\x10\x22\x80\x55')
+        arr2 = bytes(b'\x30\xff\x00\xa9')
         actual_result = ch.BytesAnd(arr1, arr2)
-        expected_result = bytearray(b'\x10\x22\x00\x01')
+        expected_result = bytes(b'\x10\x22\x00\x01')
         assert expected_result == actual_result
         
     def test_str_to_bitmask_empty(self):

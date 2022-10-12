@@ -38,7 +38,7 @@ class RigSerialPort():
         self.OnSerialPortMessageReceived += method
     
     @property
-    def IsConnected(self):
+    def IsConnected(self) -> bool:
         if not self._connected or self._serial_port == None:
             return False
         self._connected = self._serial_port.isOpen
@@ -71,7 +71,7 @@ class RigSerialPort():
 
     def SendMessageAndReadBytes(self, data: bytearray, expected_bytes: int) -> bytes:
         """sends data to the port"""
-        outputCharacters = []
+        outputCharacters = bytearray(b'')
         try:
             self._serial_port.write(data)
             while 1:
@@ -84,7 +84,7 @@ class RigSerialPort():
 
         except serial.SerialTimeoutException:
             '''Do nothing in case of the timeout, just return what was fetched'''
-        return outputCharacters
+        return bytes(outputCharacters)
 
 def test_serial():
     """Start the testing"""

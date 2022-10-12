@@ -39,6 +39,9 @@ class CommandQueue(List[QueueItem]):
         self.append(item)
         return item
 
+    def Add(self, item: QueueItem) -> None:
+        self.append(item)
+
     def AddBeforeStatusCommands(self, item):
         if len(self) == 0:
             self.append(item)

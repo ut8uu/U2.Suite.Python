@@ -16,6 +16,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os, unittest
+from threading import Timer
 import time
 from contracts.RigParameter import RigParameter
 
@@ -40,8 +41,8 @@ class HostRigTests(unittest.TestCase):
         settings.RtsMode = False
         settings.Parity = 'None'
         settings.StopBits = 1
-        settings.TimeoutMs = 500
-        settings.PollMs = 2000
+        settings.TimeoutMs = 2000
+        settings.PollMs = 500
 
         return settings
 
@@ -156,4 +157,18 @@ class HostRigTests(unittest.TestCase):
         rig.Xit = RigParameter.xiton
         self.assertEqual(RigParameter.xiton.value, emulator._rig.Xit)
 
+        emulator.stop()
+
+    def test_GetFreqAViaSerialPort(self) -> None:
+        '''to test how the FreqA can be retrieved using the STATUS command'''
+        emulator = IC705Emulator()
+        emulator.start()
+        emulator._rig.FreqA = 14232000
+
+        rig = self.GetHostRig(True, emulator)
+
+        rig.CheckQueue()
+        self.assertEqual(14232000, rig.FreqA)
+
+        rig.Enabled = False
         emulator.stop()
