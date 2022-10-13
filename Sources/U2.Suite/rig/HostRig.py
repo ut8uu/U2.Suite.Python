@@ -16,7 +16,6 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-import sched
 import threading
 import time
 from contracts.BitMask import BitMask
@@ -51,13 +50,14 @@ class HostRig(Rig):
     _rig_settings : RigSettings
     _serial_port : RigSerialPort
     _queue : CommandQueue = CommandQueue()
-    _poll_scheduler : sched.scheduler
     _changed_params : List[RigParameter]
     _poll_thread : threading.Thread
     _stop_signal : bool
+    _lock : threading.Lock
 
     def __init__(self, rig_number:int, application_id:int, 
                  rig_settings:RigSettings, rig_commands:RigCommands):
+        self._lock = threading.Lock()
         self._stop_signal = False
         self._rig_number = rig_number
         self._application_id = application_id
@@ -341,7 +341,7 @@ class HostRig(Rig):
 
         cmd = self._rig_commands.WriteCmd[param.value]
         if (cmd.Code == None):
-            logging.Error(f"RIG{self._rig_number} Write command not supported for {param}")
+            logging.error(f"RIG{self._rig_number} Write command not supported for {param}")
             return
 
         newCode = cmd.Code.copy()
@@ -353,7 +353,7 @@ class HostRig(Rig):
                 for index in range(0, cmd.Value.Len):
                     newCode[cmd.Value.Start + index] = fmtValue[index]
             except Exception as e:
-                logging.Error("RIG{0}: Generating command: {1}", self._rig_number, e.args[0])
+                logging.error("RIG{0}: Generating command: {1}", self._rig_number, e.args[0])
         
         queueItem = QueueItem()
         queueItem.Code = newCode
@@ -374,7 +374,10 @@ class HostRig(Rig):
             or self._queue.IsEmpty:
             return
 
-        while self._queue.CurrentCmd != None:
+        with self._lock:
+            print('Checking the queue...')
+
+        while len(self._queue) > 0:
             response = []
             try:
                 cmd = self._queue.CurrentCmd
@@ -390,7 +393,8 @@ class HostRig(Rig):
                 logging.error(ex.args[0])
 
             # a command is sent and response is received (if any)
-            self._queue.remove(self._queue.CurrentCmd)
+            if len(self._queue) > 0:
+                self._queue.remove(self._queue.CurrentCmd)
 
     def ProcessReceivedData(self, cmd: QueueItem, data: bytes) -> None:
         '''Processes a reply for the given command'''
@@ -428,10 +432,10 @@ class HostRig(Rig):
         #extract numeric values
         for index in range(0, len(cmd.Values)):
             try:
-                value = ConversionHelper.UnformatValue(data, cmd.Values[index]);
-                self.StoreParam(cmd.Values[index].Param, value);
+                value = ConversionHelper.UnformatValue(data, cmd.Values[index])
+                self.StoreParam(cmd.Values[index].Param, value)
             except (Exception) as ex:
-                logging.Error(ex.args[0]);
+                logging.error(ex.args[0])
 
         #extract bit flags
         for index in range(0, len(cmd.Flags)):

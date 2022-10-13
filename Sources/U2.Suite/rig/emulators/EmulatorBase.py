@@ -39,8 +39,10 @@ class EmulatorBase():
     _serial_port_name = ''
     _commands : RigCommands
     _rig : CustomRig
+    _lock : threading.Lock
 
     def __init__(self, ini_file_name, prefix) -> None:
+        self._lock = threading.Lock()
         self._started = False
         self._ini_file_name = ini_file_name
         self._prefix = prefix
@@ -126,35 +128,28 @@ class EmulatorBase():
         self._thread = threading.Thread(target=self.EmulatorListener, args=[self._master_port])
         self._thread.start()
 
-    def parse_custom_command(self, command : bytearray) -> Tuple[bool, str]:
-        cmd = command.removeprefix(self._prefix)
-        if len(cmd) == 0:
-            return False
-
-        #custom commands
-        match cmd:
-            case b'cmd1':
-                return (True, cmd)
-            case b'cmd2':
-                return (True, cmd)
-            case b'exit':
-                return (True, cmd)
-
-        return (False, b'')
-
     def parse_rig_command(self, command : bytes) -> Tuple[bool, RigCommand]:
         if len(command) < 3:
             return (False, None, 'none')
 
+        cmd_len = len(command)
+
         for init_cmd in self._commands.InitCmd:
+            if cmd_len != len(init_cmd.Code):
+                continue
             if bytes(init_cmd.Code) == command:
+                with self._lock:
+                    print(f'Found init command: {ConversionHelper.BytesToHexStr(command)}')
                 return (True, init_cmd, 'init')
 
         for status_cmd in self._commands.StatusCmd:
+            if cmd_len != len(status_cmd.Code):
+                continue
             if bytes(status_cmd.Code) == command:
+                with self._lock:
+                    print(f'Found status command: {ConversionHelper.BytesToHexStr(command)}')
                 return (True, status_cmd, 'status')
 
-        cmd_len = len(command)
         for write_cmd_id in self._commands.WriteCmd:
             write_cmd = self._commands.WriteCmd[write_cmd_id]
             if cmd_len != len(write_cmd.Code):
@@ -164,6 +159,8 @@ class EmulatorBase():
             for index in range(0, v.Len):
                 command_empty[v.Start + index] = 0x00
             if bytes(write_cmd.Code) == command_empty:
+                with self._lock:
+                    print(f'Found write command: {ConversionHelper.BytesToHexStr(command)}')
                 return (True, write_cmd, 'write')
 
         return (False, None, 'unknown')
@@ -177,10 +174,10 @@ class EmulatorBase():
                     if not self._started:
                         print('Exiting the thread')
                         return
-                    last_size = len(res)
-                    res += os.read(port, 1)
-                    if last_size != len(res):
+                    chars = os.read(port, 1)
+                    if len(chars) == 0:
                         continue
+                    res += chars
                     if res == self._prefix:
                         continue
                     if res.endswith(self._prefix):
@@ -188,27 +185,12 @@ class EmulatorBase():
                             print('command reset')
                         res = self._prefix
                         continue
-                    (parsed, command) = self.parse_custom_command(res)
-                    if parsed:
-                        break
                     (rig_command_parsed, rig_command, rig_command_type) = self.parse_rig_command(res)
                     if rig_command_parsed:
                         break
                 #print("command: %s" % res.removeprefix(self._prefix))
 
-                if parsed:
-                    match command:
-                        case b'cmd1':
-                            os.write(port, b'resp1')
-                        case b'cmd2':
-                            os.write(port, b'resp2')
-                        case b'exit':
-                            os.write(port, b'exiting')
-                            break
-                        case _:
-                            os.write(port, b"I dont understand\r\n")
-
-                elif rig_command_parsed:
+                if rig_command_parsed:
                     if rig_command.ReplyLength > 0:
                         match rig_command_type:
                             case 'init':
@@ -218,7 +200,6 @@ class EmulatorBase():
                                 if response != None:
                                     os.write(port, response)
                             case 'write':
-                                raw_value = bytearray()
                                 v = rig_command.Value
                                 value = ConversionHelper.UnformatValue(bytearray(res), rig_command.Value)
                                 self.SetValue(v.Param, value)
