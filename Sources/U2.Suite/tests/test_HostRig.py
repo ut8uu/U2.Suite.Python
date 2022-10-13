@@ -167,9 +167,9 @@ class HostRigTests(unittest.TestCase):
 
         rig = self.GetHostRig(True, emulator)
 
-        time.sleep(10) # need to completely poll the rig
+        time.sleep(5) # need to completely poll the rig
         rig.Enabled = False
         emulator.stop()
         
-        #self.assertEqual(14232000, rig.FreqA)
+        self.assertEqual(14232000, rig.FreqA)
 
