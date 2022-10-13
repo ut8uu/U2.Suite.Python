@@ -157,6 +157,11 @@ class RigParameterTests(unittest.TestCase):
         data = bytearray(b'\x00\x23\x32\x07')
         result = ch.FromBcdBS(data)
         self.assertEqual(233207, result)
+
+    def test_from_bcd_bu(self):
+        data = bytearray(b'\x02\x98')
+        result = ch.FromBcdBU(data)
+        self.assertEqual(298, result)
                 
     def test_from_bcd_ls(self):
         data = bytearray(b'\x07\x32\x23\x01')

@@ -192,14 +192,15 @@ class ConversionHelper():
         sb = ''
         i = 0
         while (i <= (len(data) - 1)):
-            sb += chr(0x30 + round(data[i] / 16))
-            sb += chr(0x30 + (data[i] % 16))
+            c = data[i]
+            for val in (c >> 4, c & 0xF):
+                sb += chr(0x30 + val)
             i += 1
         try:
             x = int(sb)
             return x
         except Exception as ex:
-            print("invalid BCD value: {0}. {1}", ConversionHelper.BytesToHex(data), ex.Message)
+            print("invalid BCD value: {0}. {1}", ConversionHelper.BytesToHexStr(data), ex.args[0])
             raise
         
     @staticmethod
@@ -256,7 +257,7 @@ class ConversionHelper():
             f = float(s)
             return int(f)
         except Exception:
-            raise ValueConversionException(f"Invalid reply: {ConversionHelper.BytesToHex(data)}")
+            raise ValueConversionException(f"Invalid reply: {ConversionHelper.BytesToHexStr(data)}")
 
     @staticmethod
     def UnformatValue(sourceData : bytearray, info : ParameterValue) -> int:
