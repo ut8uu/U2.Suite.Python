@@ -119,12 +119,11 @@ class EmulatorBase():
         self._thread.join(1)
 
     def start_listener(self):
-        """Start the testing"""
         self._master_port,slave = pty.openpty() #open the pseudoterminal
         self._serial_port_name = os.ttyname(slave) #translate the slave fd to a filename
 
         #create a separate thread that listens on the master device for commands
-        self._thread = threading.Thread(target=self.listener1, args=[self._master_port])
+        self._thread = threading.Thread(target=self.EmulatorListener, args=[self._master_port])
         self._thread.start()
 
     def parse_custom_command(self, command : bytearray) -> Tuple[bool, str]:
@@ -169,7 +168,7 @@ class EmulatorBase():
 
         return (False, None, 'unknown')
 
-    def listener1(self, port):
+    def EmulatorListener(self, port):
         #continuously listen to commands on the master device
         while True:
             res = b''
