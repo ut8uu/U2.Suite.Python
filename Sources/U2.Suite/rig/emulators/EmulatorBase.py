@@ -41,6 +41,7 @@ class EmulatorBase():
     _rig : CustomRig
 
     def __init__(self, ini_file_name, prefix) -> None:
+        self._started = False
         self._ini_file_name = ini_file_name
         self._prefix = prefix
         path = os.path.join(FileSystemHelper.getIniFilesFolder(), self._ini_file_name)
@@ -108,8 +109,8 @@ class EmulatorBase():
         if self._started:
             return
 
-        self.start_listener()
         self._started = True
+        self.start_listener()
 
     def stop(self):
         if not self._started:
@@ -119,19 +120,17 @@ class EmulatorBase():
 
     def start_listener(self):
         """Start the testing"""
-        master,slave = pty.openpty() #open the pseudoterminal
+        self._master_port,slave = pty.openpty() #open the pseudoterminal
         self._serial_port_name = os.ttyname(slave) #translate the slave fd to a filename
 
         #create a separate thread that listens on the master device for commands
-        self._thread = threading.Thread(target=self.listener, args=[master])
+        self._thread = threading.Thread(target=self.listener1, args=[self._master_port])
         self._thread.start()
 
     def parse_custom_command(self, command : bytearray) -> Tuple[bool, str]:
         cmd = command.removeprefix(self._prefix)
         if len(cmd) == 0:
             return False
-
-        init0 = self._commands.InitCmd[0]
 
         #custom commands
         match cmd:
@@ -170,13 +169,19 @@ class EmulatorBase():
 
         return (False, None, 'unknown')
 
-    def listener(self, port):
+    def listener1(self, port):
         #continuously listen to commands on the master device
         while True:
             res = b''
             try:
                 while True:
+                    if not self._started:
+                        print('Exiting the thread')
+                        return
+                    last_size = len(res)
                     res += os.read(port, 1)
+                    if last_size != len(res):
+                        continue
                     if res == self._prefix:
                         continue
                     if res.endswith(self._prefix):

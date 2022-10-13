@@ -63,9 +63,10 @@ class CommandQueue(List[QueueItem]):
         return firstStatusItem != None
 
     @property
-    def CurrentCmd(self):
+    def CurrentCmd(self) -> QueueItem:
         if len(self) > 0:
-            return self[0]
+            item = self[0]
+            return item
         return None
 
     @property

@@ -66,19 +66,19 @@ class HostRig(Rig):
         self._serial_port = RigSerialPort(rig_settings)
         self._serial_port.Connect()
 
-        self._poll_scheduler = sched.scheduler(time.time, time.sleep)
+        self._poll_scheduler = sched.scheduler(time.monotonic, time.sleep)
 
-        self._poll_scheduler.enter(self._rig_settings.PollMs / 1000, 1, self.PollQueue, (self._poll_scheduler,))
+        self._poll_scheduler.enter(self._rig_settings.PollMs / 1000, 1, self.PollQueue, argument=(self._poll_scheduler,))
         self._poll_scheduler.run(False)
         
-    def PollQueue(self, sc): 
+    def PollQueue(self, scheduler): 
         print("Polling the RIG...")
 
         if not self._queue.HasStatusCommands:
             self.AddCommands(self._rig_commands.StatusCmd, CommandKind.Status)
         self.CheckQueue()
 
-        sc.enter(self._rig_settings.PollMs / 1000, 1, self.PollQueue, (sc,))
+        scheduler.enter(self._rig_settings.PollMs / 1000, 1, self.PollQueue, argument=(scheduler,))
 
     def AddCommands(self, commands : List[RigCommand], kind : CommandKind) -> None:
         index = 0
@@ -373,22 +373,23 @@ class HostRig(Rig):
             or self._queue.IsEmpty:
             return
 
-        response = []
-        try:
-            cmd = self._queue.CurrentCmd
-            if cmd.NeedsReply:
-                response = self._serial_port.SendMessageAndReadBytes(cmd.Code, cmd.ReplyLength)
-                if len(response) == cmd.ReplyLength:
-                    self.OnSerialPortMessageReceived(response)
-            else:
-                self._serial_port.SendMessage(cmd.Code)
-        except TimeoutException as ex:
-            logging.error(ex.args[0])
-        except Exception as ex:
-            logging.error(ex.args[0])
+        while self._queue.CurrentCmd != None:
+            response = []
+            try:
+                cmd = self._queue.CurrentCmd
+                if cmd.NeedsReply:
+                    response = self._serial_port.SendMessageAndReadBytes(cmd.Code, cmd.ReplyLength)
+                    if len(response) == cmd.ReplyLength:
+                        self.OnSerialPortMessageReceived(response)
+                else:
+                    self._serial_port.SendMessage(cmd.Code)
+            except TimeoutException as ex:
+                logging.error(ex.args[0])
+            except Exception as ex:
+                logging.error(ex.args[0])
 
-        # a command is sent and response is received (if any)
-        self._queue.remove(self._queue.CurrentCmd)
+            # a command is sent and response is received (if any)
+            self._queue.remove(self._queue.CurrentCmd)
 
     def ProcessReceivedData(self, cmd: QueueItem, data: bytes) -> None:
         '''Processes a reply for the given command'''
