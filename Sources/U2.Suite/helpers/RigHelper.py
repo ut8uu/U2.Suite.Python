@@ -260,7 +260,7 @@ class RigHelper():
             if value.Mult <= 0:
                 raise ValueValidationException("invalid Multiplier value: {}".format(value.Mult))
         except Exception as e:
-            raise ValueValidationException(e.Message)
+            raise ValueValidationException(e.args[0])
 
     @staticmethod
     def ReadStatusEntryValue(cmd: RigCommand, config_parser: configparser.ConfigParser,
@@ -419,7 +419,7 @@ class RigHelper():
             try:
                 list.append(RigHelper.loadRigCommands(file))
             except IniFileLoadException as ex:
-                print('Error loading ini file {}. {}'.format(file, ex.Message))
+                print('Error loading ini file {}. {}'.format(file, ex.args[0]))
         return list   
     
     @staticmethod
