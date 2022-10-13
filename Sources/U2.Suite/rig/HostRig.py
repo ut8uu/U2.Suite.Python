@@ -53,9 +53,12 @@ class HostRig(Rig):
     _queue : CommandQueue = CommandQueue()
     _poll_scheduler : sched.scheduler
     _changed_params : List[RigParameter]
+    _poll_thread : threading.Thread
+    _stop_signal : bool
 
     def __init__(self, rig_number:int, application_id:int, 
                  rig_settings:RigSettings, rig_commands:RigCommands):
+        self._stop_signal = False
         self._rig_number = rig_number
         self._application_id = application_id
         self._rig_settings = rig_settings
@@ -66,19 +69,17 @@ class HostRig(Rig):
         self._serial_port = RigSerialPort(rig_settings)
         self._serial_port.Connect()
 
-        self._poll_scheduler = sched.scheduler(time.monotonic, time.sleep)
-
-        self._poll_scheduler.enter(self._rig_settings.PollMs / 1000, 1, self.PollQueue, argument=(self._poll_scheduler,))
-        self._poll_scheduler.run(False)
+        self._poll_thread = threading.Thread(target=self.PollQueue, args=[])
+        self._poll_thread.start()
         
-    def PollQueue(self, scheduler): 
-        print("Polling the RIG...")
+    def PollQueue(self): 
+        while not self._stop_signal:
+            if not self._queue.HasStatusCommands:
+                self.AddCommands(self._rig_commands.StatusCmd, CommandKind.Status)
 
-        if not self._queue.HasStatusCommands:
-            self.AddCommands(self._rig_commands.StatusCmd, CommandKind.Status)
-        self.CheckQueue()
-
-        scheduler.enter(self._rig_settings.PollMs / 1000, 1, self.PollQueue, argument=(scheduler,))
+            if self.Enabled:
+                self.CheckQueue()
+            time.sleep(self._rig_settings.PollMs / 1000)
 
     def AddCommands(self, commands : List[RigCommand], kind : CommandKind) -> None:
         index = 0
