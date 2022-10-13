@@ -24,13 +24,14 @@ class CommandQueueTests(unittest.TestCase):
 
     def test_Add(self):
         queue = CommandQueue()
-        queue.Add()
+        queue.Add(QueueItem())
         self.assertEqual(1, len(queue))
 
     def test_AddBeforeStatus(self):
         queue = CommandQueue()
-        item = queue.Add()
+        item = QueueItem()
         item.Kind = CommandKind.Init
+        queue.Add(item)
 
         new_item = QueueItem()
         new_item.Kind = CommandKind.Custom
@@ -40,7 +41,7 @@ class CommandQueueTests(unittest.TestCase):
 
     def test_HasStatusCommand(self):
         queue = CommandQueue()
-        item = queue.Add()
+        queue.Add(QueueItem())
         self.assertFalse(queue.HasStatusCommands)
 
         queue[0].Kind = CommandKind.Status
@@ -50,12 +51,12 @@ class CommandQueueTests(unittest.TestCase):
         queue = CommandQueue()
         self.assertEqual(None, queue.CurrentCmd)
 
-        queue.Add()
+        queue.Add(QueueItem())
         self.assertNotEqual(None, queue.CurrentCmd)
     
     def test_IsEmpty(self):
         queue = CommandQueue()
         self.assertTrue(queue.IsEmpty)
 
-        queue.Add()
+        queue.Add(QueueItem())
         self.assertFalse(queue.IsEmpty)
