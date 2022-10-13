@@ -41,8 +41,8 @@ class HostRigTests(unittest.TestCase):
         settings.RtsMode = False
         settings.Parity = 'None'
         settings.StopBits = 1
-        settings.TimeoutMs = 2000
-        settings.PollMs = 500
+        settings.TimeoutMs = 500
+        settings.PollMs = 2000
 
         return settings
 
