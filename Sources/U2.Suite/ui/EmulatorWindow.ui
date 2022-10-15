@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>EmulatorMainWindow</class>
+ <widget class="QMainWindow" name="EmulatorMainWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -617,7 +617,7 @@
   <connection>
    <sender>dial</sender>
    <signal>valueChanged(int)</signal>
-   <receiver>MainWindow</receiver>
+   <receiver>EmulatorMainWindow</receiver>
    <slot>tuningValueChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -633,7 +633,7 @@
   <connection>
    <sender>rbVfoA</sender>
    <signal>toggled(bool)</signal>
-   <receiver>MainWindow</receiver>
+   <receiver>EmulatorMainWindow</receiver>
    <slot>vfoASwitched(bool)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -649,7 +649,7 @@
   <connection>
    <sender>rbVfoB</sender>
    <signal>toggled(bool)</signal>
-   <receiver>MainWindow</receiver>
+   <receiver>EmulatorMainWindow</receiver>
    <slot>vfoBSwitched(bool)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -665,7 +665,7 @@
   <connection>
    <sender>rbRx</sender>
    <signal>toggled(bool)</signal>
-   <receiver>MainWindow</receiver>
+   <receiver>EmulatorMainWindow</receiver>
    <slot>rxSwitched(bool)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -681,7 +681,7 @@
   <connection>
    <sender>rbTX</sender>
    <signal>toggled(bool)</signal>
-   <receiver>MainWindow</receiver>
+   <receiver>EmulatorMainWindow</receiver>
    <slot>txSwitched(bool)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -697,7 +697,7 @@
   <connection>
    <sender>cbMode_2</sender>
    <signal>currentIndexChanged(QString)</signal>
-   <receiver>MainWindow</receiver>
+   <receiver>EmulatorMainWindow</receiver>
    <slot>bandChanged(QString)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -713,7 +713,7 @@
   <connection>
    <sender>cbMode</sender>
    <signal>currentIndexChanged(QString)</signal>
-   <receiver>MainWindow</receiver>
+   <receiver>EmulatorMainWindow</receiver>
    <slot>modeChanged(QString)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -729,7 +729,7 @@
   <connection>
    <sender>cbMode_7</sender>
    <signal>currentIndexChanged(QString)</signal>
-   <receiver>MainWindow</receiver>
+   <receiver>EmulatorMainWindow</receiver>
    <slot>splitChanged(QString)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -745,7 +745,7 @@
   <connection>
    <sender>spinXitOffset_2</sender>
    <signal>valueChanged(int)</signal>
-   <receiver>MainWindow</receiver>
+   <receiver>EmulatorMainWindow</receiver>
    <slot>pitchChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -761,7 +761,7 @@
   <connection>
    <sender>cbMode_6</sender>
    <signal>currentIndexChanged(QString)</signal>
-   <receiver>MainWindow</receiver>
+   <receiver>EmulatorMainWindow</receiver>
    <slot>ritChanged(QString)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -777,7 +777,7 @@
   <connection>
    <sender>spinRitOffset</sender>
    <signal>valueChanged(int)</signal>
-   <receiver>MainWindow</receiver>
+   <receiver>EmulatorMainWindow</receiver>
    <slot>ritOffsetChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -793,7 +793,7 @@
   <connection>
    <sender>cbMode_3</sender>
    <signal>currentIndexChanged(QString)</signal>
-   <receiver>MainWindow</receiver>
+   <receiver>EmulatorMainWindow</receiver>
    <slot>xitChanged(QString)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -809,7 +809,7 @@
   <connection>
    <sender>spinXitOffset</sender>
    <signal>valueChanged(int)</signal>
-   <receiver>MainWindow</receiver>
+   <receiver>EmulatorMainWindow</receiver>
    <slot>xitOffsetChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
