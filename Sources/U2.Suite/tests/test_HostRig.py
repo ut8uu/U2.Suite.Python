@@ -64,103 +64,54 @@ class HostRigTests(unittest.TestCase):
         emulator.start()
 
         rig = self.GetHostRig(True, emulator)
-        # SetFreqA should pass
-        rig.SetFreqA(1)
-        time.sleep(5)
-        self.assertEqual(1, rig.FreqA)
 
         # SetFreq raises an exception
         with self.assertRaises(ArgumentException) as ex:
             rig.SetFreq(1)
 
-    @unittest.skipIf(os.name != 'posix', "not supported on the current platform")
-    def test_CanSetFreqAViaSerialPort(self):
-        emulator = IC705Emulator()
-        emulator.start()
-        
-        rig = self.GetHostRig(True, emulator)
-
         freq = 14200120
         rig.FreqA = freq
         rig.FreqB = freq + 1
 
-        time.sleep(1)  # wait for some time
         self.assertEqual(freq, emulator._rig.FreqA)
         self.assertEqual(freq + 1, emulator._rig.FreqB)
 
-        emulator.stop()
-
-    @unittest.skipIf(os.name != 'posix', "not supported on the current platform")
-    def test_CanSetModeViaSerialPort(self):
-        emulator = IC705Emulator()
-        emulator.start()
-        
-        rig = self.GetHostRig(True, emulator)
-
+        '''Set Mode'''
         rig.Mode = RigParameter.fm
-        time.sleep(2) # ensure the value was written
         self.assertEqual(RigParameter.fm, emulator._rig.Mode)
 
         rig.Mode = RigParameter.am
-        time.sleep(2) # ensure the value was written
         self.assertEqual(RigParameter.am, emulator._rig.Mode)
 
-        emulator.stop()
-
-    def test_CanSetSplitViaSerialPort(self):
-        emulator = IC705Emulator()
-        emulator.start()
-        
-        rig = self.GetHostRig(True, emulator)
-
+        '''Set Split'''
         rig.Split = RigParameter.spliton
         self.assertEqual(RigParameter.spliton, emulator._rig.Split)
 
         rig.Split = RigParameter.splitoff
         self.assertEqual(RigParameter.splitoff, emulator._rig.Split)
 
-        emulator.stop()
-
-    def test_CanSetTxViaSerialPort(self):
-        emulator = IC705Emulator()
-        emulator.start()
-        
-        rig = self.GetHostRig(True, emulator)
-
+        '''Set Tx'''
         rig.Tx = RigParameter.tx
         self.assertEqual(RigParameter.tx, emulator._rig.Tx)
 
         rig.Tx = RigParameter.rx
         self.assertEqual(RigParameter.rx, emulator._rig.Tx)
 
-        emulator.stop()
-
-    def test_CanSetRitViaSerialPort(self):
-        emulator = IC705Emulator()
-        emulator.start()
-        
-        rig = self.GetHostRig(True, emulator)
-
+        '''Set Rit'''
         rig.Rit = RigParameter.ritoff
         self.assertEqual(RigParameter.ritoff, emulator._rig.Rit)
 
         rig.Rit = RigParameter.riton
         self.assertEqual(RigParameter.riton, emulator._rig.Rit)
 
-        emulator.stop()
-
-    def test_CanSetXitViaSerialPort(self):
-        emulator = IC705Emulator()
-        emulator.start()
-        
-        rig = self.GetHostRig(True, emulator)
-
+        '''Set Xit'''
         rig.Xit = RigParameter.xitoff
         self.assertEqual(RigParameter.xitoff, emulator._rig.Xit)
 
         rig.Xit = RigParameter.xiton
         self.assertEqual(RigParameter.xiton, emulator._rig.Xit)
 
+        rig.Enabled = False
         emulator.stop()
 
     def test_GetFreqAViaSerialPort(self) -> None:
