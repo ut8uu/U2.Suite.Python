@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>774</width>
+    <width>737</width>
     <height>536</height>
    </rect>
   </property>
@@ -431,63 +431,6 @@
      </layout>
     </widget>
    </widget>
-   <widget class="QGroupBox" name="gbTuning">
-    <property name="geometry">
-     <rect>
-      <x>470</x>
-      <y>10</y>
-      <width>251</width>
-      <height>271</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>12</pointsize>
-     </font>
-    </property>
-    <property name="title">
-     <string>Tuning</string>
-    </property>
-    <widget class="QDial" name="dial">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>40</y>
-       <width>211</width>
-       <height>211</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>12</pointsize>
-      </font>
-     </property>
-     <property name="minimum">
-      <number>0</number>
-     </property>
-     <property name="maximum">
-      <number>100</number>
-     </property>
-     <property name="singleStep">
-      <number>1</number>
-     </property>
-     <property name="pageStep">
-      <number>20</number>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="wrapping">
-      <bool>true</bool>
-     </property>
-     <property name="notchTarget">
-      <double>5.000000000000000</double>
-     </property>
-     <property name="notchesVisible">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </widget>
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
@@ -577,6 +520,113 @@
      </item>
     </layout>
    </widget>
+   <widget class="QDial" name="dial">
+    <property name="geometry">
+     <rect>
+      <x>490</x>
+      <y>10</y>
+      <width>211</width>
+      <height>211</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="minimum">
+     <number>0</number>
+    </property>
+    <property name="maximum">
+     <number>100</number>
+    </property>
+    <property name="singleStep">
+     <number>1</number>
+    </property>
+    <property name="pageStep">
+     <number>20</number>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+    <property name="wrapping">
+     <bool>true</bool>
+    </property>
+    <property name="notchTarget">
+     <double>5.000000000000000</double>
+    </property>
+    <property name="notchesVisible">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblMult">
+    <property name="geometry">
+     <rect>
+      <x>487</x>
+      <y>240</y>
+      <width>91</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Dial step</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="cbTuningMult">
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>240</y>
+      <width>121</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <item>
+     <property name="text">
+      <string>1 Hz</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>10 Hz</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>100 Hz</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>1 kHz</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>10 kHz</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>100 kHz</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>1 MHz</string>
+     </property>
+    </item>
+   </widget>
   </widget>
   <action name="actionE_xit">
    <property name="text">
@@ -590,7 +640,6 @@
  <tabstops>
   <tabstop>rbVfoA</tabstop>
   <tabstop>rbVfoB</tabstop>
-  <tabstop>dial</tabstop>
   <tabstop>rbRx</tabstop>
   <tabstop>rbTX</tabstop>
   <tabstop>cbMode_2</tabstop>
@@ -605,30 +654,14 @@
  <resources/>
  <connections>
   <connection>
-   <sender>dial</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>EmulatorMainWindow</receiver>
-   <slot>tuningValueChanged(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>617</x>
-     <y>114</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>451</x>
-     <y>38</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>rbVfoA</sender>
    <signal>toggled(bool)</signal>
    <receiver>EmulatorMainWindow</receiver>
    <slot>vfoASwitched(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>94</x>
-     <y>63</y>
+     <x>95</x>
+     <y>48</y>
     </hint>
     <hint type="destinationlabel">
      <x>14</x>
@@ -643,8 +676,8 @@
    <slot>vfoBSwitched(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>64</x>
-     <y>192</y>
+     <x>65</x>
+     <y>181</y>
     </hint>
     <hint type="destinationlabel">
      <x>13</x>
@@ -659,8 +692,8 @@
    <slot>rxSwitched(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>245</x>
-     <y>365</y>
+     <x>283</x>
+     <y>354</y>
     </hint>
     <hint type="destinationlabel">
      <x>220</x>
@@ -675,8 +708,8 @@
    <slot>txSwitched(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>311</x>
-     <y>364</y>
+     <x>358</x>
+     <y>354</y>
     </hint>
     <hint type="destinationlabel">
      <x>296</x>
@@ -691,8 +724,8 @@
    <slot>bandChanged(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>337</x>
-     <y>408</y>
+     <x>359</x>
+     <y>397</y>
     </hint>
     <hint type="destinationlabel">
      <x>358</x>
@@ -707,8 +740,8 @@
    <slot>modeChanged(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>252</x>
-     <y>445</y>
+     <x>359</x>
+     <y>434</y>
     </hint>
     <hint type="destinationlabel">
      <x>84</x>
@@ -723,12 +756,12 @@
    <slot>splitChanged(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>285</x>
-     <y>484</y>
+     <x>359</x>
+     <y>471</y>
     </hint>
     <hint type="destinationlabel">
      <x>377</x>
-     <y>555</y>
+     <y>535</y>
     </hint>
    </hints>
   </connection>
@@ -739,8 +772,8 @@
    <slot>pitchChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>306</x>
-     <y>522</y>
+     <x>359</x>
+     <y>508</y>
     </hint>
     <hint type="destinationlabel">
      <x>14</x>
@@ -755,11 +788,11 @@
    <slot>ritChanged(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>625</x>
-     <y>362</y>
+     <x>709</x>
+     <y>351</y>
     </hint>
     <hint type="destinationlabel">
-     <x>762</x>
+     <x>736</x>
      <y>336</y>
     </hint>
    </hints>
@@ -771,11 +804,11 @@
    <slot>ritOffsetChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>659</x>
-     <y>404</y>
+     <x>709</x>
+     <y>389</y>
     </hint>
     <hint type="destinationlabel">
-     <x>762</x>
+     <x>736</x>
      <y>399</y>
     </hint>
    </hints>
@@ -787,11 +820,11 @@
    <slot>xitChanged(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>670</x>
-     <y>436</y>
+     <x>709</x>
+     <y>427</y>
     </hint>
     <hint type="destinationlabel">
-     <x>761</x>
+     <x>736</x>
      <y>442</y>
     </hint>
    </hints>
@@ -803,12 +836,44 @@
    <slot>xitOffsetChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>659</x>
-     <y>478</y>
+     <x>709</x>
+     <y>465</y>
     </hint>
     <hint type="destinationlabel">
-     <x>759</x>
+     <x>736</x>
      <y>478</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>dial</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>EmulatorMainWindow</receiver>
+   <slot>tuningValueChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>599</x>
+     <y>119</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>736</x>
+     <y>121</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cbTuningMult</sender>
+   <signal>currentIndexChanged(QString)</signal>
+   <receiver>EmulatorMainWindow</receiver>
+   <slot>dialStepChanged(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>653</x>
+     <y>259</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>736</x>
+     <y>249</y>
     </hint>
    </hints>
   </connection>
@@ -827,5 +892,6 @@
   <slot>ritOffsetChanged(int)</slot>
   <slot>xitChanged(QString)</slot>
   <slot>xitOffsetChanged(int)</slot>
+  <slot>dialStepChanged(QString)</slot>
  </slots>
 </ui>
