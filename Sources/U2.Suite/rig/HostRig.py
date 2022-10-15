@@ -374,27 +374,30 @@ class HostRig(Rig):
             or self._queue.IsEmpty:
             return
 
-        with self._lock:
-            print('Checking the queue...')
+        try:
+            with self._lock:
+                print('Checking the queue...')
 
-        while len(self._queue) > 0:
-            response = []
-            try:
-                cmd = self._queue.CurrentCmd
-                if cmd.NeedsReply:
-                    response = self._serial_port.SendMessageAndReadBytes(cmd.Code, cmd.ReplyLength)
-                    if len(response) == cmd.ReplyLength:
-                        self.OnSerialPortMessageReceived(response)
-                else:
-                    self._serial_port.SendMessage(cmd.Code)
-            except TimeoutException as ex:
-                logging.error(ex.args[0])
-            except Exception as ex:
-                logging.error(ex.args[0])
+            while len(self._queue) > 0:
+                response = []
+                try:
+                    cmd = self._queue.CurrentCmd
+                    if cmd.NeedsReply:
+                        response = self._serial_port.SendMessageAndReadBytes(cmd.Code, cmd.ReplyLength)
+                        if len(response) == cmd.ReplyLength:
+                            self.OnSerialPortMessageReceived(response)
+                    else:
+                        self._serial_port.SendMessage(cmd.Code)
+                except TimeoutException as ex:
+                    logging.error(ex.args[0])
+                except Exception as ex:
+                    logging.error(ex.args[0])
 
-            # a command is sent and response is received (if any)
-            if len(self._queue) > 0:
-                self._queue.remove(self._queue.CurrentCmd)
+                # a command is sent and response is received (if any)
+                if len(self._queue) > 0:
+                    self._queue.remove(self._queue.CurrentCmd)
+        except:
+            ''''''
 
     def ProcessReceivedData(self, cmd: QueueItem, data: bytes) -> None:
         '''Processes a reply for the given command'''
