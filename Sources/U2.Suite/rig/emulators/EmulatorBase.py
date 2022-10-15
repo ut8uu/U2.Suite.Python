@@ -223,17 +223,17 @@ class EmulatorBase():
                 self._rig.Pitch = value
         
         if RigHelper.CollectionContainsValue(RigHelper.ModeParams, param):
-            self._rig.Mode = param.value
+            self._rig.Mode = param
         elif RigHelper.CollectionContainsValue(RigHelper.SplitParams, param):
-            self._rig.Split = param.value
+            self._rig.Split = param
         elif RigHelper.CollectionContainsValue(RigHelper.RitOnParams, param):
-            self._rig.Rit = param.value
+            self._rig.Rit = param
         elif RigHelper.CollectionContainsValue(RigHelper.XitOnParams, param):
-            self._rig.Xit = param.value
+            self._rig.Xit = param
         elif RigHelper.CollectionContainsValue(RigHelper.TxParams, param):
-            self._rig.Tx = param.value
+            self._rig.Tx = param
         elif RigHelper.CollectionContainsValue(RigHelper.VfoParams, param):
-            self._rig.Vfo = param.value
+            self._rig.Vfo = param
 
     def read_from_serial(self, ser : Serial, count: int) -> bytes:
         res = b''
