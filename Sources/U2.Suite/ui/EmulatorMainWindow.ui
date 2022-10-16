@@ -498,7 +498,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLCDNumber" name="lcdFreqA_2">
+      <widget class="QLCDNumber" name="lcdFreqB">
        <property name="font">
         <font>
          <pointsize>12</pointsize>

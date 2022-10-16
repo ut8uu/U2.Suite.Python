@@ -26,12 +26,16 @@ from ui.Ui_EmulatorMainWindow import Ui_EmulatorMainWindow
 class EmulatorMainWindow(QDialog, Ui_EmulatorMainWindow):
     _last_dial_position : int
     _dial_step : int
+    _current_frequency : int
 
     def __init__(self):
         super().__init__()
         self.setupUi(self)
         self._last_dial_position = 0
         self._dial_step = 1
+        self._current_frequency = 1810000
+        self.lcdFreqA.display(self._current_frequency)
+        self.lcdFreqB.display(self._current_frequency)
 
     def UpdateVfoValue(self, original_value: int, dial_value: int, \
             modifier: int, mult : int) -> int:
@@ -48,35 +52,38 @@ class EmulatorMainWindow(QDialog, Ui_EmulatorMainWindow):
             rest = 0
         left_part = floor(original_value / (100 * mult)) + modifier
         result = (left_part * 100 + dial_value) * mult + rest
+        if result < 0:
+            result = original_value
         return result
+
+    def UpdateLcdDisplay(self, new_value : int) -> None:
+        if self.rbVfoA.isChecked():
+            self.lcdFreqA.display(new_value)
+        else:
+            self.lcdFreqB.display(new_value)
 
     @pyqtSlot()
     def tuningValueChanged(self):
         ''''''
-        clearHertzes = lambda x : floor(x/self.dial.maximum()) * self.dial.maximum()
-
         #tuningValue = value
         current_position = self.dial.value()
         if current_position == 100:
             current_position = 0
         dial_max = self.dial.maximum()
+        new_value = self._current_frequency
         if abs(current_position - self._last_dial_position) > dial_max/2:
             # the change is too big, we crossed the zero point
             if current_position < self._last_dial_position:
                 # moved clockwise, increase the value
-                #new_value = clearHertzes(self.lcdFreqA.intValue() + dial_max) + current_position
-                new_value = self.UpdateVfoValue(self.lcdFreqA.intValue(), current_position, 1, self._dial_step)
-                self.lcdFreqA.display(new_value)
+                new_value = self.UpdateVfoValue(self._current_frequency, current_position, 1, self._dial_step)
             else:
                 # moved counterclockwise, decrease the value
-                #new_value = clearHertzes(self.lcdFreqA.intValue() - dial_max) + current_position
-                new_value = self.UpdateVfoValue(self.lcdFreqA.intValue(), current_position, -1, self._dial_step)
-                self.lcdFreqA.display(new_value)
+                new_value = self.UpdateVfoValue(self._current_frequency, current_position, -1, self._dial_step)
         else:
-            #new_value = clearHertzes(self.lcdFreqA.intValue()) + current_position
-            new_value = self.UpdateVfoValue(self.lcdFreqA.intValue(), current_position, 0, self._dial_step)
-            self.lcdFreqA.display(new_value)
+            new_value = self.UpdateVfoValue(self._current_frequency, current_position, 0, self._dial_step)
 
+        self._current_frequency = new_value
+        self.UpdateLcdDisplay(new_value)
         self._last_dial_position = current_position
         
     @pyqtSlot()
