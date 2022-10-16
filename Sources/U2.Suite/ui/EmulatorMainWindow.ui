@@ -577,7 +577,7 @@
      <string>Dial step</string>
     </property>
    </widget>
-   <widget class="QComboBox" name="cbTuningMult">
+   <widget class="QComboBox" name="cbDialStep">
     <property name="geometry">
      <rect>
       <x>590</x>
@@ -862,7 +862,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>cbTuningMult</sender>
+   <sender>cbDialStep</sender>
    <signal>currentIndexChanged(QString)</signal>
    <receiver>EmulatorMainWindow</receiver>
    <slot>dialStepChanged(QString)</slot>
