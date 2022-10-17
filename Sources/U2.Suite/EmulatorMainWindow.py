@@ -62,6 +62,14 @@ class EmulatorMainWindow(QDialog, Ui_EmulatorMainWindow):
         else:
             self.lcdFreqB.display(new_value)
 
+    def UpdateDial(self):
+        ''''''
+        #value = int((self._current_frequency / self._dial_step) % 100)
+        left_part = int(floor(self._current_frequency / self._dial_step))
+        value = left_part % 100
+        if not self.dial.value() != value:
+            self.dial.setValue(value)
+
     @pyqtSlot()
     def tuningValueChanged(self):
         ''''''
@@ -104,17 +112,24 @@ class EmulatorMainWindow(QDialog, Ui_EmulatorMainWindow):
             self._dial_step = 100000
         elif new_value == '1 MHz':
             self._dial_step = 1000000
-        
-        value = int((self.lcdFreqA.intValue() / self._dial_step) % 100)
-        self.dial.setValue(value)
+
+        self.UpdateDial()       
 
     @pyqtSlot()
-    def vfoASwitched(self, value : bool):
+    def vfoASwitched(self):
         ''''''
+        if self.rbVfoA.isChecked: 
+            self.rbVfoB.isChecked = False
+            self._current_frequency = self.lcdFreqA.intValue()
+        self.UpdateDial()
 
     @pyqtSlot()
-    def vfoBSwitched(self, value : bool):
+    def vfoBSwitched(self):
         ''''''
+        if self.rbVfoB.isChecked: 
+            self.rbVfoA.isChecked = False
+            self._current_frequency = self.lcdFreqB.intValue()
+        self.UpdateDial()
 
     @pyqtSlot()
     def rxSwitched(self, value : bool):
