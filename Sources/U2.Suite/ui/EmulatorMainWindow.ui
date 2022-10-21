@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>737</width>
-    <height>536</height>
+    <height>603</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,16 +17,16 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>0</y>
+     <y>70</y>
      <width>781</width>
-     <height>531</height>
+     <height>521</height>
     </rect>
    </property>
    <widget class="QFrame" name="frame">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>300</y>
+      <x>10</x>
+      <y>290</y>
       <width>721</width>
       <height>221</height>
      </rect>
@@ -628,6 +628,36 @@
     </item>
    </widget>
   </widget>
+  <widget class="QPushButton" name="btnPower">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>20</y>
+     <width>161</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>16</pointsize>
+    </font>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Power: OFF</string>
+   </property>
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+  </widget>
   <action name="actionE_xit">
    <property name="text">
     <string>Exit</string>
@@ -660,8 +690,8 @@
    <slot>vfoASwitched(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>95</x>
-     <y>48</y>
+     <x>96</x>
+     <y>118</y>
     </hint>
     <hint type="destinationlabel">
      <x>14</x>
@@ -676,8 +706,8 @@
    <slot>vfoBSwitched(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>65</x>
-     <y>181</y>
+     <x>66</x>
+     <y>251</y>
     </hint>
     <hint type="destinationlabel">
      <x>13</x>
@@ -692,8 +722,8 @@
    <slot>rxSwitched(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>283</x>
-     <y>354</y>
+     <x>263</x>
+     <y>414</y>
     </hint>
     <hint type="destinationlabel">
      <x>220</x>
@@ -708,8 +738,8 @@
    <slot>txSwitched(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>358</x>
-     <y>354</y>
+     <x>338</x>
+     <y>414</y>
     </hint>
     <hint type="destinationlabel">
      <x>296</x>
@@ -724,8 +754,8 @@
    <slot>bandChanged(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>359</x>
-     <y>397</y>
+     <x>339</x>
+     <y>457</y>
     </hint>
     <hint type="destinationlabel">
      <x>358</x>
@@ -740,8 +770,8 @@
    <slot>modeChanged(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>359</x>
-     <y>434</y>
+     <x>339</x>
+     <y>494</y>
     </hint>
     <hint type="destinationlabel">
      <x>84</x>
@@ -756,8 +786,8 @@
    <slot>splitChanged(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>359</x>
-     <y>471</y>
+     <x>339</x>
+     <y>531</y>
     </hint>
     <hint type="destinationlabel">
      <x>377</x>
@@ -772,8 +802,8 @@
    <slot>pitchChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>359</x>
-     <y>508</y>
+     <x>339</x>
+     <y>568</y>
     </hint>
     <hint type="destinationlabel">
      <x>14</x>
@@ -788,8 +818,8 @@
    <slot>ritChanged(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>709</x>
-     <y>351</y>
+     <x>689</x>
+     <y>411</y>
     </hint>
     <hint type="destinationlabel">
      <x>736</x>
@@ -804,8 +834,8 @@
    <slot>ritOffsetChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>709</x>
-     <y>389</y>
+     <x>689</x>
+     <y>449</y>
     </hint>
     <hint type="destinationlabel">
      <x>736</x>
@@ -820,8 +850,8 @@
    <slot>xitChanged(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>709</x>
-     <y>427</y>
+     <x>689</x>
+     <y>487</y>
     </hint>
     <hint type="destinationlabel">
      <x>736</x>
@@ -836,8 +866,8 @@
    <slot>xitOffsetChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>709</x>
-     <y>465</y>
+     <x>689</x>
+     <y>525</y>
     </hint>
     <hint type="destinationlabel">
      <x>736</x>
@@ -869,11 +899,27 @@
    <hints>
     <hint type="sourcelabel">
      <x>653</x>
-     <y>259</y>
+     <y>329</y>
     </hint>
     <hint type="destinationlabel">
      <x>736</x>
      <y>249</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnPower</sender>
+   <signal>clicked()</signal>
+   <receiver>EmulatorMainWindow</receiver>
+   <slot>powerButtonClick()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>136</x>
+     <y>46</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>240</x>
+     <y>35</y>
     </hint>
    </hints>
   </connection>
@@ -893,5 +939,6 @@
   <slot>xitChanged(QString)</slot>
   <slot>xitOffsetChanged(int)</slot>
   <slot>dialStepChanged(QString)</slot>
+  <slot>powerButtonClick()</slot>
  </slots>
 </ui>
