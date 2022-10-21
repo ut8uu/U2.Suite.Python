@@ -21,21 +21,28 @@ import sys
 
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog
+from rig.emulators.EmulatorBase import EmulatorBase
+from rig.emulators.IC705Emulator import IC705Emulator
 from ui.Ui_EmulatorMainWindow import Ui_EmulatorMainWindow
 
 class EmulatorMainWindow(QDialog, Ui_EmulatorMainWindow):
     _last_dial_position : int
     _dial_step : int
     _current_frequency : int
+    _emulator : EmulatorBase
 
     def __init__(self):
         super().__init__()
+        
         self.setupUi(self)
         self._last_dial_position = 0
         self._dial_step = 1
         self._current_frequency = 1810000
         self.lcdFreqA.display(self._current_frequency)
         self.lcdFreqB.display(self._current_frequency)
+
+        self._emulator = IC705Emulator()
+        self._emulator.start()
 
     def UpdateVfoValue(self, original_value: int, dial_value: int, \
             modifier: int, mult : int) -> int:

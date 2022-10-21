@@ -128,7 +128,7 @@ class EmulatorBase():
         self._thread = threading.Thread(target=self.EmulatorListener, args=[self._master_port])
         self._thread.start()
 
-    def parse_rig_command(self, command : bytes) -> Tuple[bool, RigCommand]:
+    def parse_rig_command(self, command : bytearray) -> Tuple[bool, RigCommand]:
         if len(command) < 3:
             return (False, None, 'none')
 

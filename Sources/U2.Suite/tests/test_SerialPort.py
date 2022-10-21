@@ -69,6 +69,5 @@ class SerialPortTests(unittest.TestCase):
 
         #command = emulator._commands.WriteCmd[0]
 
-
         emulator.stop()
 
