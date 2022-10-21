@@ -15,6 +15,12 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+'''
+A HostRig instance connects to the RIG via COM port and manages it.
+An instance should be launched on the PC connected to the RIG.
+When configured, a HostRig instance can send UDP packages to any listener.
+The GuestRig class is an implementation of such listener object.
+'''
 import logging
 import threading
 import time

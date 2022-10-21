@@ -134,11 +134,11 @@ class EmulatorMainWindow(QDialog, Ui_EmulatorMainWindow):
             self.UpdateDial()
 
     @pyqtSlot()
-    def rxSwitched(self, value : bool):
+    def rxSwitched(self):
         ''''''
 
     @pyqtSlot()
-    def txSwitched(self, value : bool):
+    def txSwitched(self):
         ''''''
 
     @pyqtSlot()

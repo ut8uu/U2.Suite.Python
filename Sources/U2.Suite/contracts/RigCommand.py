@@ -20,14 +20,21 @@ from contracts.BitMask import BitMask
 from contracts.ParameterValue import ParameterValue
 
 class RigCommand(object):
+    _Code : bytearray
+    _Value : ParameterValue
+    _Validation : BitMask
+    _ReplyEnd : bytearray
+    _ReplyLength : int
+    _Flags : List[BitMask]
+
     def __init__(self):
-        self._Code = None
-        self._Value = None
-        self._ReplyLength = None
-        self._ReplyEnd = None
-        self._Validation = None
-        self._Values = None
-        self._Flags = None
+        self._Code = bytearray()
+        self._ReplyLength = 0
+        self._ReplyEnd = bytearray()
+        self._Validation = BitMask()
+        self._Value = ParameterValue()
+        self._Values = []
+        self._Flags = []
 
     @property
     def Code(self) -> bytearray:
