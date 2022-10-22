@@ -14,12 +14,12 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_EmulatorMainWindow(object):
     def setupUi(self, EmulatorMainWindow):
         EmulatorMainWindow.setObjectName("EmulatorMainWindow")
-        EmulatorMainWindow.resize(737, 536)
+        EmulatorMainWindow.resize(737, 603)
         self.centralwidget = QtWidgets.QWidget(EmulatorMainWindow)
-        self.centralwidget.setGeometry(QtCore.QRect(0, 0, 781, 531))
+        self.centralwidget.setGeometry(QtCore.QRect(0, 70, 781, 521))
         self.centralwidget.setObjectName("centralwidget")
         self.frame = QtWidgets.QFrame(self.centralwidget)
-        self.frame.setGeometry(QtCore.QRect(30, 300, 721, 221))
+        self.frame.setGeometry(QtCore.QRect(10, 290, 721, 221))
         font = QtGui.QFont()
         font.setPointSize(12)
         self.frame.setFont(font)
@@ -269,6 +269,25 @@ class Ui_EmulatorMainWindow(object):
         self.cbDialStep.addItem("")
         self.cbDialStep.addItem("")
         self.cbDialStep.addItem("")
+        self.btnPower = QtWidgets.QPushButton(EmulatorMainWindow)
+        self.btnPower.setGeometry(QtCore.QRect(30, 20, 161, 51))
+        font = QtGui.QFont()
+        font.setPointSize(16)
+        self.btnPower.setFont(font)
+        self.btnPower.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.btnPower.setAutoFillBackground(False)
+        self.btnPower.setCheckable(True)
+        self.btnPower.setChecked(False)
+        self.btnPower.setObjectName("btnPower")
+        self.label = QtWidgets.QLabel(EmulatorMainWindow)
+        self.label.setGeometry(QtCore.QRect(285, 25, 91, 40))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        self.label.setFont(font)
+        self.label.setObjectName("label")
+        self.cbComPort = QtWidgets.QComboBox(EmulatorMainWindow)
+        self.cbComPort.setGeometry(QtCore.QRect(380, 30, 311, 31))
+        self.cbComPort.setObjectName("cbComPort")
         self.actionE_xit = QtWidgets.QAction(EmulatorMainWindow)
         self.actionE_xit.setObjectName("actionE_xit")
 
@@ -287,6 +306,8 @@ class Ui_EmulatorMainWindow(object):
         self.spinXitOffset.valueChanged['int'].connect(EmulatorMainWindow.xitOffsetChanged) # type: ignore
         self.dial.valueChanged['int'].connect(EmulatorMainWindow.tuningValueChanged) # type: ignore
         self.cbDialStep.currentIndexChanged['QString'].connect(EmulatorMainWindow.dialStepChanged) # type: ignore
+        self.btnPower.clicked.connect(EmulatorMainWindow.powerButtonClick) # type: ignore
+        self.cbComPort.currentTextChanged['QString'].connect(EmulatorMainWindow.comPortTextChanged) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(EmulatorMainWindow)
         EmulatorMainWindow.setTabOrder(self.rbVfoA, self.rbVfoB)
         EmulatorMainWindow.setTabOrder(self.rbVfoB, self.rbRx)
@@ -349,5 +370,7 @@ class Ui_EmulatorMainWindow(object):
         self.cbDialStep.setItemText(4, _translate("EmulatorMainWindow", "10 kHz"))
         self.cbDialStep.setItemText(5, _translate("EmulatorMainWindow", "100 kHz"))
         self.cbDialStep.setItemText(6, _translate("EmulatorMainWindow", "1 MHz"))
+        self.btnPower.setText(_translate("EmulatorMainWindow", "Power: OFF"))
+        self.label.setText(_translate("EmulatorMainWindow", "COM port"))
         self.actionE_xit.setText(_translate("EmulatorMainWindow", "Exit"))
         self.actionE_xit.setShortcut(_translate("EmulatorMainWindow", "Ctrl+X"))

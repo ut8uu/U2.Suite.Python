@@ -42,7 +42,6 @@ class EmulatorMainWindow(QDialog, Ui_EmulatorMainWindow):
         self.lcdFreqB.display(self._current_frequency)
 
         self._emulator = IC705Emulator()
-        self._emulator.start()
 
     def UpdateVfoValue(self, original_value: int, dial_value: int, \
             modifier: int, mult : int) -> int:
@@ -139,6 +138,16 @@ class EmulatorMainWindow(QDialog, Ui_EmulatorMainWindow):
             self.rbVfoA.setChecked(False)
             self._current_frequency = self.lcdFreqB.intValue()
             self.UpdateDial()
+
+    @pyqtSlot()
+    def powerButtonClick(self):
+        ''''''
+        if self.btnPower.isChecked():
+            self.btnPower.setText('Power: ON')
+            self._emulator.start()
+        else:
+            self.btnPower.setText('Power: OFF')
+            self._emulator.stop()
 
     @pyqtSlot()
     def rxSwitched(self):
