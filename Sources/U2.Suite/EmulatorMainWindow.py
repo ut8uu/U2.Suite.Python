@@ -30,6 +30,7 @@ class EmulatorMainWindow(QDialog, Ui_EmulatorMainWindow):
     _dial_step : int
     _current_frequency : int
     _emulator : EmulatorBase
+    _com_port : str
 
     def __init__(self):
         super().__init__()
@@ -41,6 +42,7 @@ class EmulatorMainWindow(QDialog, Ui_EmulatorMainWindow):
         self.lcdFreqA.display(self._current_frequency)
         self.lcdFreqB.display(self._current_frequency)
 
+        self._com_port = ''
         self._emulator = IC705Emulator()
 
     def UpdateVfoValue(self, original_value: int, dial_value: int, \
@@ -144,10 +146,16 @@ class EmulatorMainWindow(QDialog, Ui_EmulatorMainWindow):
         ''''''
         if self.btnPower.isChecked():
             self.btnPower.setText('Power: ON')
+            self._emulator._serial_port_name = self._com_port
             self._emulator.start()
         else:
             self.btnPower.setText('Power: OFF')
             self._emulator.stop()
+
+    @pyqtSlot()
+    def comPortTextChanged(self):
+        '''Handles changes to the COM port drop down list'''
+        self._com_port = self.cbComPort.currentText()
 
     @pyqtSlot()
     def rxSwitched(self):
