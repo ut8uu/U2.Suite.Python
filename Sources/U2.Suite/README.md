@@ -6,8 +6,12 @@ This is a Python implementation of the U2.Suite
 
 # Setup
 - Install poetry (https://python-poetry.org/docs/)
-- Go to the 'U2.Suite' folder and run in cmd: "poetry install"
- (it will install python and all necessary dependencies)
+- Go to the 'U2.Suite' folder 
+- Execute the following commands:
+    $> poetry config virtualenvs.in-project true
+    $> poetry install
+    $> poetry shell
+
 - IDE open project:
 	+ Visual Studio (vers 2019/2022): open project U2.Suite.pyproj
 	+ Visual Code: open folder 'U2.Suite'
