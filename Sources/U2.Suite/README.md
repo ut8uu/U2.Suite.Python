@@ -16,6 +16,21 @@ This is a Python implementation of the U2.Suite
 	+ Visual Studio (vers 2019/2022): open project U2.Suite.pyproj
 	+ Visual Code: open folder 'U2.Suite'
 
+# Working with the solution
+
+## VS Code
+
+Th solution contains a U2.Suite.code-workspace file. 
+Tpen the solution as a Workspace click the menu File -> Open Workspace from File...
+
+To select the proper interpreter:
+- Open any Python file
+- In the bottom right corner click the Interpreter panel and select the one you just have shelled.
+
+## MSVS 20xx
+
+[TBD]
+
 # Test
 - Run command: 'poetry run pytest'
 All tests are located in the folder "U2.Suite\tests".
