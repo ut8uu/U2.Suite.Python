@@ -31,6 +31,21 @@ To select the proper interpreter:
 
 [TBD]
 
+# Environments
+
+The solution can work under any OS supporting the Puthon language.
+
+## RIG Emulator
+
+The RIG Emulator has a native support under the posix operating systems (Linux, OSx)
+Unfortunately, there is no native support of file descriptors under the Windows, so you have to install the com0com software to prepare the infrastructure for the emulator.
+
+Once installed, the com0com software creates two pairs of virtual ports.
+You can use any pair or create a new one.
+Open the rig\emulators\EmulatorBase.py and make the following changes:
+- Set the port name on the right pane as a value for the WINDOWS_MASTER_COM_PORT constant.
+- Set the port name on the left pane as a value for the WINDOWS_LISTENER_COM_PORT constant.
+
 # Test
 - Run command: 'poetry run pytest'
 All tests are located in the folder "U2.Suite\tests".
