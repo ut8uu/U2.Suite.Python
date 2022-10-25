@@ -71,3 +71,9 @@ class SerialPortTests(unittest.TestCase):
 
         emulator.stop()
 
+    def test_GetSerialPortInfo(self) -> None:
+        from serial_device2 import SerialDevice, find_serial_device_ports
+        ports = find_serial_device_ports() # Returns list of available serial ports
+        dev = SerialDevice() # Might automatically find device if one available
+        info = dev.get_device_info()
+        x = info[0]

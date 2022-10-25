@@ -15,7 +15,9 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import atexit
 import os, threading
+import platform
 from contracts.KnownIdentifiers import KnownIdentifiers
 from contracts.RigCommand import RigCommand
 from contracts.RigCommands import RigCommands
@@ -28,8 +30,13 @@ from rig.CustomRig import CustomRig
 from serial import Serial
 from typing import Tuple
 from rig.enums.MessageDisplayModes import MessageDisplayModes
-
 from rig.enums.RigControlType import RigControlType
+
+if platform.system() != 'Windows':
+    import pty
+
+WINDOWS_LISTENER_COM_PORT = 'COM6'
+WINDOWS_MASTER_COM_PORT = 'COM7'
 
 class EmulatorBase():
     _prefix = b''
@@ -40,8 +47,13 @@ class EmulatorBase():
     _commands : RigCommands
     _rig : CustomRig
     _lock : threading.Lock
+    _is_windows : bool
+    _serial_windows : Serial
 
     def __init__(self, ini_file_name, prefix) -> None:
+        self._is_windows = platform.system() == 'Windows'
+        if self._is_windows:
+            self._serial_windows = Serial(WINDOWS_MASTER_COM_PORT, 9600, timeout=0)
         self._lock = threading.Lock()
         self._started = False
         self._ini_file_name = ini_file_name
@@ -53,6 +65,10 @@ class EmulatorBase():
     @property
     def SerialPortName(self) -> str:
         return self._serial_port_name
+
+    def ShutdownEmulator(self):
+        '''Shuts down the emulator'''
+        self.stop()
 
     def init_rig(self):
         self._rig = CustomRig(RigControlType.emulator, 1, KnownIdentifiers.U2RigEmulator)
@@ -112,17 +128,28 @@ class EmulatorBase():
             return
 
         self._started = True
+        if self._is_windows:
+            if not self._serial_windows.isOpen():
+                self._serial_windows.open()
+
         self.start_listener()
 
     def stop(self):
         if not self._started:
             return
+        if self._is_windows:
+            if self._serial_windows.isOpen():
+                self._serial_windows.close()
         self._started = False
         self._thread.join(1)
 
     def start_listener(self):
-        self._master_port,slave = pty.openpty() #open the pseudoterminal
-        self._serial_port_name = os.ttyname(slave) #translate the slave fd to a filename
+        if self._is_windows:
+            self._master_port = WINDOWS_MASTER_COM_PORT
+            self._serial_port_name = WINDOWS_LISTENER_COM_PORT
+        else:
+            self._master_port,slave = pty.openpty() #open the pseudoterminal
+            self._serial_port_name = os.ttyname(slave) #translate the slave fd to a filename
 
         #create a separate thread that listens on the master device for commands
         self._thread = threading.Thread(target=self.EmulatorListener, args=[self._master_port])
@@ -165,7 +192,28 @@ class EmulatorBase():
 
         return (False, None, 'unknown')
 
+    def ReadFromComPort(self, port) -> bytes:
+        if self._is_windows:
+            while True:
+                chars = self._serial_windows.read()
+                if len(chars) == 0:
+                    continue
+                return chars
+        else:
+            while True:
+                chars = os.read(port, 1)
+                if len(chars) == 0:
+                    continue
+                return chars
+
+    def WriteToSerialPort(self, port, content) -> None:
+        if self._is_windows:
+            self._serial_windows.write(content)
+        else:
+            os.write(port, content)
+
     def EmulatorListener(self, port):
+        print(f'Listener started on port {port}')
         #continuously listen to commands on the master device
         while True:
             res = b''
@@ -174,9 +222,8 @@ class EmulatorBase():
                     if not self._started:
                         print('Exiting the thread')
                         return
-                    chars = os.read(port, 1)
-                    if len(chars) == 0:
-                        continue
+                    chars = self.ReadFromComPort(port)
+                    print(chars)
                     res += chars
                     if res == self._prefix:
                         continue
@@ -194,11 +241,13 @@ class EmulatorBase():
                     if rig_command.ReplyLength > 0:
                         match rig_command_type:
                             case 'init':
-                                os.write(port, rig_command.Validation.Flags)
+                                #os.write(port, rig_command.Validation.Flags)
+                                self.WriteToSerialPort(port, rig_command.Validation.Flags)
                             case 'status':
                                 response = self.try_prepare_response(rig_command)
                                 if response != None:
-                                    os.write(port, response)
+                                    #os.write(port, response)
+                                    self.WriteToSerialPort(port, response)
                             case 'write':
                                 v = rig_command.Value
                                 value = ConversionHelper.UnformatValue(bytearray(res), rig_command.Value)
@@ -207,8 +256,10 @@ class EmulatorBase():
                                 response = bytearray(rig_command.Validation.Flags)
                                 for index in range(0, v.Len):
                                     response[v.Start + index] = formatted_value[index]
-                                os.write(port, response)
+                                #os.write(port, response)
+                                self.WriteToSerialPort(port, response)
             except Exception as ex:
+                print(ex.args[0])
                 continue
 
     def SetValue(self, param: RigParameter, value: int):
