@@ -15,6 +15,7 @@ parameterized = "^0.8.1"
 pyqt5 = "^5.15"
 pyserial = "^3.5"
 pyrsistent = "^0.18.1"
+serial-device2 = "^2.0.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.1"
