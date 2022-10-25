@@ -35,8 +35,8 @@ from rig.enums.RigControlType import RigControlType
 if platform.system() != 'Windows':
     import pty
 
-WINDOWS_LISTENER_COM_PORT = 'COM6'
-WINDOWS_MASTER_COM_PORT = 'COM7'
+WINDOWS_LISTENER_COM_PORT = 'COM7'
+WINDOWS_MASTER_COM_PORT = 'COM6'
 
 class EmulatorBase():
     _prefix = b''
