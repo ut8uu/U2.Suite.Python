@@ -36,7 +36,7 @@ if platform.system() != 'Windows':
     import pty
 
 # two constants below are used under the Windows
-# refer to README.md to get details
+# refer to the README.md to get details
 WINDOWS_LISTENER_COM_PORT = '\\\\.\\CNCA0' #a port name from the com0com left pane
 WINDOWS_MASTER_COM_PORT = '\\\\.\\CNCB0' # a port name from the com0com right pane
 

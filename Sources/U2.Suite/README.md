@@ -42,7 +42,8 @@ Unfortunately, there is no native support of file descriptors under the Windows,
 
 Once installed, the com0com software creates two pairs of virtual ports.
 You can use any existing pair or create a new one.
-Please note, that in case of using port names in form CNCxx you have to add \\.\ prefix to that name.
+Please note, that in case of using port names in form of CNCxx you have 
+to add \\.\ prefix to that name.
 
 Open the rig\emulators\EmulatorBase.py and make the following changes:
 - Set the port name on the right pane as a value for the WINDOWS_MASTER_COM_PORT constant.
