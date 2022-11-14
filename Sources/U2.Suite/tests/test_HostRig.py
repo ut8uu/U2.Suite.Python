@@ -78,37 +78,47 @@ class HostRigTests(unittest.TestCase):
 
         '''Set Mode'''
         rig.Mode = RigParameter.fm
+        time.sleep(1)
         self.assertEqual(RigParameter.fm, emulator._rig.Mode)
 
         rig.Mode = RigParameter.am
+        time.sleep(1)
         self.assertEqual(RigParameter.am, emulator._rig.Mode)
 
         '''Set Split'''
         rig.Split = RigParameter.spliton
+        time.sleep(1)
         self.assertEqual(RigParameter.spliton, emulator._rig.Split)
 
         rig.Split = RigParameter.splitoff
+        time.sleep(1)
         self.assertEqual(RigParameter.splitoff, emulator._rig.Split)
 
         '''Set Tx'''
         rig.Tx = RigParameter.tx
+        time.sleep(1)
         self.assertEqual(RigParameter.tx, emulator._rig.Tx)
 
         rig.Tx = RigParameter.rx
+        time.sleep(1)
         self.assertEqual(RigParameter.rx, emulator._rig.Tx)
 
         '''Set Rit'''
         rig.Rit = RigParameter.ritoff
+        time.sleep(1)
         self.assertEqual(RigParameter.ritoff, emulator._rig.Rit)
 
         rig.Rit = RigParameter.riton
+        time.sleep(1)
         self.assertEqual(RigParameter.riton, emulator._rig.Rit)
 
         '''Set Xit'''
         rig.Xit = RigParameter.xitoff
+        time.sleep(1)
         self.assertEqual(RigParameter.xitoff, emulator._rig.Xit)
 
         rig.Xit = RigParameter.xiton
+        time.sleep(1)
         self.assertEqual(RigParameter.xiton, emulator._rig.Xit)
 
         rig.Enabled = False
@@ -122,7 +132,7 @@ class HostRigTests(unittest.TestCase):
 
         rig = self.GetHostRig(True, emulator)
 
-        time.sleep(5) # need to completely poll the rig
+        time.sleep(5) # need to completely finish polling the rig
         rig.Enabled = False
         emulator.stop()
         

@@ -19,17 +19,17 @@ from contracts.RigParameter import RigParameter
 
 class BitMask:
     def __init__(self):
-        self._Mask = bytes(b'')
-        self._Flags = bytes(b'')
+        self._Mask = b''
+        self._Flags = b''
         self._Param = RigParameter.none
     @property
-    def Mask(self) -> bytes:
+    def Mask(self) -> bytearray:
         return self._Mask
     @Mask.setter
     def Mask(self, value):
         self._Mask = value
     @property
-    def Flags(self) -> bytes:
+    def Flags(self) -> bytearray:
         return self._Flags
     @Flags.setter
     def Flags(self, value):

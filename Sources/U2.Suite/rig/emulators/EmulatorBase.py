@@ -112,7 +112,7 @@ class EmulatorBase():
         raise ParameterNotSupported(f"Parameter {command.Value.Param} not supported.");
 
     def try_inject_value(self, command: RigCommand, value: int) -> bytearray:
-        response = command.Validation.Flags
+        response = command.Validation.Flags.copy()
 
         info = command.Values[0]
         bytes = ConversionHelper.FormatValue(value, info)

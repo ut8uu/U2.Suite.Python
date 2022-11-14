@@ -50,8 +50,12 @@ class SerialPortTests(unittest.TestCase):
         serial_port = RigSerialPort(settings)
         return serial_port
 
-    @unittest.skipIf(os.name != 'posix', "not supported on the current platform")
-    def test_CanSendCommands(self) -> None:
+    def test_CanSendCommandsUnderWindows(self) -> None:
+        '''
+        In case of running under Windows, ensure you have the com0com installed and configured.
+        Please specify the name of the port in the com0com in the 
+        WINDOWS_MASTER_COM_PORT constant in the EmulatorBase.py
+        '''
         emulator = self.GetEmulator()
         emulator.start()
         serial_port = self.GetRigSerialPort(emulator.SerialPortName)
@@ -67,11 +71,11 @@ class SerialPortTests(unittest.TestCase):
         command = emulator._commands.InitCmd[0]
         serial_port.SendMessage(command.Code)
 
-        #command = emulator._commands.WriteCmd[0]
-
         emulator.stop()
 
+    @unittest.skipIf(True, 'Comment this when working with real ports.')
     def test_GetSerialPortInfo(self) -> None:
+        '''This test cannot find any COM port created by com0com'''
         from serial_device2 import SerialDevice, find_serial_device_ports
         ports = find_serial_device_ports() # Returns list of available serial ports
         dev = SerialDevice() # Might automatically find device if one available
