@@ -21,6 +21,7 @@ from pyrsistent import b
 from contracts.BitMask import BitMask
 from contracts.Constants import Constants
 from contracts.ParameterValue import ParameterValue
+from contracts.RadioBand import RadioBand
 from contracts.RigParameter import RigParameter
 from contracts.ValueFormat import ValueFormat
 from exceptions.ArgumentOutOfRangeException import ArgumentOutOfRangeException
@@ -457,3 +458,9 @@ class ConversionHelper():
                 return serial.STOPBITS_TWO
             case _:
                 raise ConversionException(f'A value "{value}" cannot be converted to serial.StopBits. Expected 1.0, 1.5, 2.0.')
+
+    @staticmethod
+    def FrequencyToRadioBand(frequency : int) -> RadioBand:
+        '''
+        Converts given integer to the radio band
+        '''
