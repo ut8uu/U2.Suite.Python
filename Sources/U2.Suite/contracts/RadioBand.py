@@ -143,20 +143,20 @@ class RadioBand(object):
         self._SubBands = value
 
 class RadioBandName(object):
-    B160m : str
-    B80m : str
-    B60m : str
-    B40m : str
-    B30m : str
-    B20m : str
-    B17m : str
-    B15m : str
-    B12m : str
-    B10m : str
-    B6m : str
-    B4m : str
-    B2m : str
-    B70cm : str
+    B160m : str = '160m'
+    B80m : str = '80m'
+    B60m : str = '60m'
+    B40m : str = '40m'
+    B30m : str = '30m'
+    B20m : str = '20m'
+    B17m : str = '17m'
+    B15m : str = '15m'
+    B12m : str = '12m'
+    B10m : str = '10m'
+    B6m : str = '6m'
+    B4m : str = '4m'
+    B2m : str = '2m'
+    B70cm : str = '70cm'
 
     def __init__(self):
         self.B160m = "160m"

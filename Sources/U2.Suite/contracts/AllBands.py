@@ -324,3 +324,35 @@ class Band160M(RadioBand):
         self.SubBands.append(SubBand(1838000, 1840000, RadioMode.NarrowBandModes()))
         self.SubBands.append(SubBand(1840000, 2000000, RadioMode.AllModes()))
 
+class AllBands(object):
+    _band160m : Band160M
+    _band80m : Band80M
+    _band60m : Band60M
+    _band40m : Band40M
+    _band30m : Band30M
+    _band20m : Band20M
+    _band17m : Band17M
+    _band15m : Band15M
+    _band12m : Band12M
+    _band10m : Band10M
+    _band6m : Band6M
+    _band4m : Band4M
+    _band2m : Band2M
+    _band70cm : Band70CM
+
+    def __init__(self) -> None:
+        self._band70cm = Band70CM()
+        self._band2m = Band2M()
+        self._band4m = Band4M()
+        self._band6m = Band6M()
+        self._band10m = Band10M()
+        self._band12m = Band12M()
+        self._band15m = Band15M()
+        self._band17m = Band17M()
+        self._band20m = Band20M()
+        self._band30m = Band30M()
+        self._band40m = Band40M()
+        self._band60m = Band60M()
+        self._band80m = Band80M()
+        self._band160m = Band160M()
+        

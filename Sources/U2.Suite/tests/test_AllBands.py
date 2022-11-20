@@ -23,6 +23,24 @@ import unittest
 
 class AllBandsTests(unittest.TestCase):
 
+    def test_AllBands(self) -> None:
+        all_bands = AllBands()
+
+        self.assertNotEqual(None, all_bands._band70cm)
+        self.assertNotEqual(None, all_bands._band2m)
+        self.assertNotEqual(None, all_bands._band4m)
+        self.assertNotEqual(None, all_bands._band6m)
+        self.assertNotEqual(None, all_bands._band10m)
+        self.assertNotEqual(None, all_bands._band12m)
+        self.assertNotEqual(None, all_bands._band15m)
+        self.assertNotEqual(None, all_bands._band17m)
+        self.assertNotEqual(None, all_bands._band20m)
+        self.assertNotEqual(None, all_bands._band30m)
+        self.assertNotEqual(None, all_bands._band40m)
+        self.assertNotEqual(None, all_bands._band60m)
+        self.assertNotEqual(None, all_bands._band80m)
+        self.assertNotEqual(None, all_bands._band160m)
+
     def test_Band70CM(self):
         band = Band70CM()
         self.assertEqual(430000000, band.BeginMhz)
