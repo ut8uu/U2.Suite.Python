@@ -18,12 +18,14 @@
 import binascii, re, serial, sys
 
 from pyrsistent import b
+from contracts.AllBands import AllBands
 from contracts.BitMask import BitMask
 from contracts.Constants import Constants
 from contracts.ParameterValue import ParameterValue
 from contracts.RadioBand import RadioBand
 from contracts.RigParameter import RigParameter
 from contracts.ValueFormat import ValueFormat
+from exceptions.ArgumentException import ArgumentException
 from exceptions.ArgumentOutOfRangeException import ArgumentOutOfRangeException
 from exceptions.ConversionException import ConversionException
 from exceptions.FormatParseException import FormatParseException
@@ -464,3 +466,8 @@ class ConversionHelper():
         '''
         Converts given integer to the radio band
         '''
+        for band in AllBands.AllBands:
+            if band.BeginMhz <= frequency and band.EndMhz >=frequency:
+                return band
+        
+        raise ArgumentException(f'Frequency {frequency} not found.')

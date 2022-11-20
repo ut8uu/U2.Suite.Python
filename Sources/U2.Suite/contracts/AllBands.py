@@ -339,6 +339,6 @@ class AllBands(object):
     Band4m : Band4M = Band4M()
     Band2m : Band2M = Band2M()
     Band70cm : Band70CM = Band70CM()
-    AllBands = [Band160m, Band80m, Band60m, Band40m, Band30m, Band20m, 
+    AllBands : List[RadioBand] = [Band160m, Band80m, Band60m, Band40m, Band30m, Band20m, 
         Band17m, Band15m, Band12m, Band10m, Band6m, Band4m, Band2m, Band70cm]
     

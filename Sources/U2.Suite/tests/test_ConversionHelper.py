@@ -16,10 +16,13 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from unittest import result
+from contracts.AllBands import AllBands
 from contracts.Constants import Constants
 from contracts.ParameterValue import ParameterValue
+from contracts.RadioBand import *
 from contracts.RigParameter import RigParameter
 from contracts.ValueFormat import ValueFormat
+from exceptions.ArgumentException import ArgumentException
 from exceptions.ArgumentOutOfRangeException import ArgumentOutOfRangeException
 from exceptions.ConversionException import ConversionException
 from exceptions.FormatParseException import FormatParseException
@@ -331,3 +334,24 @@ class RigParameterTests(unittest.TestCase):
         with self.assertRaises(ConversionException) as ex:
             ch.float_to_stopbits(3.0)
         
+class AllBandsTests(unittest.TestCase):
+    '''This is about the AllBands-related conversion'''
+
+    def test_FrequencyToBand(self):
+        self.assertEqual(AllBands.Band160m, ch.FrequencyToRadioBand(1850000))
+        self.assertEqual(AllBands.Band80m, ch.FrequencyToRadioBand(3520000))
+        self.assertEqual(AllBands.Band60m, ch.FrequencyToRadioBand(5352000))
+        self.assertEqual(AllBands.Band40m, ch.FrequencyToRadioBand(7040000))
+        self.assertEqual(AllBands.Band30m, ch.FrequencyToRadioBand(10120000))
+        self.assertEqual(AllBands.Band20m, ch.FrequencyToRadioBand(14200000))
+        self.assertEqual(AllBands.Band17m, ch.FrequencyToRadioBand(18100000))
+        self.assertEqual(AllBands.Band15m, ch.FrequencyToRadioBand(21200000))
+        self.assertEqual(AllBands.Band12m, ch.FrequencyToRadioBand(24900000))
+        self.assertEqual(AllBands.Band10m, ch.FrequencyToRadioBand(28500000))
+        self.assertEqual(AllBands.Band6m, ch.FrequencyToRadioBand(52000000))
+        self.assertEqual(AllBands.Band4m, ch.FrequencyToRadioBand(70250000))
+        self.assertEqual(AllBands.Band2m, ch.FrequencyToRadioBand(145000000))
+        self.assertEqual(AllBands.Band70cm, ch.FrequencyToRadioBand(439000000))
+
+        with self.assertRaises(ArgumentException) as ex:
+            ch.FrequencyToRadioBand(1)
