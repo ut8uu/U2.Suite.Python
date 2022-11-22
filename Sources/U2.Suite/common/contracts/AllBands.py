@@ -15,8 +15,8 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from contracts.RadioBand import *
-from contracts.RadioMode import *
+from common.contracts.RadioBand import *
+from common.contracts.RadioMode import *
 from typing import List
 
 

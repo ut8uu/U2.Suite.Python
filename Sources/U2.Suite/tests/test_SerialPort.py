@@ -17,12 +17,12 @@
 
 import os
 import unittest
-from contracts.RigParameter import RigParameter
-from contracts.RigSettings import RigSettings
+from common.contracts.RigParameter import RigParameter
+from common.contracts.RigSettings import RigSettings
 from helpers.RigHelper import RigHelper
-from rig.RigSerialPort import RigSerialPort
+from manyrig.rig.RigSerialPort import RigSerialPort
 
-from rig.emulators.IC705Emulator import IC705Emulator
+from manyrig.rig.emulators.IC705Emulator import IC705Emulator
 
 class SerialPortTests(unittest.TestCase):
     '''To test the abilities of the RigSerialPort class'''

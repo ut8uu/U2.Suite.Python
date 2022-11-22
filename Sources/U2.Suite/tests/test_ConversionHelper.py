@@ -16,22 +16,22 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from unittest import result
-from contracts.AllBands import AllBands
-from contracts.Constants import Constants
-from contracts.ParameterValue import ParameterValue
-from contracts.RadioBand import *
-from contracts.RigParameter import RigParameter
-from contracts.ValueFormat import ValueFormat
-from exceptions.ArgumentException import ArgumentException
-from exceptions.ArgumentOutOfRangeException import ArgumentOutOfRangeException
-from exceptions.ConversionException import ConversionException
-from exceptions.FormatParseException import FormatParseException
-from exceptions.ParameterParseException import ParameterParseException
-from exceptions.ParityConversionException import ParityConversionException
-from exceptions.ValueConversionException import ValueConversionException
+from common.contracts.AllBands import AllBands
+from common.contracts.Constants import Constants
+from common.contracts.ParameterValue import ParameterValue
+from common.contracts.RadioBand import *
+from common.contracts.RigParameter import RigParameter
+from common.contracts.ValueFormat import ValueFormat
+from common.exceptions.ArgumentException import ArgumentException
+from common.exceptions.ArgumentOutOfRangeException import ArgumentOutOfRangeException
+from common.exceptions.ConversionException import ConversionException
+from common.exceptions.FormatParseException import FormatParseException
+from common.exceptions.ParameterParseException import ParameterParseException
+from common.exceptions.ParityConversionException import ParityConversionException
+from common.exceptions.ValueConversionException import ValueConversionException
 from helpers.ConversionHelper import ConversionHelper as ch
 from pyrsistent import b
-from rig.enums.Parity import Parity
+from manyrig.rig.enums.Parity import Parity
 import serial
 import unittest
 

@@ -18,14 +18,14 @@
 import os, unittest
 from threading import Timer
 import time
-from contracts.RigParameter import RigParameter
+from common.contracts.RigParameter import RigParameter
 
-from contracts.RigSettings import RigSettings
-from exceptions.ArgumentException import ArgumentException
+from common.contracts.RigSettings import RigSettings
+from common.exceptions.ArgumentException import ArgumentException
 from helpers.FileSystemHelper import FileSystemHelper
 from helpers.RigHelper import RigHelper
-from rig.HostRig import HostRig
-from rig.emulators.IC705Emulator import IC705Emulator
+from manyrig.rig.HostRig import HostRig
+from manyrig.rig.emulators.IC705Emulator import IC705Emulator
 
 class HostRigTests(unittest.TestCase):
 

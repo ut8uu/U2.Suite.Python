@@ -15,10 +15,10 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from contracts.CommandQueue import CommandQueue
-from contracts.QueueItem import QueueItem
-from rig.enums.CommandKind import CommandKind
-from contracts.AllBands import *
+from common.contracts.AllBands import *
+from common.contracts.CommandQueue import CommandQueue
+from common.contracts.QueueItem import QueueItem
+from manyrig.rig.enums.CommandKind import CommandKind
 import unittest
 
 class AllBandsTests(unittest.TestCase):

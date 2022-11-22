@@ -18,10 +18,10 @@
 import sys
 
 from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtWidgets import QDialog, QTableWidgetItem
+from PyQt5.QtWidgets import QApplication, QDialog, QTableWidgetItem
 
-from ui.Ui_RigSelectDialog import Ui_RigSelector
-from dialogs.NewRigDialog import NewRigDialog
+from suite.ui.Ui_RigSelectDialog import Ui_RigSelector
+from Suite_NewRigDialog import NewRigDialog
 
 class RigSelectorDialog(QDialog, Ui_RigSelector):
     __selected_rig = 0
@@ -47,3 +47,8 @@ class RigSelectorDialog(QDialog, Ui_RigSelector):
         newRigDialog = NewRigDialog()
         newRigDialog.exec()
  
+if __name__ == '__main__':
+    from Suite_RigSelectorDialog import RigSelectorDialog
+    app = QApplication(sys.argv)
+    dialog = RigSelectorDialog()
+    dialog.exec()

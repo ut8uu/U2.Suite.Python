@@ -21,8 +21,8 @@ import sys
 
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog
-from rig.emulators.EmulatorBase import EmulatorBase
-from rig.emulators.IC705Emulator import IC705Emulator
+from manyrig.rig.emulators.EmulatorBase import EmulatorBase
+from manyrig.rig.emulators.IC705Emulator import IC705Emulator
 from ui.Ui_EmulatorMainWindow import Ui_EmulatorMainWindow
 
 class EmulatorMainWindow(QDialog, Ui_EmulatorMainWindow):

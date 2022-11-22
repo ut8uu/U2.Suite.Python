@@ -15,9 +15,9 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from contracts.QueueItem import QueueItem
-from rig.enums.CommandKind import CommandKind
-from rig.enums.ExchangePhase import ExchangePhase
+from common.contracts.QueueItem import QueueItem
+from manyrig.rig.enums.CommandKind import CommandKind
+from manyrig.rig.enums.ExchangePhase import ExchangePhase
 from typing import List
 
 class CommandQueue(List[QueueItem]):

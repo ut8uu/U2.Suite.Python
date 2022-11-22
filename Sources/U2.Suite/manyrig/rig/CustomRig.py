@@ -15,9 +15,9 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from contracts.RigParameter import RigParameter
-from rig.enums.RigControlType import RigControlType
-from rig.enums.RigControlStatus import RigControlStatus
+from common.contracts.RigParameter import RigParameter
+from manyrig.rig.enums.RigControlType import RigControlType
+from manyrig.rig.enums.RigControlStatus import RigControlStatus
 
 class CustomRig(object):
     _application_id : str

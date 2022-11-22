@@ -15,9 +15,9 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from contracts.RigParameter import RigParameter
+from common.contracts.RigParameter import RigParameter
 from helpers.ConversionHelper import ConversionHelper
-from rig.enums.CommandKind import CommandKind
+from manyrig.rig.enums.CommandKind import CommandKind
 
 class QueueItem(object):
     def __init__(self):

@@ -1,6 +1,6 @@
 import os, serial, threading, time
-from contracts.RigCommand import RigCommand
-from contracts.RigCommands import RigCommands
+from common.contracts.RigCommand import RigCommand
+from common.contracts.RigCommands import RigCommands
 from helpers.FileSystemHelper import FileSystemHelper
 from helpers.RigHelper import RigHelper
 from typing import List, Tuple

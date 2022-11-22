@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from Rig import Rig
+from manyrig.rig import Rig
 from enums.RigControlType import RigControlType
 
 class GuesRig(Rig):

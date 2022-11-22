@@ -24,31 +24,31 @@ The GuestRig class is an implementation of such listener object.
 import logging
 import threading
 import time
-from contracts.BitMask import BitMask
-from contracts.CommandQueue import CommandQueue
-from contracts.RigCommand import RigCommand
-from contracts.RigCommands import RigCommands
-from contracts.RigParameter import RigParameter
-from contracts.RigSettings import RigSettings
-from contracts.QueueItem import QueueItem
-from contracts.ValueFormat import ValueFormat
-from exceptions.ArgumentException import ArgumentException
-from exceptions.ArgumentOutOfRangeException import ArgumentOutOfRangeException
-from exceptions.TimeoutException import TimeoutException
-from exceptions.ValueValidationException import ValueValidationException
+from common.contracts.BitMask import BitMask
+from common.contracts.CommandQueue import CommandQueue
+from common.contracts.RigCommand import RigCommand
+from common.contracts.RigCommands import RigCommands
+from common.contracts.RigParameter import RigParameter
+from common.contracts.RigSettings import RigSettings
+from common.contracts.QueueItem import QueueItem
+from common.contracts.ValueFormat import ValueFormat
+from common.exceptions.ArgumentException import ArgumentException
+from common.exceptions.ArgumentOutOfRangeException import ArgumentOutOfRangeException
+from common.exceptions.TimeoutException import TimeoutException
+from common.exceptions.ValueValidationException import ValueValidationException
 from helpers.ConversionHelper import ConversionHelper
 from helpers.DebugHelper import DebugHelper
 from helpers.RigHelper import RigHelper
-from rig.RigSerialPort import RigSerialPort
-from rig.enums.CommandKind import CommandKind
-from rig.enums.ExchangePhase import ExchangePhase
-from rig.enums.MessageDisplayModes import MessageDisplayModes
-from rig.enums.RigControlType import RigControlType
-from rig.events.OnRigParameterChangedEvent import OnRigParameterChangedEvent
-from rig.Rig import Rig
+from manyrig.rig.RigSerialPort import RigSerialPort
+from manyrig.rig.enums.CommandKind import CommandKind
+from manyrig.rig.enums.ExchangePhase import ExchangePhase
+from manyrig.rig.enums.MessageDisplayModes import MessageDisplayModes
+from manyrig.rig.enums.RigControlType import RigControlType
+from manyrig.rig.events.OnRigParameterChangedEvent import OnRigParameterChangedEvent
+from manyrig.rig.Rig import Rig
 from typing import List, Tuple
 
-from rig.events.SerialPortMessageReceivedEvent import SerialPortMessageReceivedEvent
+from manyrig.rig.events.SerialPortMessageReceivedEvent import SerialPortMessageReceivedEvent
 
 class HostRig(Rig):
 

@@ -30,7 +30,7 @@ class FileSystemHelperTests(unittest.TestCase):
         local_folder = fh.getLocalFolder()
         if local_folder.endswith('U2.Suite'):
             local_folder = local_folder.removesuffix('U2.Suite')
-        path = join(local_folder, 'U2.Suite', 'ini')
+        path = join(local_folder, 'U2.Suite', 'manyrig', 'ini')
         files = fh.enumerateDirectory(path, '.ini')
         assert files.count('IC-705.ini') == 1
     

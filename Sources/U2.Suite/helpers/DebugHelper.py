@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from rig.enums.MessageDisplayModes import MessageDisplayModes
+from manyrig.rig.enums.MessageDisplayModes import MessageDisplayModes
 from typing import List
 
 class DebugHelper(object):

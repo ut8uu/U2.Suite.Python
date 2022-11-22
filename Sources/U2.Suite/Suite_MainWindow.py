@@ -17,12 +17,19 @@
 
 import sys
 
-from PyQt5.QtWidgets import QMainWindow
+from PyQt5.QtWidgets import QApplication, QMainWindow
 
-from ui.Ui_MainWindow import Ui_MainWindow
+from suite.ui.Ui_MainWindow import Ui_MainWindow
 
-class MainWindow(QMainWindow, Ui_MainWindow):
+class Suite_MainWindow(QMainWindow, Ui_MainWindow):
     
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
+
+if __name__ == '__main__':
+    from Suite_MainWindow import Suite_MainWindow
+    app = QApplication(sys.argv)
+    window = Suite_MainWindow()
+    window.show()
+    app.exec()

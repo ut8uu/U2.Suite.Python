@@ -15,28 +15,8 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from contracts.RigParameter import RigParameter
+from manyrig.rig.emulators.EmulatorBase import EmulatorBase
 
-class BitMask:
+class IC705Emulator(EmulatorBase):
     def __init__(self):
-        self._Mask = b''
-        self._Flags = b''
-        self._Param = RigParameter.none
-    @property
-    def Mask(self) -> bytearray:
-        return self._Mask
-    @Mask.setter
-    def Mask(self, value):
-        self._Mask = value
-    @property
-    def Flags(self) -> bytearray:
-        return self._Flags
-    @Flags.setter
-    def Flags(self, value):
-        self._Flags = value
-    @property
-    def Param(self) -> RigParameter:
-        return self._Param
-    @Param.setter
-    def Param(self, value):
-        self._Param = value
+        super().__init__('IC-705.ini', b'\xfe\xfe')

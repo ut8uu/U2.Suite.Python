@@ -15,8 +15,14 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from rig.emulators.EmulatorBase import EmulatorBase
+from common.contracts.RigCommands import RigCommands
+from manyrig.rig.CustomRig import CustomRig
+from manyrig.rig.enums.RigControlType import RigControlType
 
-class IC705Emulator(EmulatorBase):
-    def __init__(self):
-        super().__init__('IC-705.ini', b'\xfe\xfe')
+class Rig(CustomRig):
+    
+    def __init__(self, 
+        control_type: RigControlType, 
+        rig_number: int,
+        application_id: str):
+        super().__init__(control_type, rig_number, application_id)

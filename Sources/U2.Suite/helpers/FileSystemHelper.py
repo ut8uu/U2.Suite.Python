@@ -47,5 +47,5 @@ class FileSystemHelper():
     
     @staticmethod
     def getIniFilesFolder() -> str:
-        return join(FileSystemHelper.getLocalFolder(), 'ini')
+        return join(FileSystemHelper.getLocalFolder(), 'manyrig', 'ini')
     

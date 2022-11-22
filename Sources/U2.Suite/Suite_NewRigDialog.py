@@ -20,12 +20,12 @@ import sys
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QApplication, QDialog
 
-from contracts.Constants import Constants
+from common.contracts.Constants import Constants
 from helpers import ComPortHelper
 from helpers.FileSystemHelper import FileSystemHelper
-from rig.HostRig import HostRig
+from manyrig.rig.HostRig import HostRig
+from suite.ui.Ui_NewRigDialog import Ui_NewRigDialog
 from typing import List
-from ui.Ui_NewRigDialog import Ui_NewRigDialog
 
 class NewRigDialog(QDialog, Ui_NewRigDialog):
     __all_rigs = []
@@ -112,7 +112,7 @@ class NewRigDialog(QDialog, Ui_NewRigDialog):
 
 
 if __name__ == '__main__':
-    from NewRigDialog import NewRigDialog
+    from Suite_NewRigDialog import NewRigDialog
     app = QApplication(sys.argv)
     dialog = NewRigDialog()
     

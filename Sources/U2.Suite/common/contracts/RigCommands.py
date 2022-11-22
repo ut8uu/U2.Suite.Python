@@ -17,8 +17,8 @@
 
 import sys
 
-from contracts.RigCommand import RigCommand
-from contracts.RigParameter import RigParameter
+from common.contracts.RigCommand import RigCommand
+from common.contracts.RigParameter import RigParameter
 from typing import Dict, List
 
 class RigCommands(object):

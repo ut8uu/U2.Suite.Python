@@ -20,10 +20,10 @@ import configparser
 import unittest
 
 from pyparsing import dict_of
-from contracts.RigCommand import RigCommand
-from contracts.RigParameter import RigParameter
-from contracts.ValueFormat import ValueFormat
-from exceptions.UnexpectedEntryException import UnexpectedEntryException
+from common.contracts.RigCommand import RigCommand
+from common.contracts.RigParameter import RigParameter
+from common.contracts.ValueFormat import ValueFormat
+from common.exceptions.UnexpectedEntryException import UnexpectedEntryException
 from helpers.FileSystemHelper import FileSystemHelper as fsh
 from helpers.RigHelper import RigHelper
 from os import path

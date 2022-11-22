@@ -15,8 +15,8 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from contracts.RigParameter import RigParameter
-from contracts.ValueFormat import ValueFormat
+from common.contracts.RigParameter import RigParameter
+from common.contracts.ValueFormat import ValueFormat
 
 class ParameterValue(object):
     def __init__(self):

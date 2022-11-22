@@ -18,19 +18,19 @@
 import atexit
 import os, threading
 import platform
-from contracts.KnownIdentifiers import KnownIdentifiers
-from contracts.RigCommand import RigCommand
-from contracts.RigCommands import RigCommands
-from contracts.RigParameter import RigParameter
-from exceptions.ParameterNotSupported import ParameterNotSupported
+from common.contracts.KnownIdentifiers import KnownIdentifiers
+from common.contracts.RigCommand import RigCommand
+from common.contracts.RigCommands import RigCommands
+from common.contracts.RigParameter import RigParameter
+from common.exceptions.ParameterNotSupported import ParameterNotSupported
 from helpers.ConversionHelper import ConversionHelper
 from helpers.RigHelper import RigHelper
 from helpers.FileSystemHelper import FileSystemHelper
-from rig.CustomRig import CustomRig
+from manyrig.rig.CustomRig import CustomRig
 from serial import Serial
 from typing import Tuple
-from rig.enums.MessageDisplayModes import MessageDisplayModes
-from rig.enums.RigControlType import RigControlType
+from manyrig.rig.enums.MessageDisplayModes import MessageDisplayModes
+from manyrig.rig.enums.RigControlType import RigControlType
 
 if platform.system() != 'Windows':
     import pty

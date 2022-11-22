@@ -16,8 +16,8 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from typing import List
-from contracts.BitMask import BitMask
-from contracts.ParameterValue import ParameterValue
+from common.contracts.BitMask import BitMask
+from common.contracts.ParameterValue import ParameterValue
 
 class RigCommand(object):
     _Code : bytearray

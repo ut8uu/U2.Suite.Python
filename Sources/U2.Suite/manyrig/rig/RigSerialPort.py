@@ -16,10 +16,10 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os, serial, threading
-from contracts.RigSettings import RigSettings
-from exceptions.TimeoutException import TimeoutException
+from common.contracts.RigSettings import RigSettings
+from common.exceptions.TimeoutException import TimeoutException
 from helpers.ConversionHelper import ConversionHelper
-from rig.events.SerialPortMessageReceivedEvent import SerialPortMessageReceivedEvent
+from manyrig.rig.events.SerialPortMessageReceivedEvent import SerialPortMessageReceivedEvent
 
 class RigSerialPort():
     _rig_settings: RigSettings

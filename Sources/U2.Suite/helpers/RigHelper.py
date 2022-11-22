@@ -20,20 +20,20 @@ import logging
 
 from pyparsing import empty
 
-from contracts.BitMask import BitMask
-from contracts.ParameterValue import ParameterValue
-from contracts.RigCommand import RigCommand
-from contracts.RigCommands import RigCommands
-from contracts.RigParameter import RigParameter
-from exceptions.EntryLoadErrorException import EntryLoadErrorException
-from exceptions.IniFileLoadException import IniFileLoadException
-from exceptions.LoadInitCommandsException import LoadInitCommandsException
-from exceptions.LoadStatusCommandsException import LoadStatusCommandsException
-from exceptions.LoadWriteCommandException import LoadWriteCommandException
-from exceptions.MaskValidationException import MaskValidationException
-from exceptions.UnexpectedEntryException import UnexpectedEntryException
-from exceptions.ValueLoadException import ValueLoadException
-from exceptions.ValueValidationException import ValueValidationException
+from common.contracts.BitMask import BitMask
+from common.contracts.ParameterValue import ParameterValue
+from common.contracts.RigCommand import RigCommand
+from common.contracts.RigCommands import RigCommands
+from common.contracts.RigParameter import RigParameter
+from common.exceptions.EntryLoadErrorException import EntryLoadErrorException
+from common.exceptions.IniFileLoadException import IniFileLoadException
+from common.exceptions.LoadInitCommandsException import LoadInitCommandsException
+from common.exceptions.LoadStatusCommandsException import LoadStatusCommandsException
+from common.exceptions.LoadWriteCommandException import LoadWriteCommandException
+from common.exceptions.MaskValidationException import MaskValidationException
+from common.exceptions.UnexpectedEntryException import UnexpectedEntryException
+from common.exceptions.ValueLoadException import ValueLoadException
+from common.exceptions.ValueValidationException import ValueValidationException
 from helpers.ConversionHelper import ConversionHelper
 from helpers.DebugHelper import DebugHelper
 from helpers.IniFileHelper import IniFileHelper as ih
@@ -41,7 +41,7 @@ from helpers.FileSystemHelper import FileSystemHelper as fsh
 from os import path
 from typing import List, Tuple
 
-from rig.enums.MessageDisplayModes import MessageDisplayModes
+from manyrig.rig.enums.MessageDisplayModes import MessageDisplayModes
 
 class RigHelper():
     

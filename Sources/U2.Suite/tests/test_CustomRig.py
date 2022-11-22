@@ -16,9 +16,9 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from contracts.RigParameter import RigParameter
-from rig.CustomRig import CustomRig
-from rig.enums.RigControlType import RigControlType
+from common.contracts.RigParameter import RigParameter
+from manyrig.rig.CustomRig import CustomRig
+from manyrig.rig.enums.RigControlType import RigControlType
 
 class CustomRigTests(unittest.TestCase):
     def test_setters(self):
