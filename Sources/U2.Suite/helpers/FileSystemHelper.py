@@ -15,7 +15,9 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import pathlib
 import sys
+import os
 from os import listdir, getcwd, path
 from os.path import isfile, join
 from typing import List
@@ -48,4 +50,28 @@ class FileSystemHelper():
     @staticmethod
     def getIniFilesFolder() -> str:
         return join(FileSystemHelper.getLocalFolder(), 'manyrig', 'ini')
+
+    @staticmethod
+    def get_appdata_path(folder : str, create_if_not_exists : bool = False) -> pathlib.Path:
+        '''
+        Returns a path to the given folder in the application 
+        data folder depending on the OS.
+
+        folder - a name of the folder inside the shared folder
+        create_if_not_exists - indicates whether the folder must be created if it is absent
+        '''
+        home = pathlib.Path.home()
+        path : pathlib.Path
+
+        if sys.platform == "win32":
+            path = home / "AppData/Roaming" / folder
+        elif sys.platform == "linux":
+            path = home / ".local/share" / folder
+        elif sys.platform == "darwin":
+            path = home / "Library/Application Support" / folder
+
+        if create_if_not_exists and not os.path.exists(path):
+            os.mkdir(path)
+
+        return path
     
