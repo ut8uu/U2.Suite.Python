@@ -50,3 +50,23 @@ class LogDatabaseTests(unittest.TestCase):
         db = self.get_database(file_name)
 
         self.assertTrue(os.path.exists(full_path))
+
+    def test_Callsigns(self) -> None:
+        '''This is to test how database can handle callsign-related CRUD operations'''
+        self.cleanup_test_data()
+        db = self.get_database('test_callsigns.sqlite')
+
+        # at this point there is no records yet
+        (id, name) = db.get_or_add_callsign('UT8UU')
+        self.assertEqual(1, id)
+
+        # here we should get the same id
+        (id, name) = db.get_or_add_callsign('UT8UU')
+        self.assertEqual(1, id)
+
+        # here we try to add the same callsign in lower case
+        # the result must be the same
+        (id, name) = db.get_or_add_callsign('ut8uu')
+        self.assertEqual(1, id)
+
+        
