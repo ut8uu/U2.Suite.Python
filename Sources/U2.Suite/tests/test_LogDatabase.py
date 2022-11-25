@@ -15,13 +15,11 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from pathlib import Path
-import pathlib
-import shutil
-
 import helpers.FileSystemHelper as fsh
 import logger.log_database
 import os
+from pathlib import Path
+import shutil
 import unittest
 
 class LogDatabaseTests(unittest.TestCase):
@@ -37,15 +35,18 @@ class LogDatabaseTests(unittest.TestCase):
             shutil.rmtree(path)
         os.mkdir(path)
 
+    def get_database(self, file_name : str) -> logger.log_database.LogDatabase:
+        '''This is creates an empty database with given name.'''
+        path = self.get_test_data_path()
+        return logger.log_database.LogDatabase(path, file_name)
+
     def test_CreateNewDatabase(self) -> None:
         '''This is to test how the new database can be created'''
         self.cleanup_test_data()
-
         path = self.get_test_data_path()
+
         file_name = 'create_new_db.sqlite'
         full_path = path / file_name
-        db = logger.log_database.LogDatabase(path, file_name)
+        db = self.get_database(file_name)
 
         self.assertTrue(os.path.exists(full_path))
-
-        
