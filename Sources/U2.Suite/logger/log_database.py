@@ -120,9 +120,8 @@ CREATE TABLE "qso" (
         Returns 0 if callsign is absent in the database.
 
         '''
-        cursor = self._connection.cursor()
-
         sql = 'SELECT id, name FROM calls WHERE callsign=? COLLATE NOCASE'
+        cursor = self._connection.cursor()
         cursor.execute(sql, (callsign,))
         data = cursor.fetchone()
         cursor.close()
@@ -142,6 +141,21 @@ CREATE TABLE "qso" (
         self.execute_non_query(self._connection, sql, (callsign, name))
 
         return self.get_callsign(callsign)
+
+    def get_callsign_by_id(self, i_id : int) -> Tuple[int, str, str]:
+        '''
+        Retrieves the callsign and operator name by the given id
+        '''
+        sql = 'SELECT callsign, name FROM calls WHERE id=?'
+        cursor = self._connection.cursor()
+        cursor.execute(sql, (i_id,))
+        data = cursor.fetchone()
+        cursor.close()
+
+        if data == None:
+            raise CallsignNotFoundException(f'Record with ID={i_id} not found.')
+
+        return (i_id, data[0], data[1])
 
     def get_or_add_callsign(self, i_callsign : str, i_name : str = '') -> int:
         '''

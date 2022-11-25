@@ -16,6 +16,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from common.exceptions.ArgumentException import ArgumentException
+from common.exceptions.logger.CallsignNotFoundException import CallsignNotFoundException
 import helpers.FileSystemHelper as fsh
 import logger.log_database
 import os
@@ -25,6 +26,9 @@ import unittest
 
 class LogDatabaseTests(unittest.TestCase):
     '''This is to test the LogDatabase class'''
+
+    TEST_CALLSIGN = 'UT8UU'
+    TEST_NAME = 'Sergey'
 
     def get_test_data_path(self) -> Path:
         return Path(fsh.FileSystemHelper.getLocalFolder()) / '.test_data'
@@ -40,6 +44,9 @@ class LogDatabaseTests(unittest.TestCase):
         '''This is creates an empty database with given name.'''
         path = self.get_test_data_path()
         return logger.log_database.LogDatabase(path, file_name)
+
+    def insert_test_data(self, db : logger.log_database.LogDatabase) -> None:
+        db.insert_callsign(self.TEST_CALLSIGN, self.TEST_NAME)
 
     def test_CreateNewDatabase(self) -> None:
         '''This is to test how the new database can be created'''
@@ -87,4 +94,18 @@ class LogDatabaseTests(unittest.TestCase):
 
         with self.assertRaises(ArgumentException) as ex:
             db.update_callsign(0, '', '')
+        
+    def test_GetCallsignById(self):
+        '''This is to test how the callsign can be found by ID'''
+        self.cleanup_test_data()
+        db = self.get_database('test_callsigns.sqlite')
+        self.insert_test_data(db)
+
+        with self.assertRaises(CallsignNotFoundException) as ex:
+            db.get_callsign_by_id(0)
+
+        (id, callsign, name) = db.get_callsign_by_id(1)
+        self.assertEqual(1, id)
+        self.assertEqual(self.TEST_CALLSIGN, callsign)
+        self.assertEqual(self.TEST_NAME, name)
         
