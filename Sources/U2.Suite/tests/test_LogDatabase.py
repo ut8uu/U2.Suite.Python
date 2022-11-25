@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+from common.exceptions.ArgumentException import ArgumentException
 import helpers.FileSystemHelper as fsh
 import logger.log_database
 import os
@@ -47,17 +48,17 @@ class LogDatabaseTests(unittest.TestCase):
 
         file_name = 'create_new_db.sqlite'
         full_path = path / file_name
-        db = self.get_database(file_name)
+        self.get_database(file_name)
 
         self.assertTrue(os.path.exists(full_path))
 
-    def test_Callsigns(self) -> None:
+    def test_GetAddCallsigns(self) -> None:
         '''This is to test how database can handle callsign-related CRUD operations'''
         self.cleanup_test_data()
         db = self.get_database('test_callsigns.sqlite')
 
         # at this point there is no records yet
-        (id, name) = db.get_or_add_callsign('UT8UU')
+        (id, name) = db.get_or_add_callsign('UT8UU', 'Sergey')
         self.assertEqual(1, id)
 
         # here we should get the same id
@@ -68,5 +69,22 @@ class LogDatabaseTests(unittest.TestCase):
         # the result must be the same
         (id, name) = db.get_or_add_callsign('ut8uu')
         self.assertEqual(1, id)
+        self.assertEqual('Sergey', name)
 
+    def test_UpdateCallsign(self):
+        '''This is to test how the callsign can be updated'''
+        self.cleanup_test_data()
+        db = self.get_database('test_callsigns.sqlite')
+
+        # at this point there is no records yet
+        (id, name) = db.get_or_add_callsign('UT8UU', 'Sergey')
+        self.assertEqual(1, id)
+
+        db.update_callsign(1, 'UT8UU-1', 'Updated')
+        (id, name) = db.get_or_add_callsign('UT8UU-1')
+        self.assertEqual(1, id)
+        self.assertEqual('Updated', name)
+
+        with self.assertRaises(ArgumentException) as ex:
+            db.update_callsign(0, '', '')
         

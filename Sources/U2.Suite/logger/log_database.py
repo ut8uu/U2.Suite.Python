@@ -16,15 +16,19 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from typing import Tuple
-from common.exceptions import ArgumentException
+from common.exceptions.ArgumentException import ArgumentException
 import os
 from pathlib import Path
 import sqlite3
+from common.exceptions.logger.CallsignNotFoundException import CallsignNotFoundException
 
 from helpers.FileSystemHelper import FileSystemHelper
 
 class LogDatabase(object):
     '''Class handles all requests to the database'''
+
+    DB_VERSION_MAJOR : int = 1
+    DB_VERSION_MINOR : int = 0
 
     _db_name : str
     _db_full_path : Path
@@ -62,6 +66,17 @@ class LogDatabase(object):
             p = str(path)
             sqlite_connection = sqlite3.connect(p)   
 
+            # create a table for version
+            sql = '''
+CREATE TABLE "version" (
+    "major" INTEGER,
+    "minor" INTEGER
+    );
+'''
+            self.execute_non_query(sqlite_connection, sql)
+            sql = 'INSERT INTO version (major, minor) VALUES (?, ?)'
+            self.execute_non_query(sqlite_connection, sql, (self.DB_VERSION_MAJOR, self.DB_VERSION_MINOR))
+
             # create a table for callsigns 
             sql = '''
 CREATE TABLE "calls" (
@@ -91,10 +106,10 @@ CREATE TABLE "qso" (
             if (sqlite_connection):
                 sqlite_connection.close()
 
-    def execute_non_query(self, sqlite_connection : sqlite3.Connection, sql : str) -> None:
+    def execute_non_query(self, sqlite_connection : sqlite3.Connection, sql : str, params = ()) -> None:
         '''Executes given SQL against the database'''
         cursor = sqlite_connection.cursor()
-        cursor.execute(sql)
+        cursor.execute(sql, params)
         sqlite_connection.commit()
         cursor.close()
 
@@ -123,15 +138,12 @@ CREATE TABLE "qso" (
         A duplicate check is not performed.
         '''
 
-        cursor = self._connection.cursor()
         sql = 'INSERT INTO calls (callsign, name) VALUES (?, ?)'
-        cursor.execute(sql, (callsign, name))
-        self._connection.commit()
-        cursor.close()
+        self.execute_non_query(self._connection, sql, (callsign, name))
 
         return self.get_callsign(callsign)
 
-    def get_or_add_callsign(self, callsign : str, name : str = '') -> int:
+    def get_or_add_callsign(self, i_callsign : str, i_name : str = '') -> int:
         '''
         Looks for a given callsign (case insensitive) and returns one found.
         Creates a new record if callsign was not found.
@@ -140,11 +152,19 @@ CREATE TABLE "qso" (
         name - a name of the operator (optional)
         '''
 
-        if len(callsign.lstrip()) == 0:
+        if len(i_callsign.lstrip()) == 0:
             raise ArgumentException('Callsign is a mandatory parameter.')
 
-        (id, name) = self.get_callsign(callsign)
+        (id, name) = self.get_callsign(i_callsign)
         if id > 0:
             return (id, name)
 
-        return self.insert_callsign(callsign, name) 
+        return self.insert_callsign(i_callsign, i_name) 
+
+    def update_callsign(self, i_id : int, i_callsign : str, i_name : str) -> None:
+        if len(i_callsign.lstrip()) == 0:
+            raise ArgumentException('Callsign is a mandatory parameter.')
+
+        sql = 'UPDATE calls SET callsign=?, name=? WHERE id=?'
+        self.execute_non_query(self._connection, sql, (i_callsign, i_name, i_id))
+
