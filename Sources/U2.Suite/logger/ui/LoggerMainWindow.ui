@@ -1,0 +1,538 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>LoggerMainWindow</class>
+ <widget class="QMainWindow" name="LoggerMainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>611</width>
+    <height>251</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>U2.Suite Logger</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>20</y>
+      <width>47</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Callsign</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="tbCallsign">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>40</y>
+      <width>171</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>16</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>210</x>
+      <y>20</y>
+      <width>47</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Snt</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="tbSnt">
+    <property name="geometry">
+     <rect>
+      <x>210</x>
+      <y>40</y>
+      <width>51</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>16</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_3">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>20</y>
+      <width>47</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Rcv</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="tbRcv">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>40</y>
+      <width>51</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>16</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_4">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>20</y>
+      <width>47</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Name</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="tbName">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>40</y>
+      <width>101</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>16</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_5">
+    <property name="geometry">
+     <rect>
+      <x>440</x>
+      <y>20</y>
+      <width>47</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Comment</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="tbComment">
+    <property name="geometry">
+     <rect>
+      <x>440</x>
+      <y>40</y>
+      <width>141</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>16</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_6">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>80</y>
+      <width>47</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Band</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_7">
+    <property name="geometry">
+     <rect>
+      <x>440</x>
+      <y>80</y>
+      <width>47</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Mode</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="cbBand">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>100</y>
+      <width>101</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>16</pointsize>
+     </font>
+    </property>
+    <item>
+     <property name="text">
+      <string>160m</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>80m</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>60m</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>40m</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>30m</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>20m</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>17m</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>15m</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>12m</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>10m</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>6m</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>4m</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>2m</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>70cm</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QComboBox" name="cbMode">
+    <property name="geometry">
+     <rect>
+      <x>440</x>
+      <y>100</y>
+      <width>141</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>16</pointsize>
+     </font>
+    </property>
+    <item>
+     <property name="text">
+      <string>CW</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>DIGITALVOICE</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>RTTY</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>SSB</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QDateTimeEdit" name="tdDateTime">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>100</y>
+      <width>221</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>16</pointsize>
+     </font>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_8">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>80</y>
+      <width>60</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Date/Time</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="cbUtc">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>80</y>
+      <width>51</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>UTC</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="cbRealTime">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>80</y>
+      <width>70</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Real time</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>150</y>
+      <width>551</width>
+      <height>54</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
+      <widget class="QPushButton" name="btnF1">
+       <property name="text">
+        <string>F1 Clear</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QPushButton" name="btnF2">
+       <property name="text">
+        <string>F2 Spare</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <widget class="QPushButton" name="btnF3">
+       <property name="text">
+        <string>F3 Spare</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="3">
+      <widget class="QPushButton" name="btnF4">
+       <property name="text">
+        <string>F4 Spare</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="4">
+      <widget class="QPushButton" name="btnF5">
+       <property name="text">
+        <string>F5 Spare</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="5">
+      <widget class="QPushButton" name="btnF6">
+       <property name="text">
+        <string>F6 Spare</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QPushButton" name="btnF7">
+       <property name="text">
+        <string>F7 Spare</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QPushButton" name="btnF8">
+       <property name="text">
+        <string>F8 Spare</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QPushButton" name="btnF9">
+       <property name="text">
+        <string>F9 Spare</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="3">
+      <widget class="QPushButton" name="btnF10">
+       <property name="text">
+        <string>F10 Spare</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="4">
+      <widget class="QPushButton" name="btnF11">
+       <property name="text">
+        <string>F11 Spare</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="5">
+      <widget class="QPushButton" name="btnF12">
+       <property name="text">
+        <string>F12 Spare</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>611</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionNewLog"/>
+    <addaction name="actionOpenLog"/>
+    <addaction name="separator"/>
+    <addaction name="actionExit"/>
+   </widget>
+   <addaction name="menuFile"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionNewLog">
+   <property name="text">
+    <string>New log</string>
+   </property>
+  </action>
+  <action name="actionOpenLog">
+   <property name="text">
+    <string>Open log</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
+ </widget>
+ <tabstops>
+  <tabstop>btnF11</tabstop>
+  <tabstop>tbSnt</tabstop>
+  <tabstop>tbRcv</tabstop>
+  <tabstop>tbName</tabstop>
+  <tabstop>tbComment</tabstop>
+  <tabstop>tdDateTime</tabstop>
+  <tabstop>cbUtc</tabstop>
+  <tabstop>cbRealTime</tabstop>
+  <tabstop>cbBand</tabstop>
+  <tabstop>cbMode</tabstop>
+  <tabstop>btnF12</tabstop>
+  <tabstop>btnF1</tabstop>
+  <tabstop>btnF2</tabstop>
+  <tabstop>btnF3</tabstop>
+  <tabstop>btnF4</tabstop>
+  <tabstop>btnF5</tabstop>
+  <tabstop>btnF6</tabstop>
+  <tabstop>tbCallsign</tabstop>
+  <tabstop>btnF7</tabstop>
+  <tabstop>btnF8</tabstop>
+  <tabstop>btnF9</tabstop>
+  <tabstop>btnF10</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>
