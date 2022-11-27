@@ -14,7 +14,7 @@
    <string>U2.Suite Logger</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QLabel" name="label">
+   <widget class="QLabel" name="lblCallsign">
     <property name="geometry">
      <rect>
       <x>30</x>
@@ -45,7 +45,7 @@
      <string/>
     </property>
    </widget>
-   <widget class="QLabel" name="label_2">
+   <widget class="QLabel" name="lblSent">
     <property name="geometry">
      <rect>
       <x>210</x>
@@ -76,7 +76,7 @@
      <string/>
     </property>
    </widget>
-   <widget class="QLabel" name="label_3">
+   <widget class="QLabel" name="lblRcvd">
     <property name="geometry">
      <rect>
       <x>270</x>
@@ -86,7 +86,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Rcv</string>
+     <string>Rcvd</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="tbRcv">
@@ -107,7 +107,7 @@
      <string/>
     </property>
    </widget>
-   <widget class="QLabel" name="label_4">
+   <widget class="QLabel" name="lblName">
     <property name="geometry">
      <rect>
       <x>330</x>
@@ -138,7 +138,7 @@
      <string/>
     </property>
    </widget>
-   <widget class="QLabel" name="label_5">
+   <widget class="QLabel" name="lblComment">
     <property name="geometry">
      <rect>
       <x>440</x>
@@ -169,7 +169,7 @@
      <string/>
     </property>
    </widget>
-   <widget class="QLabel" name="label_6">
+   <widget class="QLabel" name="lblBand">
     <property name="geometry">
      <rect>
       <x>330</x>
@@ -182,7 +182,7 @@
      <string>Band</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_7">
+   <widget class="QLabel" name="lblMode">
     <property name="geometry">
      <rect>
       <x>440</x>
@@ -330,7 +330,7 @@
      </font>
     </property>
    </widget>
-   <widget class="QLabel" name="label_8">
+   <widget class="QLabel" name="lblDateTime">
     <property name="geometry">
      <rect>
       <x>30</x>
