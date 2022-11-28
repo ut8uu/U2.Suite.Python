@@ -375,7 +375,7 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>30</x>
@@ -510,7 +510,7 @@
   </action>
  </widget>
  <tabstops>
-  <tabstop>btnF11</tabstop>
+  <tabstop>tbCallsign</tabstop>
   <tabstop>tbSnt</tabstop>
   <tabstop>tbRcv</tabstop>
   <tabstop>tbName</tabstop>
@@ -527,7 +527,7 @@
   <tabstop>btnF4</tabstop>
   <tabstop>btnF5</tabstop>
   <tabstop>btnF6</tabstop>
-  <tabstop>tbCallsign</tabstop>
+  <tabstop>btnF11</tabstop>
   <tabstop>btnF7</tabstop>
   <tabstop>btnF8</tabstop>
   <tabstop>btnF9</tabstop>

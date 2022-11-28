@@ -19,14 +19,19 @@ import sys
 
 import helpers.KeyBinderKeys as kbk
 from logger.ui.Ui_LoggerMainWindow import Ui_LoggerMainWindow
+from PyQt5.QtCore import QAbstractNativeEventFilter, QAbstractEventDispatcher
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget
 from pyqtkeybind import keybinder
 from typing import List
+
+from trainings.keybinding import WinEventFilter
 
 class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
     _lastSelectedControl: QWidget
     _allControls : List[QWidget]
     _registered = False
+    _win_event_filter : WinEventFilter
+    _event_dispatcher : QAbstractEventDispatcher
     
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -38,6 +43,11 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
             self.cbBand, self.cbMode, self.cbUtc, self.cbRealTime,
             self.tdDateTime,
             ]
+        self.registerKeys()
+    
+    def __del__(self):
+        '''A class' destructor'''
+        self.unregisterKeys()
     
     def getSelectedControl(self) -> QWidget:
         '''
@@ -49,9 +59,32 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
 
         return None
 
+    def isCallsignFocused(self) -> bool:
+        return self.tbCallsign.hasFocus()
+
+    def handleKeySpace(self) -> None:
+        '''Handles the SPACE key'''
+        # Callsign
+        if self.isCallsignFocused():
+            self.tbName.setFocus()
+        # Name
+        elif self.tbName.hasFocus():
+            if len(self.tbName.text()) > 0:
+                self.tbName.setText(self.tbName.text() + ' ')
+            else:
+                self.tbComment.setFocus()
+        # Comment
+        elif self.tbComment.hasFocus():
+            if len(self.tbComment.text()) > 0:
+                self.tbComment.setText(self.tbComment.text() + ' ')
+            else:
+                self.tbCallsign.setFocus()
+
     def keyPress(self, key_string : str):
         '''Handles the key by its name'''
-        
+        match key_string:
+            case kbk.KEY_SPACE:
+                self.handleKeySpace()
 
     def keyEnterPress(self) -> None:
         self.keyPress(kbk.KEY_ENTER)
@@ -105,7 +138,10 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         if self._registered:
             return
 
-        keybinder.register_hotkey(self.winId(), kbk.KEY_ENTER, self.keyEnterPress)
+        keybinder.init()
+
+        #keybinder.register_hotkey(self.winId(), kbk.KEY_ENTER, self.keyEnterPress)
+        keybinder.register_hotkey(self.winId(), kbk.KEY_SPACE, self.keySpacePress)
         keybinder.register_hotkey(self.winId(), kbk.KEY_ESC, self.keyEscPress)
         keybinder.register_hotkey(self.winId(), kbk.KEY_F1, self.keyF1Press)
         keybinder.register_hotkey(self.winId(), kbk.KEY_F2, self.keyF2Press)
@@ -119,9 +155,12 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         keybinder.register_hotkey(self.winId(), kbk.KEY_F10, self.keyF10Press)
         keybinder.register_hotkey(self.winId(), kbk.KEY_F11, self.keyF11Press)
         keybinder.register_hotkey(self.winId(), kbk.KEY_F12, self.keyF12Press)
-        keybinder.register_hotkey(self.winId(), kbk.KEY_SPACE, self.keySpacePress)
-        self._registered = True
 
+        self._win_event_filter = WinEventFilter(keybinder)
+        self._event_dispatcher = QAbstractEventDispatcher.instance()
+        self._event_dispatcher.installNativeEventFilter(self._win_event_filter)
+
+        self._registered = True
 
     def unregisterKeys(self, window : QMainWindow) -> None:
         '''
@@ -130,7 +169,8 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         if not self._registered:
             return
         self._registered = False
-        keybinder.unregister_hotkey(self, kbk.KEY_ENTER)
+        #keybinder.unregister_hotkey(self, kbk.KEY_ENTER)
+        keybinder.unregister_hotkey(self, kbk.KEY_SPACE)
         keybinder.unregister_hotkey(self, kbk.KEY_ESC)
         keybinder.unregister_hotkey(self, kbk.KEY_F1)
         keybinder.unregister_hotkey(self, kbk.KEY_F2)
@@ -144,7 +184,10 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         keybinder.unregister_hotkey(self, kbk.KEY_F10)
         keybinder.unregister_hotkey(self, kbk.KEY_F11)
         keybinder.unregister_hotkey(self, kbk.KEY_F12)
-        keybinder.unregister_hotkey(self, kbk.KEY_SPACE)
+
+def keyEnterPress():
+    ''''''
+    a = 1
 
 if __name__ == '__main__':
     from logger.ui.Ui_LoggerMainWindow import Ui_LoggerMainWindow
@@ -152,4 +195,16 @@ if __name__ == '__main__':
     window = Logger_MainWindow()
 
     window.show()
+    #window.registerKeys()
+    '''keybinder.init()
+    keybinder.register_hotkey(window.winId(), "F1", keyEnterPress)
+    win_event_filter = WinEventFilter(keybinder)
+    event_dispatcher = QAbstractEventDispatcher.instance()
+    event_dispatcher.installNativeEventFilter(win_event_filter)
+'''
+
     app.exec()
+
+#    window.unregisterKeys(window)
+
+    del window
