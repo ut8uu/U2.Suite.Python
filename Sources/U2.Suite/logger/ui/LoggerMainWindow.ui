@@ -73,7 +73,7 @@
      </font>
     </property>
     <property name="text">
-     <string/>
+     <string>599</string>
     </property>
    </widget>
    <widget class="QLabel" name="lblRcvd">
@@ -104,7 +104,7 @@
      </font>
     </property>
     <property name="text">
-     <string/>
+     <string>599</string>
     </property>
    </widget>
    <widget class="QLabel" name="lblName">
@@ -534,5 +534,42 @@
   <tabstop>btnF10</tabstop>
  </tabstops>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>cbMode</sender>
+   <signal>currentIndexChanged(QString)</signal>
+   <receiver>LoggerMainWindow</receiver>
+   <slot>modeChanged(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>510</x>
+     <y>140</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>594</x>
+     <y>108</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cbBand</sender>
+   <signal>currentIndexChanged(QString)</signal>
+   <receiver>LoggerMainWindow</receiver>
+   <slot>bandChanged(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>392</x>
+     <y>135</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>302</x>
+     <y>111</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>modeChanged(QString)</slot>
+  <slot>bandChanged(QString)</slot>
+ </slots>
 </ui>

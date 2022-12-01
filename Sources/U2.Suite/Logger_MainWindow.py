@@ -18,8 +18,9 @@
 import sys
 
 import helpers.KeyBinderKeys as kbk
+from logger.logger_constants import *
 from logger.ui.Ui_LoggerMainWindow import Ui_LoggerMainWindow
-from PyQt5.QtCore import QAbstractNativeEventFilter, QAbstractEventDispatcher
+from PyQt5.QtCore import QAbstractNativeEventFilter, QAbstractEventDispatcher, pyqtSlot
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget
 from pyqtkeybind import keybinder
 from typing import List
@@ -182,9 +183,24 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         keybinder.unregister_hotkey(self, kbk.KEY_F11)
         keybinder.unregister_hotkey(self, kbk.KEY_F12)
 
-def keyEnterPress():
-    ''''''
-    a = 1
+    @pyqtSlot()
+    def bandChanged(self):
+        '''Handles changing of the band'''
+
+    @pyqtSlot()
+    def modeChanged(self):
+        '''Handles changing of the mode'''
+        current_text = self.cbMode.currentText()
+        report = '599'
+        if current_text == MODE_CW:
+            report = '599'
+        elif current_text == MODE_DIGITALVOICE:
+            report = '59'
+        elif current_text == MODE_SSB:
+            report = '59'
+
+        self.tbRcv.setText(report)
+        self.tbSnt.setText(report)
 
 if __name__ == '__main__':
     from logger.ui.Ui_LoggerMainWindow import Ui_LoggerMainWindow

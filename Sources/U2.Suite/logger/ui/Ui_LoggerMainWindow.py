@@ -35,7 +35,6 @@ class Ui_LoggerMainWindow(object):
         font = QtGui.QFont()
         font.setPointSize(16)
         self.tbSnt.setFont(font)
-        self.tbSnt.setText("")
         self.tbSnt.setObjectName("tbSnt")
         self.lblRcvd = QtWidgets.QLabel(self.centralwidget)
         self.lblRcvd.setGeometry(QtCore.QRect(270, 20, 47, 13))
@@ -45,7 +44,6 @@ class Ui_LoggerMainWindow(object):
         font = QtGui.QFont()
         font.setPointSize(16)
         self.tbRcv.setFont(font)
-        self.tbRcv.setText("")
         self.tbRcv.setObjectName("tbRcv")
         self.lblName = QtWidgets.QLabel(self.centralwidget)
         self.lblName.setGeometry(QtCore.QRect(330, 20, 47, 13))
@@ -185,6 +183,8 @@ class Ui_LoggerMainWindow(object):
         self.menubar.addAction(self.menuFile.menuAction())
 
         self.retranslateUi(LoggerMainWindow)
+        self.cbMode.currentIndexChanged['QString'].connect(LoggerMainWindow.modeChanged) # type: ignore
+        self.cbBand.currentIndexChanged['QString'].connect(LoggerMainWindow.bandChanged) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(LoggerMainWindow)
         LoggerMainWindow.setTabOrder(self.tbCallsign, self.tbSnt)
         LoggerMainWindow.setTabOrder(self.tbSnt, self.tbRcv)
@@ -213,7 +213,9 @@ class Ui_LoggerMainWindow(object):
         LoggerMainWindow.setWindowTitle(_translate("LoggerMainWindow", "U2.Suite Logger"))
         self.lblCallsign.setText(_translate("LoggerMainWindow", "Callsign"))
         self.lblSent.setText(_translate("LoggerMainWindow", "Snt"))
+        self.tbSnt.setText(_translate("LoggerMainWindow", "599"))
         self.lblRcvd.setText(_translate("LoggerMainWindow", "Rcvd"))
+        self.tbRcv.setText(_translate("LoggerMainWindow", "599"))
         self.lblName.setText(_translate("LoggerMainWindow", "Name"))
         self.lblComment.setText(_translate("LoggerMainWindow", "Comment"))
         self.lblBand.setText(_translate("LoggerMainWindow", "Band"))
