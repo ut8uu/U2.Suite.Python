@@ -59,13 +59,10 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
 
         return None
 
-    def isCallsignFocused(self) -> bool:
-        return self.tbCallsign.hasFocus()
-
     def handleKeySpace(self) -> None:
         '''Handles the SPACE key'''
         # Callsign
-        if self.isCallsignFocused():
+        if self.tbCallsign.hasFocus():
             self.tbName.setFocus()
         # Name
         elif self.tbName.hasFocus():
@@ -87,7 +84,7 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
                 self.handleKeySpace()
 
     def keyEnterPress(self) -> None:
-        self.keyPress(kbk.KEY_ENTER)
+        self.keyPress(kbk.KEY_RETURN)
 
     def keyEscPress(self) -> None:
         self.keyPress(kbk.KEY_ESC)
@@ -140,7 +137,7 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
 
         keybinder.init()
 
-        #keybinder.register_hotkey(self.winId(), kbk.KEY_ENTER, self.keyEnterPress)
+        keybinder.register_hotkey(self.winId(), kbk.KEY_RETURN, self.keyEnterPress)
         keybinder.register_hotkey(self.winId(), kbk.KEY_SPACE, self.keySpacePress)
         keybinder.register_hotkey(self.winId(), kbk.KEY_ESC, self.keyEscPress)
         keybinder.register_hotkey(self.winId(), kbk.KEY_F1, self.keyF1Press)
@@ -169,7 +166,7 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         if not self._registered:
             return
         self._registered = False
-        #keybinder.unregister_hotkey(self, kbk.KEY_ENTER)
+        #keybinder.unregister_hotkey(self, kbk.KEY_RETURN)
         keybinder.unregister_hotkey(self, kbk.KEY_SPACE)
         keybinder.unregister_hotkey(self, kbk.KEY_ESC)
         keybinder.unregister_hotkey(self, kbk.KEY_F1)
