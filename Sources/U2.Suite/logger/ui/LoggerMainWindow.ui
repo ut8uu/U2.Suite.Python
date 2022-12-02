@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>611</width>
-    <height>251</height>
+    <height>310</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -172,8 +172,8 @@
    <widget class="QLabel" name="lblBand">
     <property name="geometry">
      <rect>
-      <x>330</x>
-      <y>80</y>
+      <x>30</x>
+      <y>140</y>
       <width>47</width>
       <height>13</height>
      </rect>
@@ -185,8 +185,8 @@
    <widget class="QLabel" name="lblMode">
     <property name="geometry">
      <rect>
-      <x>440</x>
-      <y>80</y>
+      <x>140</x>
+      <y>140</y>
       <width>47</width>
       <height>13</height>
      </rect>
@@ -198,8 +198,8 @@
    <widget class="QComboBox" name="cbBand">
     <property name="geometry">
      <rect>
-      <x>330</x>
-      <y>100</y>
+      <x>30</x>
+      <y>160</y>
       <width>101</width>
       <height>31</height>
      </rect>
@@ -283,8 +283,8 @@
    <widget class="QComboBox" name="cbMode">
     <property name="geometry">
      <rect>
-      <x>440</x>
-      <y>100</y>
+      <x>140</x>
+      <y>160</y>
       <width>141</width>
       <height>31</height>
      </rect>
@@ -294,6 +294,11 @@
       <pointsize>16</pointsize>
      </font>
     </property>
+    <item>
+     <property name="text">
+      <string>AM</string>
+     </property>
+    </item>
     <item>
      <property name="text">
       <string>CW</string>
@@ -306,6 +311,11 @@
     </item>
     <item>
      <property name="text">
+      <string>FM</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
       <string>RTTY</string>
      </property>
     </item>
@@ -314,13 +324,21 @@
       <string>SSB</string>
      </property>
     </item>
+    <item>
+     <property name="text">
+      <string>THOR</string>
+     </property>
+    </item>
    </widget>
    <widget class="QDateTimeEdit" name="tdDateTime">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>30</x>
       <y>100</y>
-      <width>221</width>
+      <width>260</width>
       <height>31</height>
      </rect>
     </property>
@@ -328,6 +346,30 @@
      <font>
       <pointsize>16</pointsize>
      </font>
+    </property>
+    <property name="wrapping">
+     <bool>false</bool>
+    </property>
+    <property name="frame">
+     <bool>true</bool>
+    </property>
+    <property name="accelerated">
+     <bool>false</bool>
+    </property>
+    <property name="showGroupSeparator" stdset="0">
+     <bool>false</bool>
+    </property>
+    <property name="displayFormat">
+     <string>dd.MM.yyyy hh:mm:ss</string>
+    </property>
+    <property name="calendarPopup">
+     <bool>true</bool>
+    </property>
+    <property name="currentSectionIndex">
+     <number>0</number>
+    </property>
+    <property name="timeSpec">
+     <enum>Qt::LocalTime</enum>
     </property>
    </widget>
    <widget class="QLabel" name="lblDateTime">
@@ -346,7 +388,7 @@
    <widget class="QCheckBox" name="cbUtc">
     <property name="geometry">
      <rect>
-      <x>100</x>
+      <x>90</x>
       <y>80</y>
       <width>51</width>
       <height>17</height>
@@ -359,27 +401,11 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QCheckBox" name="cbRealTime">
-    <property name="geometry">
-     <rect>
-      <x>160</x>
-      <y>80</y>
-      <width>70</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Real time</string>
-    </property>
-    <property name="checked">
-     <bool>true</bool>
-    </property>
-   </widget>
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>150</y>
+      <y>210</y>
       <width>551</width>
       <height>54</height>
      </rect>
@@ -388,7 +414,7 @@
      <item row="0" column="0">
       <widget class="QPushButton" name="btnF1">
        <property name="text">
-        <string>F1 Clear</string>
+        <string>F1 Spare</string>
        </property>
       </widget>
      </item>
@@ -465,11 +491,127 @@
      <item row="1" column="5">
       <widget class="QPushButton" name="btnF12">
        <property name="text">
-        <string>F12 Spare</string>
+        <string>F12 Wipe</string>
        </property>
       </widget>
      </item>
     </layout>
+   </widget>
+   <widget class="QComboBox" name="cbPropagation">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>160</y>
+      <width>141</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>16</pointsize>
+     </font>
+    </property>
+    <item>
+     <property name="text">
+      <string/>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Aurora</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Aurora E</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Back scatter</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>EchoLink</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>EME</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>F2</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Ionoscatter</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Meteor scatter</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Rain scatter</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Satellite</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Sporadic E</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Terrestrial repeater</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Tropospheric ducting</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Trans-equatorial</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QLabel" name="lblPropagation">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>140</y>
+      <width>70</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Propagation</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnNow">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>100</y>
+      <width>70</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt; Now</string>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -517,7 +659,6 @@
   <tabstop>tbComment</tabstop>
   <tabstop>tdDateTime</tabstop>
   <tabstop>cbUtc</tabstop>
-  <tabstop>cbRealTime</tabstop>
   <tabstop>cbBand</tabstop>
   <tabstop>cbMode</tabstop>
   <tabstop>btnF12</tabstop>
@@ -542,8 +683,8 @@
    <slot>modeChanged(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>510</x>
-     <y>140</y>
+     <x>210</x>
+     <y>200</y>
     </hint>
     <hint type="destinationlabel">
      <x>594</x>
@@ -558,8 +699,8 @@
    <slot>bandChanged(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>392</x>
-     <y>135</y>
+     <x>92</x>
+     <y>195</y>
     </hint>
     <hint type="destinationlabel">
      <x>302</x>
@@ -567,9 +708,43 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>cbUtc</sender>
+   <signal>stateChanged(int)</signal>
+   <receiver>LoggerMainWindow</receiver>
+   <slot>dateTimeCheckBoxChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>109</x>
+     <y>102</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>122</x>
+     <y>42</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnNow</sender>
+   <signal>clicked()</signal>
+   <receiver>LoggerMainWindow</receiver>
+   <slot>SetCurrentDateTime()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>354</x>
+     <y>141</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>419</x>
+     <y>141</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>modeChanged(QString)</slot>
   <slot>bandChanged(QString)</slot>
+  <slot>dateTimeCheckBoxChanged()</slot>
+  <slot>SetCurrentDateTime()</slot>
  </slots>
 </ui>
