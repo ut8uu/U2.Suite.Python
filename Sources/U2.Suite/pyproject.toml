@@ -16,6 +16,7 @@ pyqt5 = "^5.15"
 pyserial = "^3.5"
 pyrsistent = "^0.18.1"
 serial-device2 = "^2.0.2"
+pyqtkeybind = "^0.0.9"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.1"

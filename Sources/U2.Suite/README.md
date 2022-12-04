@@ -71,5 +71,8 @@ OS Linux: required libs:
                     sudo apt-get install libpython3.8-dev
                     sudo apt-get install libatlas-base-dev
 
+# Used libraries
+
+(PyQtKeyBind)[https://github.com/codito/pyqtkeybind]
 
   
