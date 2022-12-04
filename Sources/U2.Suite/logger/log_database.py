@@ -36,7 +36,9 @@ class LogDatabase(object):
 
     def __init__(self, db_name : str) -> None:
         self._db_name = db_name
-        self._db_full_path = FileSystemHelper.get_appdata_path('U2.Suite', create_if_not_exists=True) / db_name
+        path = 'U2.Suite' / 'logs'
+        logs_path = FileSystemHelper.get_appdata_path(path, create_if_not_exists=True)
+        self._db_full_path = logs_path / db_name
         self.open_db(self._db_full_path)
         pass
 
