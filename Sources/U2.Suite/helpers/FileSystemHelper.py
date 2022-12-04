@@ -52,7 +52,7 @@ class FileSystemHelper():
         return join(FileSystemHelper.getLocalFolder(), 'manyrig', 'ini')
 
     @staticmethod
-    def get_appdata_path(folder : str, create_if_not_exists : bool = False) -> pathlib.Path:
+    def get_appdata_path(folder : pathlib.Path, create_if_not_exists : bool = False) -> pathlib.Path:
         '''
         Returns a path to the given folder in the application 
         data folder depending on the OS.
@@ -71,7 +71,7 @@ class FileSystemHelper():
             path = home / "Library/Application Support" / folder
 
         if create_if_not_exists and not os.path.exists(path):
-            os.mkdir(path)
+            os.makedirs(path, exist_ok=True)
 
         return path
     
