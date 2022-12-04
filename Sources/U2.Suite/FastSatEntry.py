@@ -17,17 +17,31 @@
 
 import datetime
 import sys
-from typing import Tuple
-from helpers.FileSystemHelper import FileSystemHelper
+from typing import List, Tuple
 from logger.ui.Ui_FastSatEntry import Ui_FastSatEntry
 from PyQt5.QtCore import pyqtSlot, QDateTime
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QFileDialog
 
 class FastSatEntry(QMainWindow, Ui_FastSatEntry):
+
+    _sat_info : List[Tuple[str, str, str, str, str]] = []
 
     def __init__(self, parent = None):
         super().__init__(parent)
         self.setupUi(self)
+        self.InitDatabase()
+
+    def InitDatabase(self) -> None:
+        '''
+        Initializes a database of satellites
+        List contains the following values: sat_name, band, mode, sat_mode
+        '''
+        self._sat_info.append(('SO-50', '2m', 'FM', 'VU'))
+        self._sat_info.append(('ISS', '2m', 'FM', 'VU'))
+        self._sat_info.append(('AO-27', '2m', 'FM', 'VU'))
+        self._sat_info.append(('AO-85', '70cm', 'FM', 'UV'))
+        self._sat_info.append(('AO-91', '70cm', 'FM', 'UV'))
+        self._sat_info.append(('AO-92', '70cm', 'FM', 'UV'))
 
     @pyqtSlot()
     def NowClicked(self) -> None:
@@ -65,7 +79,9 @@ class FastSatEntry(QMainWindow, Ui_FastSatEntry):
         qso_date = self.dateTime.dateTime().toString('MMddyyyy')
         qso_time = self.dateTime.dateTime().toString('HHmm')
         grid = self.tbGridLocator.text().lstrip().rstrip()
-        (band, mode, sat_mode, sat_name) = self.GetSatInfo(self.cbSatellite.currentText())
+        (sat_name, band, mode, sat_mode) = self.GetSatInfo(self.cbSatellite.currentText())
+        if len(sat_name) == 0:
+            return
         num = self.tbCallsigns.document().blockCount()
         block = self.tbCallsigns.document().firstBlock()
         index = 0
@@ -84,28 +100,27 @@ class FastSatEntry(QMainWindow, Ui_FastSatEntry):
 '''
             block = block.next()
         
-        fh = open('export.adif', 'w')
+        name = QFileDialog.getSaveFileName(self, 'Save File')
+        if len(name[0]) == 0:
+            return
+        file_name = name[0]
+        if file_name.lower().find('.adi') == -1:
+            file_name += '.adif'
+        fh = open(file_name, 'w')
         fh.write(adif)
         fh.close()
 
-        self.DisplayMessage('ADIF was written to "export.adif".')
+        self.DisplayMessage(f'ADIF was written to "{file_name}".')
 
     def GetSatInfo(self, sat_name : str) -> Tuple[str, str, str, str]:
         '''
         Returns the satellite information by its name.
         The following information is being returned: 
-        band, mode, sat_mode, sat_name
+        sat_name, band, mode, sat_mode
         '''
-        if sat_name == 'SO-50':
-            return ('2m', 'FM', 'VU', sat_name)
-        elif sat_name == 'ISS':
-            return ('2m', 'FM', 'VU', sat_name)
-        elif sat_name == 'AO-85':
-            return ('70cm', 'FM', 'UV', sat_name)
-        elif sat_name == 'AO-91':
-            return ('70cm', 'FM', 'UV', sat_name)
-        elif sat_name == 'AO-92':
-            return ('70cm', 'FM', 'UV', sat_name)
+        for sat_info in self._sat_info:
+            if sat_info[0] == sat_name:
+                return sat_info
 
         self.DisplayErrorMessage(f'Satellite {sat_name} not supported.')
         return ('', '', '', '')
