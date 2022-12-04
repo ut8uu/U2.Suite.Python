@@ -23,6 +23,7 @@ import sqlite3
 from common.exceptions.logger.CallsignNotFoundException import CallsignNotFoundException
 
 from helpers.FileSystemHelper import FileSystemHelper
+from logger.logger_constants import DATABASE_DEFAULT
 
 class LogDatabase(object):
     '''Class handles all requests to the database'''
@@ -34,11 +35,9 @@ class LogDatabase(object):
     _db_full_path : Path
     _connection : sqlite3.Connection
 
-    def __init__(self, db_name : str) -> None:
-        self._db_name = db_name
-        path = 'U2.Suite' / 'logs'
-        logs_path = FileSystemHelper.get_appdata_path(path, create_if_not_exists=True)
-        self._db_full_path = logs_path / db_name
+    def __init__(self, path: Path) -> None:
+        self._db_name = DATABASE_DEFAULT
+        self._db_full_path = path / self._db_name
         self.open_db(self._db_full_path)
         pass
 

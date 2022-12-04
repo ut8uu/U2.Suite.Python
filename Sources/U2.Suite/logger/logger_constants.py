@@ -23,3 +23,5 @@ DISPLAY_FORMAT_MMDDYY_HHMMSS_AP = 'MM/dd/yyyy hh:mm:ss AP'
 DISPLAY_FORMAT_MMDDYY_HHMMSS = 'MM/dd/yyyy HH:mm:ss'
 DISPLAY_FORMAT_DDMMYY_HHMMSS_AP = 'dd.MM.yyyy hh:mm:ss AP'
 DISPLAY_FORMAT_DDMMYY_HHMMSS = 'dd.MM.yyyy HH:mm:ss'
+
+DATABASE_DEFAULT = 'default.sqlite'
