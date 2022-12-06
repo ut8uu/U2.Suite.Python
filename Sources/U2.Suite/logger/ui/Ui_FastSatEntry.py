@@ -19,7 +19,7 @@ class Ui_FastSatEntry(object):
         self.centralwidget = QtWidgets.QWidget(FastSatEntry)
         self.centralwidget.setObjectName("centralwidget")
         self.btnExport = QtWidgets.QPushButton(self.centralwidget)
-        self.btnExport.setGeometry(QtCore.QRect(330, 310, 75, 41))
+        self.btnExport.setGeometry(QtCore.QRect(350, 310, 75, 41))
         font = QtGui.QFont()
         font.setPointSize(12)
         self.btnExport.setFont(font)
@@ -125,7 +125,7 @@ class Ui_FastSatEntry(object):
         self.horizontalLayout.addWidget(self.btnNow)
         self.formLayout.setLayout(4, QtWidgets.QFormLayout.FieldRole, self.horizontalLayout)
         self.btnSave = QtWidgets.QPushButton(self.centralwidget)
-        self.btnSave.setGeometry(QtCore.QRect(40, 310, 75, 41))
+        self.btnSave.setGeometry(QtCore.QRect(20, 310, 75, 41))
         font = QtGui.QFont()
         font.setPointSize(12)
         self.btnSave.setFont(font)
@@ -164,7 +164,7 @@ class Ui_FastSatEntry(object):
 
     def retranslateUi(self, FastSatEntry):
         _translate = QtCore.QCoreApplication.translate
-        FastSatEntry.setWindowTitle(_translate("FastSatEntry", "Fast Sat Entry"))
+        FastSatEntry.setWindowTitle(_translate("FastSatEntry", "Fast Sat Entry by UT8UU"))
         self.btnExport.setText(_translate("FastSatEntry", "Export"))
         self.label.setText(_translate("FastSatEntry", "Satellite"))
         self.cbSatellite.setItemText(0, _translate("FastSatEntry", "AO-27"))

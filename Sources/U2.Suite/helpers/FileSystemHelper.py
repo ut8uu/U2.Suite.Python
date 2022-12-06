@@ -22,6 +22,10 @@ from os import listdir, getcwd, path
 from os.path import isfile, join
 from typing import List
 
+if __name__ == "__main__":
+    print("I'm not the program you are looking for.")
+    exit
+
 class FileSystemHelper():
     @staticmethod
     def enumerateDirectory(path:str, ext:str) -> List[str]:
