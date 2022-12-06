@@ -25,3 +25,10 @@ DISPLAY_FORMAT_DDMMYY_HHMMSS_AP = 'dd.MM.yyyy hh:mm:ss AP'
 DISPLAY_FORMAT_DDMMYY_HHMMSS = 'dd.MM.yyyy HH:mm:ss'
 
 DATABASE_DEFAULT = 'default.sqlite'
+
+KEY_MYCALLSIGN = 'mycallsign'
+KEY_MYGRID = 'mygrid'
+KEY_DEFAULT_MODE = 'mode'
+KEY_DEFAULT_SATELLITE = 'satellite'
+
+PREFERENCES_FILE = 'FastSatEntry_preferences.json'
