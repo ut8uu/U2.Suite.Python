@@ -32,3 +32,5 @@ KEY_DEFAULT_MODE = 'mode'
 KEY_DEFAULT_SATELLITE = 'satellite'
 
 PREFERENCES_FILE = 'FastSatEntry_preferences.json'
+
+UNIQUE_ID_FAST_SAT_ENTRY = 'U2.Suite.FastSatEntry'

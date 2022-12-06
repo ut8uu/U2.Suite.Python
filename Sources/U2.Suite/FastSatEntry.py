@@ -20,8 +20,10 @@ from json import dumps, loads
 import logging
 import os
 import sys
+from helpers.FileSystemHelper import FileSystemHelper as fsh
 from logger.logger_constants import *
 from logger.ui.Ui_FastSatEntry import Ui_FastSatEntry
+from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import pyqtSlot, QDateTime
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QFileDialog
 from typing import List, Tuple
@@ -33,6 +35,11 @@ class FastSatEntry(QMainWindow, Ui_FastSatEntry):
     def __init__(self, parent = None):
         super().__init__(parent)
         self.setupUi(self)
+        self.setWindowIcon(QIcon(fsh.relpath('icon/sat_dish-32.png')))
+        if os.name.lower().find('nt') > -1:
+            import ctypes
+            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(UNIQUE_ID_FAST_SAT_ENTRY)
+
         self.init_database()
 
         self.preferences = {

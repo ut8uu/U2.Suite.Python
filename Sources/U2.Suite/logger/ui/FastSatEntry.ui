@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Fast Sat Entry</string>
+   <string>Fast Sat Entry by UT8UU</string>
   </property>
   <property name="styleSheet">
    <string notr="true">background-color: rgb(46, 52, 54); color: rgb(211, 215, 207);</string>
@@ -20,7 +20,7 @@
    <widget class="QPushButton" name="btnExport">
     <property name="geometry">
      <rect>
-      <x>330</x>
+      <x>350</x>
       <y>310</y>
       <width>75</width>
       <height>41</height>
@@ -248,7 +248,7 @@
    <widget class="QPushButton" name="btnSave">
     <property name="geometry">
      <rect>
-      <x>40</x>
+      <x>20</x>
       <y>310</y>
       <width>75</width>
       <height>41</height>
