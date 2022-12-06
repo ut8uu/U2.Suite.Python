@@ -75,4 +75,22 @@ OS Linux: required libs:
 
 (PyQtKeyBind)[https://github.com/codito/pyqtkeybind]
 
-  
+## Building your own binary.
+
+Install pyinstaller.
+
+`python3 -m pip3 install pyinstaller`
+
+Build the binary.
+
+For Linux and Raspberry PI:
+
+`pyinstaller linux.spec`
+
+For Windows:
+
+`pyinstaller FastSatEntry-win.spec`
+
+
+You will find the binary in the newly created dist directory.
+

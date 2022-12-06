@@ -6,22 +6,30 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>362</width>
-    <height>397</height>
+    <width>440</width>
+    <height>411</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Fast Sat Entry</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(46, 52, 54); color: rgb(211, 215, 207);</string>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QPushButton" name="btnExport">
     <property name="geometry">
      <rect>
-      <x>260</x>
-      <y>300</y>
+      <x>330</x>
+      <y>310</y>
       <width>75</width>
       <height>41</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
     </property>
     <property name="text">
      <string>Export</string>
@@ -32,13 +40,23 @@
      <rect>
       <x>20</x>
       <y>15</y>
-      <width>311</width>
+      <width>417</width>
       <height>281</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
     </property>
     <layout class="QFormLayout" name="formLayout">
      <item row="2" column="0">
       <widget class="QLabel" name="label">
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
        <property name="text">
         <string>Satellite</string>
        </property>
@@ -46,6 +64,11 @@
      </item>
      <item row="2" column="1">
       <widget class="QComboBox" name="cbSatellite">
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
        <item>
         <property name="text">
          <string>AO-27</string>
@@ -75,6 +98,11 @@
      </item>
      <item row="4" column="0">
       <widget class="QLabel" name="label_2">
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
        <property name="text">
         <string>Date/Time (UTC)</string>
        </property>
@@ -82,6 +110,11 @@
      </item>
      <item row="5" column="0">
       <widget class="QLabel" name="label_3">
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
        <property name="text">
         <string>Callsigns</string>
        </property>
@@ -89,6 +122,11 @@
      </item>
      <item row="5" column="1">
       <widget class="QTextEdit" name="tbCallsigns">
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
        <property name="toolTip">
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter all callsigns you have worked.&lt;/p&gt;&lt;p&gt;Use comma or semicolon as a separator.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
@@ -96,6 +134,11 @@
      </item>
      <item row="0" column="0">
       <widget class="QLabel" name="label_4">
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
        <property name="text">
         <string>My callsign</string>
        </property>
@@ -103,6 +146,11 @@
      </item>
      <item row="0" column="1">
       <widget class="QLineEdit" name="tbMyCallsign">
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
        <property name="text">
         <string/>
        </property>
@@ -110,16 +158,32 @@
      </item>
      <item row="1" column="0">
       <widget class="QLabel" name="label_5">
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
        <property name="text">
         <string>My grid locator</string>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QLineEdit" name="tbGridLocator"/>
+      <widget class="QLineEdit" name="tbGridLocator">
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+      </widget>
      </item>
      <item row="3" column="0">
       <widget class="QLabel" name="label_6">
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
        <property name="text">
         <string>Mode</string>
        </property>
@@ -127,6 +191,11 @@
      </item>
      <item row="3" column="1">
       <widget class="QComboBox" name="cbMode">
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
        <item>
         <property name="text">
          <string>CW</string>
@@ -152,10 +221,21 @@
      <item row="4" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
-        <widget class="QDateTimeEdit" name="dateTime"/>
+        <widget class="QDateTimeEdit" name="dateTime">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QPushButton" name="btnNow">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
          <property name="text">
           <string>Now</string>
          </property>
@@ -165,13 +245,34 @@
      </item>
     </layout>
    </widget>
+   <widget class="QPushButton" name="btnSave">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>310</y>
+      <width>75</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Saves current values as a default values.</string>
+    </property>
+    <property name="text">
+     <string>Save</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>362</width>
+     <width>440</width>
      <height>21</height>
     </rect>
    </property>
@@ -197,17 +298,27 @@
    </property>
   </action>
  </widget>
+ <tabstops>
+  <tabstop>tbMyCallsign</tabstop>
+  <tabstop>tbGridLocator</tabstop>
+  <tabstop>cbSatellite</tabstop>
+  <tabstop>cbMode</tabstop>
+  <tabstop>dateTime</tabstop>
+  <tabstop>btnNow</tabstop>
+  <tabstop>tbCallsigns</tabstop>
+  <tabstop>btnExport</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
    <sender>btnNow</sender>
    <signal>clicked(bool)</signal>
    <receiver>FastSatEntry</receiver>
-   <slot>NowClicked()</slot>
+   <slot>now_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>68</x>
-     <y>342</y>
+     <x>386</x>
+     <y>184</y>
     </hint>
     <hint type="destinationlabel">
      <x>135</x>
@@ -219,11 +330,11 @@
    <sender>btnExport</sender>
    <signal>clicked(bool)</signal>
    <receiver>FastSatEntry</receiver>
-   <slot>ExportClicked()</slot>
+   <slot>export_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>289</x>
-     <y>341</y>
+     <x>330</x>
+     <y>362</y>
     </hint>
     <hint type="destinationlabel">
      <x>232</x>
@@ -231,9 +342,26 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>btnSave</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>FastSatEntry</receiver>
+   <slot>save_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>83</x>
+     <y>362</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>50</x>
+     <y>281</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
-  <slot>NowClicked()</slot>
-  <slot>ExportClicked()</slot>
+  <slot>now_clicked()</slot>
+  <slot>export_clicked()</slot>
+  <slot>save_clicked()</slot>
  </slots>
 </ui>
