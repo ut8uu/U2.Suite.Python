@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>LoggerMainWindow</class>
  <widget class="QMainWindow" name="LoggerMainWindow">
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(46, 52, 54); color: rgb(211, 215, 207);</string>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>

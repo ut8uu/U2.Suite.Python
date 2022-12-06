@@ -74,4 +74,19 @@ class FileSystemHelper():
             os.makedirs(path, exist_ok=True)
 
         return path
+
+    @staticmethod
+    def relpath(filename: str) -> str:
+        """
+        If the program is packaged with pyinstaller,
+        this is needed since all files will be in a temp
+        folder during execution.
+        """
+        if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
+            base_path = getattr(sys, "_MEIPASS")
+        else:
+            base_path = os.path.abspath(".")
+        return os.path.join(base_path, filename)
+
+
     
