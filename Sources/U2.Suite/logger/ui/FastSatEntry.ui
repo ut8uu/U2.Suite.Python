@@ -20,7 +20,7 @@
    <widget class="QPushButton" name="btnExport">
     <property name="geometry">
      <rect>
-      <x>330</x>
+      <x>350</x>
       <y>310</y>
       <width>75</width>
       <height>41</height>
@@ -248,7 +248,7 @@
    <widget class="QPushButton" name="btnSave">
     <property name="geometry">
      <rect>
-      <x>40</x>
+      <x>20</x>
       <y>310</y>
       <width>75</width>
       <height>41</height>
