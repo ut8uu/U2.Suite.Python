@@ -164,7 +164,7 @@ class Ui_FastSatEntry(object):
 
     def retranslateUi(self, FastSatEntry):
         _translate = QtCore.QCoreApplication.translate
-        FastSatEntry.setWindowTitle(_translate("FastSatEntry", "Fast Sat Entry"))
+        FastSatEntry.setWindowTitle(_translate("FastSatEntry", "Fast Sat Entry by UT8UU"))
         self.btnExport.setText(_translate("FastSatEntry", "Export"))
         self.label.setText(_translate("FastSatEntry", "Satellite"))
         self.cbSatellite.setItemText(0, _translate("FastSatEntry", "AO-27"))
