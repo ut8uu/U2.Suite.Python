@@ -23,13 +23,12 @@ import time
 import helpers.KeyBinderKeys as kbk
 from helpers.WinEventFilter import WinEventFilter
 from logger.logger_constants import *
-from logger.logger_main_window_keyboard import LoggerMainWindowBase
-from logger.ui.Ui_LoggerMainWindow import Ui_LoggerMainWindow
+from logger.logger_main_window_keyboard import LoggerMainWindowKeyboard
 from PyQt5.QtCore import QAbstractEventDispatcher, pyqtSlot, QDateTime
 from PyQt5.QtWidgets import QApplication, QWidget
 from typing import List
 
-class Logger_MainWindow(LoggerMainWindowBase):
+class Logger_MainWindow(LoggerMainWindowKeyboard):
     _lastSelectedControl: QWidget
     _allControls : List[QWidget]
     _registered = False

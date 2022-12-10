@@ -22,7 +22,7 @@ from PyQt5.QtCore import QAbstractEventDispatcher
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget
 from pyqtkeybind import keybinder
 
-class LoggerMainWindowBase(QMainWindow, Ui_LoggerMainWindow):
+class LoggerMainWindowKeyboard(QMainWindow, Ui_LoggerMainWindow):
 
     def handleKeySpace(self) -> None:
         '''Handles the SPACE key'''
