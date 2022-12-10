@@ -15,6 +15,7 @@ class Ui_LogContentWindow(object):
     def setupUi(self, LogContentWindow):
         LogContentWindow.setObjectName("LogContentWindow")
         LogContentWindow.resize(590, 431)
+        LogContentWindow.setStyleSheet("background-color: rgb(46, 52, 54); color: rgb(211, 215, 207);")
         self.centralwidget = QtWidgets.QWidget(LogContentWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.tableMain = QtWidgets.QTableWidget(self.centralwidget)
