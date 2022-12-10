@@ -2,9 +2,6 @@
 <ui version="4.0">
  <class>LoggerMainWindow</class>
  <widget class="QMainWindow" name="LoggerMainWindow">
-  <property name="styleSheet">
-   <string notr="true">background-color: rgb(46, 52, 54); color: rgb(211, 215, 207);</string>
-  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -15,6 +12,9 @@
   </property>
   <property name="windowTitle">
    <string>U2.Suite Logger</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(46, 52, 54); color: rgb(211, 215, 207);</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QLabel" name="lblCallsign">
@@ -505,7 +505,7 @@
      <rect>
       <x>290</x>
       <y>160</y>
-      <width>141</width>
+      <width>230</width>
       <height>31</height>
      </rect>
     </property>
@@ -642,10 +642,16 @@
    <property name="text">
     <string>New log</string>
    </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="actionOpenLog">
    <property name="text">
     <string>Open log</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionExit">
