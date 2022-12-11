@@ -30,9 +30,10 @@ class LoggerMainWindowKeyboard():
     _registered : bool
     _window : Ui_LoggerMainWindow
 
-    def __init__(self) -> None:
+    def __init__(self, window : Ui_LoggerMainWindow, win_id) -> None:
         self._registered = False
-        self._window = None
+        self._window = window
+        self._win_id = win_id
 
     def handleKeySpace(self) -> None:
         '''Handles the SPACE key'''
@@ -106,7 +107,7 @@ class LoggerMainWindowKeyboard():
     def keySpacePress(self) -> None:
         self.keyPress(kbk.KEY_SPACE)
 
-    def registerKeys(self, window) -> None:
+    def registerKeys(self) -> None:
         '''
         Registers all hotkeys
         '''
@@ -115,24 +116,21 @@ class LoggerMainWindowKeyboard():
 
         keybinder.init()
 
-        win_id = window.winId()
-        self._window = window
-
-        keybinder.register_hotkey(win_id, kbk.KEY_RETURN, self.keyEnterPress)
-        keybinder.register_hotkey(win_id, kbk.KEY_SPACE, self.keySpacePress)
-        keybinder.register_hotkey(win_id, kbk.KEY_ESC, self.keyEscPress)
-        keybinder.register_hotkey(win_id, kbk.KEY_F1, self.keyF1Press)
-        keybinder.register_hotkey(win_id, kbk.KEY_F2, self.keyF2Press)
-        keybinder.register_hotkey(win_id, kbk.KEY_F3, self.keyF3Press)
-        keybinder.register_hotkey(win_id, kbk.KEY_F4, self.keyF4Press)
-        keybinder.register_hotkey(win_id, kbk.KEY_F5, self.keyF5Press)
-        keybinder.register_hotkey(win_id, kbk.KEY_F6, self.keyF6Press)
-        keybinder.register_hotkey(win_id, kbk.KEY_F7, self.keyF7Press)
-        keybinder.register_hotkey(win_id, kbk.KEY_F8, self.keyF8Press)
-        keybinder.register_hotkey(win_id, kbk.KEY_F9, self.keyF9Press)
-        keybinder.register_hotkey(win_id, kbk.KEY_F10, self.keyF10Press)
-        keybinder.register_hotkey(win_id, kbk.KEY_F11, self.keyF11Press)
-        keybinder.register_hotkey(win_id, kbk.KEY_F12, self.keyF12Press)
+        keybinder.register_hotkey(self._win_id, kbk.KEY_RETURN, self.keyEnterPress)
+        keybinder.register_hotkey(self._win_id, kbk.KEY_SPACE, self.keySpacePress)
+        keybinder.register_hotkey(self._win_id, kbk.KEY_ESC, self.keyEscPress)
+        keybinder.register_hotkey(self._win_id, kbk.KEY_F1, self.keyF1Press)
+        keybinder.register_hotkey(self._win_id, kbk.KEY_F2, self.keyF2Press)
+        keybinder.register_hotkey(self._win_id, kbk.KEY_F3, self.keyF3Press)
+        keybinder.register_hotkey(self._win_id, kbk.KEY_F4, self.keyF4Press)
+        keybinder.register_hotkey(self._win_id, kbk.KEY_F5, self.keyF5Press)
+        keybinder.register_hotkey(self._win_id, kbk.KEY_F6, self.keyF6Press)
+        keybinder.register_hotkey(self._win_id, kbk.KEY_F7, self.keyF7Press)
+        keybinder.register_hotkey(self._win_id, kbk.KEY_F8, self.keyF8Press)
+        keybinder.register_hotkey(self._win_id, kbk.KEY_F9, self.keyF9Press)
+        keybinder.register_hotkey(self._win_id, kbk.KEY_F10, self.keyF10Press)
+        keybinder.register_hotkey(self._win_id, kbk.KEY_F11, self.keyF11Press)
+        keybinder.register_hotkey(self._win_id, kbk.KEY_F12, self.keyF12Press)
 
         self._win_event_filter = WinEventFilter(keybinder)
         self._event_dispatcher = QAbstractEventDispatcher.instance()
@@ -147,19 +145,19 @@ class LoggerMainWindowKeyboard():
         if not self._registered:
             return
         self._registered = False
-        keybinder.unregister_hotkey(self, kbk.KEY_RETURN)
-        keybinder.unregister_hotkey(self, kbk.KEY_SPACE)
-        keybinder.unregister_hotkey(self, kbk.KEY_ESC)
-        keybinder.unregister_hotkey(self, kbk.KEY_F1)
-        keybinder.unregister_hotkey(self, kbk.KEY_F2)
-        keybinder.unregister_hotkey(self, kbk.KEY_F3)
-        keybinder.unregister_hotkey(self, kbk.KEY_F4)
-        keybinder.unregister_hotkey(self, kbk.KEY_F5)
-        keybinder.unregister_hotkey(self, kbk.KEY_F6)
-        keybinder.unregister_hotkey(self, kbk.KEY_F7)
-        keybinder.unregister_hotkey(self, kbk.KEY_F8)
-        keybinder.unregister_hotkey(self, kbk.KEY_F9)
-        keybinder.unregister_hotkey(self, kbk.KEY_F10)
-        keybinder.unregister_hotkey(self, kbk.KEY_F11)
-        keybinder.unregister_hotkey(self, kbk.KEY_F12)
+        keybinder.unregister_hotkey(self._win_id, kbk.KEY_RETURN)
+        keybinder.unregister_hotkey(self._win_id, kbk.KEY_SPACE)
+        keybinder.unregister_hotkey(self._win_id, kbk.KEY_ESC)
+        keybinder.unregister_hotkey(self._win_id, kbk.KEY_F1)
+        keybinder.unregister_hotkey(self._win_id, kbk.KEY_F2)
+        keybinder.unregister_hotkey(self._win_id, kbk.KEY_F3)
+        keybinder.unregister_hotkey(self._win_id, kbk.KEY_F4)
+        keybinder.unregister_hotkey(self._win_id, kbk.KEY_F5)
+        keybinder.unregister_hotkey(self._win_id, kbk.KEY_F6)
+        keybinder.unregister_hotkey(self._win_id, kbk.KEY_F7)
+        keybinder.unregister_hotkey(self._win_id, kbk.KEY_F8)
+        keybinder.unregister_hotkey(self._win_id, kbk.KEY_F9)
+        keybinder.unregister_hotkey(self._win_id, kbk.KEY_F10)
+        keybinder.unregister_hotkey(self._win_id, kbk.KEY_F11)
+        keybinder.unregister_hotkey(self._win_id, kbk.KEY_F12)
 

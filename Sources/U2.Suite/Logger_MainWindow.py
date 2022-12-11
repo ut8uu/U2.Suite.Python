@@ -26,8 +26,8 @@ from logger.logger_constants import *
 from logger.logger_main_window_keyboard import LoggerMainWindowKeyboard
 from logger.logger_main_window_ui import LoggerMainWindowUiHelper
 from logger.ui.Ui_LoggerMainWindow import Ui_LoggerMainWindow
-from PyQt5.QtCore import QAbstractEventDispatcher, pyqtSlot, QDateTime
-from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget
+from PyQt5.QtCore import QAbstractEventDispatcher, pyqtSlot, QDateTime, pyqtSignal
+from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, qApp
 from pyqtkeybind import keybinder
 from typing import List
 
@@ -60,6 +60,8 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         self.setupUi(self)
         LoggerMainWindowUiHelper.update_ui(self)
 
+        qApp.focusChanged.connect(self.on_focusChanged)  
+        
         self._allControls = [
             self.tbCallsign, self.tbRcv, self.tbSnt, self.tbName, self.tbComment,
             self.btnF1, self.btnF2, self.btnF3, self.btnF4, self.btnF5, self.btnF6,
@@ -69,8 +71,8 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
             self.tdDateTime,
             ]
 
-        self._keyboard_handler = LoggerMainWindowKeyboard()
-        self._keyboard_handler.registerKeys(self)
+        self._keyboard_handler = LoggerMainWindowKeyboard(self, self.winId())
+        self._keyboard_handler.registerKeys()
         self.tbCallsign.setFocus()
         self.SetCurrentDateTime()
 
@@ -84,6 +86,34 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
 
     def destroy(self) -> None:
         self._running = False
+
+    @pyqtSlot("QWidget*", "QWidget*")
+    def on_focusChanged(self, old, new) -> None:
+        '''Handles obtaining the focus'''
+
+        print(f'{new}')
+        if new == None:
+            try:
+                self._keyboard_handler.unregisterKeys()
+            except Exception as ex:
+                print(ex)
+        else:
+            self._keyboard_handler.registerKeys()
+        
+        return
+
+        if new is not None:
+        #if (not old and new):
+            '''A window has got focus'''
+            self._keyboard_handler.registerKeys()
+        elif new is None:
+        #elif (old and not new):
+            '''A window has lost focus'''
+            self._keyboard_handler.registerKeys()
+
+    def focusOut(self) -> None:
+        '''Handles losing the focus'''
+        self._keyboard_handler.unregisterKeys()
 
     def realTimeThread(self) -> None:
         '''A code inside the realtime timer'''
