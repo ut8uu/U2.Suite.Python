@@ -20,6 +20,7 @@ if __name__ == '__main__':
     exit(0)
 
 import helpers.KeyBinderKeys as kbk
+from common.contracts.Event import Event
 from helpers.WinEventFilter import WinEventFilter
 from logger.ui.Ui_LoggerMainWindow import Ui_LoggerMainWindow
 from PyQt5.QtCore import QAbstractEventDispatcher
@@ -29,38 +30,24 @@ class LoggerMainWindowKeyboard():
 
     _registered : bool
     _window : Ui_LoggerMainWindow
+    _on_key_pressed : Event
 
     def __init__(self, window : Ui_LoggerMainWindow, win_id) -> None:
         self._registered = False
         self._window = window
         self._win_id = win_id
 
-    def handleKeySpace(self) -> None:
-        '''Handles the SPACE key'''
-        try:
-            # Callsign
-            if self._window.tbCallsign.hasFocus():
-                self._window.tbName.setFocus()
-            # Name
-            elif self._window.tbName.hasFocus():
-                if len(self._window.tbName.text()) > 0:
-                    self._window.tbName.setText(self._window.tbName.text() + ' ')
-                else:
-                    self._window.tbComment.setFocus()
-            # Comment
-            elif self._window.tbComment.hasFocus():
-                if len(self._window.tbComment.text()) > 0:
-                    self._window.tbComment.setText(self._window.tbComment.text() + ' ')
-                else:
-                    self._window.tbCallsign.setFocus()
-        except Exception as ex:
-            print(ex.args[0])
+        self._on_key_pressed = Event()
+
+    def AddOnKeyPressHandler(self, obj_method):
+        self._on_key_pressed += obj_method
+         
+    def RemoveOnKeyPressHandler(self, obj_method):
+        self._on_key_pressed -= obj_method
 
     def keyPress(self, key_string : str):
         '''Handles the key by its name'''
-        match key_string:
-            case kbk.KEY_SPACE:
-                self.handleKeySpace()
+        self._on_key_pressed(key_string)
 
     def keyEnterPress(self) -> None:
         self.keyPress(kbk.KEY_RETURN)

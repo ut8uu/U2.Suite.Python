@@ -60,7 +60,7 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         self.setupUi(self)
         LoggerMainWindowUiHelper.update_ui(self)
 
-        qApp.focusChanged.connect(self.on_focusChanged)  
+        qApp.focusChanged.connect(self.on_focusChanged)
         
         self._allControls = [
             self.tbCallsign, self.tbRcv, self.tbSnt, self.tbName, self.tbComment,
@@ -73,6 +73,7 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
 
         self._keyboard_handler = LoggerMainWindowKeyboard(self, self.winId())
         self._keyboard_handler.registerKeys()
+        self._keyboard_handler.AddOnKeyPressHandler(self.on_keyPressed)
         self.tbCallsign.setFocus()
         self.SetCurrentDateTime()
 
@@ -83,15 +84,49 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         '''A class' destructor'''
         self._running = False
         self._keyboard_handler.unregisterKeys()
+        self._keyboard_handler.RemoveOnKeyPressHandler(self.on_keyPressed)
 
     def destroy(self) -> None:
         self._running = False
+
+    def on_keyPressed(self, key: str) -> None:
+        '''Handles the key_pressed event'''
+        print(f'Key "{key}" pressed.')
+        if key == kbk.KEY_RETURN:
+            self.SaveQSO()
+        elif key == kbk.KEY_SPACE:
+            self.MoveFocus()
+        else:
+            print(f"Key '{key}' not supported.")
+
+    def MoveFocus(self) -> None:
+        '''Circularly moves focus among Callsign, Name, and Comment'''
+        try:
+            # Callsign
+            if self.tbCallsign.hasFocus():
+                self.tbName.setFocus()
+            # Name
+            elif self.tbName.hasFocus():
+                if len(self.tbName.text()) > 0:
+                    self.tbName.setText(self.tbName.text() + ' ')
+                else:
+                    self.tbComment.setFocus()
+            # Comment
+            elif self.tbComment.hasFocus():
+                if len(self.tbComment.text()) > 0:
+                    self.tbComment.setText(self.tbComment.text() + ' ')
+                else:
+                    self.tbCallsign.setFocus()
+        except Exception as ex:
+            print(ex.args[0])
+
+    def SaveQSO(self) -> None:
+        '''Saves the current session'''
 
     @pyqtSlot("QWidget*", "QWidget*")
     def on_focusChanged(self, old, new) -> None:
         '''Handles obtaining the focus'''
 
-        print(f'{new}')
         if new == None:
             try:
                 self._keyboard_handler.unregisterKeys()
