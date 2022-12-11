@@ -99,17 +99,6 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
                 print(ex)
         else:
             self._keyboard_handler.registerKeys()
-        
-        return
-
-        if new is not None:
-        #if (not old and new):
-            '''A window has got focus'''
-            self._keyboard_handler.registerKeys()
-        elif new is None:
-        #elif (old and not new):
-            '''A window has lost focus'''
-            self._keyboard_handler.registerKeys()
 
     def focusOut(self) -> None:
         '''Handles losing the focus'''
