@@ -15,33 +15,43 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+if __name__ == '__main__':
+    print('This module cannot be executed directly')
+    exit(0)
+
 import helpers.KeyBinderKeys as kbk
 from helpers.WinEventFilter import WinEventFilter
 from logger.ui.Ui_LoggerMainWindow import Ui_LoggerMainWindow
 from PyQt5.QtCore import QAbstractEventDispatcher
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget
 from pyqtkeybind import keybinder
 
-class LoggerMainWindowKeyboard(QMainWindow, Ui_LoggerMainWindow):
+class LoggerMainWindowKeyboard():
+
+    _registered : bool
+    _window : Ui_LoggerMainWindow
+
+    def __init__(self) -> None:
+        self._registered = False
+        self._window = None
 
     def handleKeySpace(self) -> None:
         '''Handles the SPACE key'''
         try:
             # Callsign
-            if self.tbCallsign.hasFocus():
-                self.tbName.setFocus()
+            if self._window.tbCallsign.hasFocus():
+                self._window.tbName.setFocus()
             # Name
-            elif self.tbName.hasFocus():
-                if len(self.tbName.text()) > 0:
-                    self.tbName.setText(self.tbName.text() + ' ')
+            elif self._window.tbName.hasFocus():
+                if len(self._window.tbName.text()) > 0:
+                    self._window.tbName.setText(self._window.tbName.text() + ' ')
                 else:
-                    self.tbComment.setFocus()
+                    self._window.tbComment.setFocus()
             # Comment
-            elif self.tbComment.hasFocus():
-                if len(self.tbComment.text()) > 0:
-                    self.tbComment.setText(self.tbComment.text() + ' ')
+            elif self._window.tbComment.hasFocus():
+                if len(self._window.tbComment.text()) > 0:
+                    self._window.tbComment.setText(self._window.tbComment.text() + ' ')
                 else:
-                    self.tbCallsign.setFocus()
+                    self._window.tbCallsign.setFocus()
         except Exception as ex:
             print(ex.args[0])
 
@@ -96,7 +106,7 @@ class LoggerMainWindowKeyboard(QMainWindow, Ui_LoggerMainWindow):
     def keySpacePress(self) -> None:
         self.keyPress(kbk.KEY_SPACE)
 
-    def registerKeys(self) -> None:
+    def registerKeys(self, window) -> None:
         '''
         Registers all hotkeys
         '''
@@ -105,21 +115,24 @@ class LoggerMainWindowKeyboard(QMainWindow, Ui_LoggerMainWindow):
 
         keybinder.init()
 
-        keybinder.register_hotkey(self.winId(), kbk.KEY_RETURN, self.keyEnterPress)
-        keybinder.register_hotkey(self.winId(), kbk.KEY_SPACE, self.keySpacePress)
-        keybinder.register_hotkey(self.winId(), kbk.KEY_ESC, self.keyEscPress)
-        keybinder.register_hotkey(self.winId(), kbk.KEY_F1, self.keyF1Press)
-        keybinder.register_hotkey(self.winId(), kbk.KEY_F2, self.keyF2Press)
-        keybinder.register_hotkey(self.winId(), kbk.KEY_F3, self.keyF3Press)
-        keybinder.register_hotkey(self.winId(), kbk.KEY_F4, self.keyF4Press)
-        keybinder.register_hotkey(self.winId(), kbk.KEY_F5, self.keyF5Press)
-        keybinder.register_hotkey(self.winId(), kbk.KEY_F6, self.keyF6Press)
-        keybinder.register_hotkey(self.winId(), kbk.KEY_F7, self.keyF7Press)
-        keybinder.register_hotkey(self.winId(), kbk.KEY_F8, self.keyF8Press)
-        keybinder.register_hotkey(self.winId(), kbk.KEY_F9, self.keyF9Press)
-        keybinder.register_hotkey(self.winId(), kbk.KEY_F10, self.keyF10Press)
-        keybinder.register_hotkey(self.winId(), kbk.KEY_F11, self.keyF11Press)
-        keybinder.register_hotkey(self.winId(), kbk.KEY_F12, self.keyF12Press)
+        win_id = window.winId()
+        self._window = window
+
+        keybinder.register_hotkey(win_id, kbk.KEY_RETURN, self.keyEnterPress)
+        keybinder.register_hotkey(win_id, kbk.KEY_SPACE, self.keySpacePress)
+        keybinder.register_hotkey(win_id, kbk.KEY_ESC, self.keyEscPress)
+        keybinder.register_hotkey(win_id, kbk.KEY_F1, self.keyF1Press)
+        keybinder.register_hotkey(win_id, kbk.KEY_F2, self.keyF2Press)
+        keybinder.register_hotkey(win_id, kbk.KEY_F3, self.keyF3Press)
+        keybinder.register_hotkey(win_id, kbk.KEY_F4, self.keyF4Press)
+        keybinder.register_hotkey(win_id, kbk.KEY_F5, self.keyF5Press)
+        keybinder.register_hotkey(win_id, kbk.KEY_F6, self.keyF6Press)
+        keybinder.register_hotkey(win_id, kbk.KEY_F7, self.keyF7Press)
+        keybinder.register_hotkey(win_id, kbk.KEY_F8, self.keyF8Press)
+        keybinder.register_hotkey(win_id, kbk.KEY_F9, self.keyF9Press)
+        keybinder.register_hotkey(win_id, kbk.KEY_F10, self.keyF10Press)
+        keybinder.register_hotkey(win_id, kbk.KEY_F11, self.keyF11Press)
+        keybinder.register_hotkey(win_id, kbk.KEY_F12, self.keyF12Press)
 
         self._win_event_filter = WinEventFilter(keybinder)
         self._event_dispatcher = QAbstractEventDispatcher.instance()

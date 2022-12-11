@@ -24,11 +24,15 @@ import helpers.KeyBinderKeys as kbk
 from helpers.WinEventFilter import WinEventFilter
 from logger.logger_constants import *
 from logger.logger_main_window_keyboard import LoggerMainWindowKeyboard
+from logger.logger_main_window_ui import LoggerMainWindowUiHelper
+from logger.ui.Ui_LoggerMainWindow import Ui_LoggerMainWindow
 from PyQt5.QtCore import QAbstractEventDispatcher, pyqtSlot, QDateTime
-from PyQt5.QtWidgets import QApplication, QWidget
+from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget
+from pyqtkeybind import keybinder
 from typing import List
 
-class Logger_MainWindow(LoggerMainWindowKeyboard):
+class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
+    _keyboard_handler : LoggerMainWindowKeyboard
     _lastSelectedControl: QWidget
     _allControls : List[QWidget]
     _registered = False
@@ -54,6 +58,8 @@ class Logger_MainWindow(LoggerMainWindowKeyboard):
         self._datetime_realtime = True
 
         self.setupUi(self)
+        LoggerMainWindowUiHelper.update_ui(self)
+
         self._allControls = [
             self.tbCallsign, self.tbRcv, self.tbSnt, self.tbName, self.tbComment,
             self.btnF1, self.btnF2, self.btnF3, self.btnF4, self.btnF5, self.btnF6,
@@ -62,7 +68,9 @@ class Logger_MainWindow(LoggerMainWindowKeyboard):
             #self.cbRealTime,
             self.tdDateTime,
             ]
-        self.registerKeys()
+
+        self._keyboard_handler = LoggerMainWindowKeyboard()
+        self._keyboard_handler.registerKeys(self)
         self.tbCallsign.setFocus()
         self.SetCurrentDateTime()
 
@@ -72,7 +80,7 @@ class Logger_MainWindow(LoggerMainWindowKeyboard):
     def __del__(self):
         '''A class' destructor'''
         self._running = False
-        self.unregisterKeys()
+        self._keyboard_handler.unregisterKeys()
 
     def destroy(self) -> None:
         self._running = False

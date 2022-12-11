@@ -15,6 +15,10 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+if __name__ == '__main__':
+    print('This module cannot be executed directly')
+    exit(0)
+
 from typing import Tuple
 from common.exceptions.ArgumentException import ArgumentException
 import os
