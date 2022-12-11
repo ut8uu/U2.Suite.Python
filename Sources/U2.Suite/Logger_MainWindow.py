@@ -91,7 +91,6 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
 
     def on_keyPressed(self, key: str) -> None:
         '''Handles the key_pressed event'''
-        print(f'Key "{key}" pressed.')
         if key == kbk.KEY_RETURN:
             self.SaveQSO()
         elif key == kbk.KEY_SPACE:
@@ -100,7 +99,10 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
             print(f"Key '{key}' not supported.")
 
     def MoveFocus(self) -> None:
-        '''Circularly moves focus among Callsign, Name, and Comment'''
+        '''
+        Circularly moves focus among Callsign, Name, and Comment.
+        Does nothing if none of the controls mentioned above is selected.
+        '''
         try:
             # Callsign
             if self.tbCallsign.hasFocus():
@@ -117,6 +119,8 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
                     self.tbComment.setText(self.tbComment.text() + ' ')
                 else:
                     self.tbCallsign.setFocus()
+            else:
+                print(f'Focus remains on the "{self.getSelectedControl().objectName()}" control.')
         except Exception as ex:
             print(ex.args[0])
 
