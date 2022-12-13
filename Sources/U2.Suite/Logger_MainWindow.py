@@ -16,12 +16,15 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from datetime import datetime
+from pathlib import Path
 import sys
 from threading import Thread
 import time
+from helpers.FileSystemHelper import FileSystemHelper
 
 import helpers.KeyBinderKeys as kbk
 from helpers.WinEventFilter import WinEventFilter
+from logger.log_database import LogDatabase
 from logger.logger_constants import *
 from logger.logger_main_window_keyboard import LoggerMainWindowKeyboard
 from logger.logger_main_window_ui import LoggerMainWindowUiHelper
@@ -38,6 +41,7 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
     _registered = False
     _win_event_filter : WinEventFilter
     _event_dispatcher : QAbstractEventDispatcher
+    _db : LogDatabase
 
     _running : bool
 
@@ -56,6 +60,8 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         self._datetime_utc = True
         self._datetime_24h = True
         self._datetime_realtime = True
+
+        self._db = LogDatabase(self.GetPathToDatabase(), DATABASE_DEFAULT)
 
         self.setupUi(self)
         LoggerMainWindowUiHelper.update_ui(self)
@@ -124,8 +130,15 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         except Exception as ex:
             print(ex.args[0])
 
+    def GetPathToDatabase(self) -> Path:
+        '''Calculates the full path to the database'''
+        return FileSystemHelper.get_appdata_path(Path('U2.Suite') / 'Logger' / 'Database', create_if_not_exists=True)
+
     def SaveQSO(self) -> None:
         '''Saves the current session'''
+        if len(self.tbCallsign.text().lstrip().rstrip()) == 0:
+            return
+        self._da
 
     @pyqtSlot("QWidget*", "QWidget*")
     def on_focusChanged(self, old, new) -> None:
