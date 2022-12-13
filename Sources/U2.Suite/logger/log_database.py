@@ -133,7 +133,7 @@ class LogDatabase(object):
             conn.commit()
             cursor.close()
 
-    def __get_callsign(self, callsign : str) -> dict:
+    def get_callsign(self, callsign : str) -> dict:
         '''
         Looks for a given callsign in the database.
         Returns the callsign id if one is found.
@@ -169,7 +169,7 @@ class LogDatabase(object):
         sql = f'INSERT INTO {TABLE_CALLS} ({sql_fields}) VALUES ({sql_values})'
         self.__execute_non_query(sql, values)
 
-        return self.__get_callsign(data[FIELD_CALLSIGN])
+        return self.get_callsign(data[FIELD_CALLSIGN])
 
     def get_callsign_by_id(self, i_id : int) -> dict:
         '''
@@ -184,7 +184,7 @@ class LogDatabase(object):
             cursor.close()
 
         if data == None:
-            raise CallsignNotFoundException(f'Record with ID={i_id} not found.')
+            return None
 
         result = dict()
 
@@ -205,7 +205,7 @@ class LogDatabase(object):
         if callsign == None or len(callsign.lstrip().rstrip()) == 0:
             raise ArgumentException('Callsign is a mandatory parameter.')
 
-        result = self.__get_callsign(callsign)
+        result = self.get_callsign(callsign)
         if result != None:
             return result
 
@@ -231,6 +231,22 @@ class LogDatabase(object):
 
         sql = f'UPDATE {TABLE_CALLS} SET {sql_fields} WHERE id={id}'
         self.__execute_non_query(sql, sql_values)
+
+    def delete_callsign_by_id(self, id : int) -> None:
+        '''
+        Deletes a callsign by its identifier.
+        Does nothing if identifier not found.
+        '''
+        sql = f'DELETE FROM {TABLE_CALLS} WHERE {FIELD_ID}={id}'
+        self.__execute_non_query(sql)
+        
+    def delete_callsign_by_callsign(self, callsign : str) -> None:
+        '''
+        Deletes a callsign by its identifier.
+        Does nothing if identifier not found.
+        '''
+        sql = f'DELETE FROM {TABLE_CALLS} WHERE {FIELD_CALLSIGN}=?'
+        self.__execute_non_query(sql, (callsign,))        
 
     def log_contact(self, logme: tuple) -> None:
         """

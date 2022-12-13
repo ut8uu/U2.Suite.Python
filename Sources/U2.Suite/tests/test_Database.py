@@ -105,3 +105,25 @@ class DatabaseTests(unittest.TestCase):
             if key == FIELD_ID:
                 continue
             self.assertEqual(data[key], record[key])
+
+    def test_CanDeleteCallsignById(self) -> None:
+        db = self.GetTestDatabase()
+
+        record = db.get_callsign_by_id(UT8UU_ID)
+        self.assertIsNotNone(record)
+        
+        db.delete_callsign_by_id(UT8UU_ID)
+        
+        record = db.get_callsign_by_id(UT8UU_ID)
+        self.assertIsNone(record)
+
+    def test_CanDeleteCallsignByCallsign(self) -> None:
+        db = self.GetTestDatabase()
+
+        record = db.get_callsign(UT8UU)
+        self.assertIsNotNone(record)
+        
+        db.delete_callsign_by_callsign(UT8UU)
+        
+        record = db.get_callsign(UT8UU)
+        self.assertIsNone(record)
