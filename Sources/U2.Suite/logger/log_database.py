@@ -156,19 +156,30 @@ class LogDatabase(object):
 
         return result
 
+    def __insert_in_table(self, table : str, data : dict) -> None:
+        '''Inserts a record in the given table'''
+        sql_fields = ', '.join(data)
+        sql_values = ', '.join(['?' for key in data])
+        values = tuple(data.values())
+
+        sql = f'INSERT INTO {table} ({sql_fields}) VALUES ({sql_values})'
+        self.__execute_non_query(sql, values)
+
+    def __change_row_in_table(self, table : str, id : int, data : dict) -> None:
+        '''Updates row in the given table by its identifier.'''
+        sql_fields = ', '.join([f'{key}=?' for key in data])
+        sql_values = [data[key] for key in data]
+
+        sql = f'UPDATE {table} SET {sql_fields} WHERE {FIELD_ID}={id}'
+        self.__execute_non_query(sql, sql_values)
+
     def __insert_callsign(self, data : dict) -> dict:
         '''
         Inserts given callsign in the database.
         A duplicate check is not performed.
         '''
 
-        sql_fields = ', '.join(data)
-        sql_values = ', '.join(['?' for key in data])
-        values = tuple(data.values())
-
-        sql = f'INSERT INTO {TABLE_CALLS} ({sql_fields}) VALUES ({sql_values})'
-        self.__execute_non_query(sql, values)
-
+        self.__insert_in_table(TABLE_CALLS, data)
         return self.get_callsign(data[FIELD_CALLSIGN])
 
     def get_callsign_by_id(self, i_id : int) -> dict:
@@ -226,11 +237,7 @@ class LogDatabase(object):
         if len(data[FIELD_CALLSIGN].lstrip().rstrip()) == 0:
             raise ArgumentException('Callsign is a mandatory parameter.')
 
-        sql_fields = ', '.join([f'{key}=?' for key in data])
-        sql_values = [data[key] for key in data]
-
-        sql = f'UPDATE {TABLE_CALLS} SET {sql_fields} WHERE id={id}'
-        self.__execute_non_query(sql, sql_values)
+        self.__change_row_in_table(TABLE_CALLS, id, data)
 
     def delete_callsign_by_id(self, id : int) -> None:
         '''
@@ -248,51 +255,41 @@ class LogDatabase(object):
         sql = f'DELETE FROM {TABLE_CALLS} WHERE {FIELD_CALLSIGN}=?'
         self.__execute_non_query(sql, (callsign,))        
 
-    def log_contact(self, logme: tuple) -> None:
+    def log_contact(self, data : dict) -> None:
         """
         Inserts a contact into the db.
-        pass in (hiscall, timestamp, frequency, band, mode, 
-        opname, is_run_qso, unique_id)
+        The following values can be present in the dictionary:
+        - hiscall
+        - timestamp
+        - frequency
+        - band
+        - mode, 
+        - opname
+        - is_run_qso
+        - unique_id
+        - dirty
         """
-        logging.info("%s", logme)
-        try:
-            sql = (
-                "INSERT INTO contacts "
-                "(callsign, timestamp, frequency, "
-                "band, mode, opname, is_run_qso, unique_id, dirty) "
-                "VALUES (?,datetime('now'),?,?,?,?,?,1);"
-            )
-            #logging.info("%s", sql)
-            with sqlite3.connect(self._db_full_path) as conn:
-                cur = conn.cursor()
-                cur.execute(sql, logme)
-                conn.commit()
-        except sqlite3.Error as exception:
-            logging.info("DataBase log_contact: %s", exception)
+        self.__insert_in_table(TABLE_CONTACTS, data)
 
     def delete_contact(self, contact : int) -> None:
         """Deletes a contact from the db."""
         if contact:
             try:
-                sql = f"delete from contacts where id={contact};"
+                sql = f"delete from {TABLE_CONTACTS} where id={contact};"
                 self.__execute_non_query(sql)
             except sqlite3.Error as exception:
                 logging.info("DataBase delete_contact: %s", exception)
 
-    def change_contact(self, qso : tuple) -> None:
+    def change_contact(self, id: int, data : dict) -> None:
         '''
         Changes a contact in the db by the given id.
-        pass in (hiscall, timestamp, frequency, band, mode, id)
+        The following values can be present in the dictionary:
+        - hiscall
+        - timestamp
+        - frequency
+        - band
+        - mode
+        - id
         '''
-        try:
-            sql = (
-                "update contacts set "
-                "callsign = ?, timestamp = ?, frequency = ?, band = ?, mode = ? "
-                "where id=?;"
-            )
-            logging.info("%s\n%s", sql, qso)
-            self.__execute_non_query(sql)
-        except sqlite3.Error as exception:
-            logging.info("DataBase change_contact: %s", exception)
-
+        self.__change_row_in_table(TABLE_CONTACTS, id, data)
 
