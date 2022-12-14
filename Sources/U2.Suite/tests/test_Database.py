@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import datetime
 import os
 from pathlib import Path
 from common.contracts.AllBands import *
@@ -127,3 +128,40 @@ class DatabaseTests(unittest.TestCase):
         
         record = db.get_callsign(UT8UU)
         self.assertIsNone(record)
+
+    def test_CanWorkWithContacts(self) -> None:
+        db = self.GetTestDatabase()
+
+        data = {
+            FIELD_IS_RUN_QSO : 0,
+            FIELD_BAND : '20m',
+            FIELD_FREQUENCY : 14200123,
+            FIELD_MODE : MODE_SSB,
+            FIELD_TIMESTAMP : datetime.datetime.utcnow(),
+            FIELD_CALLSIGN : UT8UU,
+            FIELD_OPNAME : 'Sergey'
+        }
+        db.log_contact(data)
+
+        result1 = db.load_all_contacts()
+        self.assertEqual(1, len(result1[1]))
+
+        data_updated = {
+            FIELD_BAND : '40m',
+            FIELD_FREQUENCY : 7200123,
+            FIELD_MODE : MODE_CW,
+            FIELD_TIMESTAMP : datetime.datetime.utcnow(),
+            FIELD_CALLSIGN : UT3UBR,
+            FIELD_OPNAME : 'Alex'
+        }
+        db.change_contact(1, data_updated)
+
+        result2 = db.load_all_contacts()
+        self.assertEqual(1, len(result2[1]))
+        all_values = result2[1]
+        for key in data_updated:
+            expected = data_updated[key]
+            actual_index = result2[0].index(key)
+            actual = all_values[0][actual_index]
+            self.assertEqual(expected, actual)
+            

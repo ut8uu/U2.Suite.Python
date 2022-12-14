@@ -20,7 +20,8 @@ if __name__ == '__main__':
     exit(0)
 
 import logging
-from typing import Any, Tuple
+from typing import Any, List, Tuple
+import uuid
 from common.exceptions.ArgumentException import ArgumentException
 import os
 from pathlib import Path
@@ -53,7 +54,7 @@ class LogDatabase(object):
                             FIELD_BAND, FIELD_MODE, FIELD_OPNAME, FIELD_IS_RUN_QSO,
                             FIELD_UNIQUE_ID, FIELD_DIRTY
                             ),
-            TABLE_VERSION : ()
+            TABLE_VERSION : (FIELD_VERSION_MAJOR, FIELD_VERSION_MINOR)
         }
         self.__check_db()
         pass
@@ -96,7 +97,7 @@ class LogDatabase(object):
                 f"CREATE TABLE IF NOT EXISTS {TABLE_CONTACTS} "
                 f"({FIELD_ID} INTEGER PRIMARY KEY, "
                 f"{FIELD_CALLSIGN} text NOT NULL, "
-                f"{FIELD_TIMESTAMP} text NOT NULL, "
+                f"{FIELD_TIMESTAMP} TIMESTAMP NOT NULL, "
                 f"{FIELD_FREQUENCY} INTEGER DEFAULT 0, "
                 f"{FIELD_BAND} text NOT NULL, "
                 f"{FIELD_MODE} text NOT NULL, "
@@ -253,22 +254,45 @@ class LogDatabase(object):
         Does nothing if identifier not found.
         '''
         sql = f'DELETE FROM {TABLE_CALLS} WHERE {FIELD_CALLSIGN}=?'
-        self.__execute_non_query(sql, (callsign,))        
+        self.__execute_non_query(sql, (callsign,))  
+
+    def load_all_contacts(self, order_by_field : str = '') -> tuple[tuple, List[tuple]]:
+        '''
+        Loads all contacts from the database.
+        Returns a tuple containing all the fields
+        and a list of tuples containing all the fetched rows.
+        '''
+        sql = f'SELECT * FROM {TABLE_CONTACTS}'
+        if len(order_by_field.lstrip().rstrip()) > 0:
+            sql += f' ORDER BY {order_by_field}'
+
+        with sqlite3.connect(self._db_full_path,
+                detect_types=sqlite3.PARSE_DECLTYPES |
+                             sqlite3.PARSE_COLNAMES) as conn:
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            result = (self._table_descriptions[TABLE_CONTACTS], cursor.fetchall())
+            cursor.close()
+            return result
+
 
     def log_contact(self, data : dict) -> None:
         """
         Inserts a contact into the db.
         The following values can be present in the dictionary:
-        - hiscall
+        - callsign
         - timestamp
         - frequency
         - band
         - mode, 
         - opname
         - is_run_qso
+        The following fields are being filled automatically:
         - unique_id
         - dirty
         """
+        data[FIELD_UNIQUE_ID] = uuid.uuid4().hex
+        data[FIELD_DIRTY] = 1
         self.__insert_in_table(TABLE_CONTACTS, data)
 
     def delete_contact(self, contact : int) -> None:
@@ -284,7 +308,7 @@ class LogDatabase(object):
         '''
         Changes a contact in the db by the given id.
         The following values can be present in the dictionary:
-        - hiscall
+        - callsign
         - timestamp
         - frequency
         - band
