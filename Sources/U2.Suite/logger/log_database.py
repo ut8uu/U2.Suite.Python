@@ -359,7 +359,7 @@ class LogDatabase(object):
         callsign_data = self.get_or_add_callsign(input_data)
         print(callsign_data)
 
-        data = self.filter_dictionary(input_data, CONTACT_FIELDS)
+        data = self.filter_dictionary(input_data, CONTACT_CHANGE_FIELDS)
 
         self.__change_row_in_table(TABLE_CONTACTS, id, data)
 
