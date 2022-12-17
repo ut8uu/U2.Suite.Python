@@ -99,10 +99,39 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         '''Handles the key_pressed event'''
         if key == kbk.KEY_RETURN:
             self.SaveQSO()
+            self.DisplayLog()
         elif key == kbk.KEY_SPACE:
             self.MoveFocus()
         else:
             print(f"Key '{key}' not supported.")
+
+    def DisplayLog(self):
+        '''Displays the entire log.'''
+        contacts = self._db.load_all_contacts(FIELD_TIMESTAMP)
+        self.listLog.items().clear()
+
+        fields = contacts[0]
+        data = contacts[1]
+        id_index = fields.index(FIELD_ID)
+        callsign_index = fields.index(FIELD_CALLSIGN)
+        timestamp_index = fields.index(FIELD_TIMESTAMP)
+        mode_index = fields.index(FIELD_MODE)
+        band_index = fields.index(FIELD_BAND)
+        for qso in contacts:
+            id = qso[id_index]
+            timestamp = qso[timestamp_index]
+            callsign = qso[callsign_index]
+            band = qso[band_index]
+            mode = qso[mode_index]
+
+            logline = (
+                f"{str(id).rjust(3,'0')} "
+                f"{timestamp.ljust(16)} "
+                f"{callsign.ljust(10)} "
+                f"{band.rjust(5)} "
+                f"{mode} "
+            )
+            self.listLog.addItem(logline)
 
     def MoveFocus(self) -> None:
         '''
@@ -136,9 +165,22 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
 
     def SaveQSO(self) -> None:
         '''Saves the current session'''
-        if len(self.tbCallsign.text().lstrip().rstrip()) == 0:
+        callsign = self.tbCallsign.text().lstrip().rstrip()
+        if len(callsign) == 0:
             return
-        self._da
+        data = {FIELD_CALLSIGN:callsign, FIELD_OPNAME:self.tbName.text()}
+        self._db.get_or_add_callsign(data)
+        
+        contact = {
+            FIELD_CALLSIGN : self.tbCallsign.text(),
+            FIELD_OPNAME : self.tbName.text(),
+            FIELD_BAND : self.cbBand.currentText(),
+            FIELD_MODE : self.cbMode.currentText(),
+            FIELD_TIMESTAMP : datetime.utcnow(),
+            FIELD_RST_SENT : self.tbSnt.text().lstrip().rstrip(),
+            FIELD_RST_RCVD : self.tbRcv.text().lstrip().rstrip()
+        }
+        self._db.log_contact(contact)
 
     @pyqtSlot("QWidget*", "QWidget*")
     def on_focusChanged(self, old, new) -> None:

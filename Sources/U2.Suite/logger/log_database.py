@@ -96,13 +96,16 @@ class LogDatabase(object):
             sql = (
                 f"CREATE TABLE IF NOT EXISTS {TABLE_CONTACTS} "
                 f"({FIELD_ID} INTEGER PRIMARY KEY, "
-                f"{FIELD_CALLSIGN} text NOT NULL, "
+                f"{FIELD_CALLSIGN} TEXT NOT NULL, "
                 f"{FIELD_TIMESTAMP} TIMESTAMP NOT NULL, "
                 f"{FIELD_FREQUENCY} INTEGER DEFAULT 0, "
                 f"{FIELD_BAND} text NOT NULL, "
                 f"{FIELD_MODE} text NOT NULL, "
-                f"{FIELD_OPNAME} text NOT NULL,"
-                f"{FIELD_IS_RUN_QSO} INTEGER DEFAULT 0,"
+                # this field can contain an overriden name of the operator
+                f"{FIELD_OPNAME} text NOT NULL," 
+                f"{FIELD_RST_SENT} text NULL, "
+                f"{FIELD_RST_RCVD} text NULL, "
+                f"{FIELD_IS_RUN_QSO} INTEGER DEFAULT 0, "
                 f"{FIELD_UNIQUE_ID} text NOT NULL, "
                 f"{FIELD_DIRTY} INTEGER DEFAULT 1);"
             )
@@ -128,16 +131,22 @@ class LogDatabase(object):
 
     def __execute_non_query(self, sql : str, params = ()) -> None:
         '''Executes given SQL against the database'''
-        with sqlite3.connect(self._db_full_path) as conn:
-            cursor = conn.cursor()
-            cursor.execute(sql, params)
-            conn.commit()
-            cursor.close()
+        try:
+            with sqlite3.connect(self._db_full_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute(sql, params)
+                conn.commit()
+                cursor.close()
+        except sqlite3.Error as ex:
+            print(f'SqLite error: {ex}')
+        print(f'Query {sql} executed successfully.')
 
     def get_callsign(self, callsign : str) -> dict:
         '''
         Looks for a given callsign in the database.
-        Returns the callsign id if one is found.
+        Returns the dictionary containing all the info about the callsign, if one is found.
+        The keys of the dictionary are names of the table columns.
+        The values are the actual values from the table.
         Returns 0 if callsign is absent in the database.
 
         '''
@@ -174,12 +183,13 @@ class LogDatabase(object):
         sql = f'UPDATE {table} SET {sql_fields} WHERE {FIELD_ID}={id}'
         self.__execute_non_query(sql, sql_values)
 
-    def __insert_callsign(self, data : dict) -> dict:
+    def __insert_callsign(self, input_data : dict) -> dict:
         '''
         Inserts given callsign in the database.
         A duplicate check is not performed.
         '''
 
+        data = self.filter_dictionary(input_data, CALLSIGN_FIELDS)
         self.__insert_in_table(TABLE_CALLS, data)
         return self.get_callsign(data[FIELD_CALLSIGN])
 
@@ -205,7 +215,16 @@ class LogDatabase(object):
 
         return result
 
-    def get_or_add_callsign(self, data : dict) -> dict:
+    def filter_dictionary(self, input : dict, allowed_keys : tuple) -> dict:
+        '''Creates new dictionary containing only allowed keys.'''
+        result = dict()
+        all_keys = input.keys()
+        for key in allowed_keys:
+            if key in all_keys:
+                result[key] = input[key]
+        return result
+
+    def get_or_add_callsign(self, input_data : dict) -> dict:
         '''
         Looks for a given callsign (case insensitive) and returns one found.
         Creates a new record if callsign was not found.
@@ -213,15 +232,21 @@ class LogDatabase(object):
         `data` - a dictionary containing the callsign data.
         '''
 
-        callsign = data[FIELD_CALLSIGN]
+        data = self.filter_dictionary(input_data, CALLSIGN_FIELDS)
+        print(data)
+
+        callsign = input_data[FIELD_CALLSIGN]
         if callsign == None or len(callsign.lstrip().rstrip()) == 0:
             raise ArgumentException('Callsign is a mandatory parameter.')
 
         result = self.get_callsign(callsign)
         if result != None:
+            print(f'Callsign {callsign} is already in the database.')
             return result
 
-        return self.__insert_callsign(data) 
+        result = self.__insert_callsign(data) 
+        print(f'Callsign {callsign} added.')
+        return result
 
     def change_callsign(self, id : int, data : dict) -> dict:
         '''
@@ -262,9 +287,11 @@ class LogDatabase(object):
         Returns a tuple containing all the fields
         and a list of tuples containing all the fetched rows.
         '''
+
         sql = f'SELECT * FROM {TABLE_CONTACTS}'
-        if len(order_by_field.lstrip().rstrip()) > 0:
-            sql += f' ORDER BY {order_by_field}'
+        order_by = order_by_field.lstrip().rstrip()
+        if len(order_by) > 0:
+            sql += f' ORDER BY {order_by}'
 
         with sqlite3.connect(self._db_full_path,
                 detect_types=sqlite3.PARSE_DECLTYPES |
@@ -276,21 +303,32 @@ class LogDatabase(object):
             return result
 
 
-    def log_contact(self, data : dict) -> None:
+    def log_contact(self, input_data : dict) -> None:
         """
         Inserts a contact into the db.
+        A provided callsign is looked up in the database and callsign_id is stored.
+
         The following values can be present in the dictionary:
-        - callsign
-        - timestamp
-        - frequency
-        - band
-        - mode, 
-        - opname
-        - is_run_qso
+        - callsign (mandatory)
+        - timestamp (mandatory)
+        - frequency (or band)
+        - band (or frequency)
+        - mode (mandatory)
+        - opname (optional)
+        - rst_rcvd (optional)
+        - rst_sent (optional)
+        - is_run_qso (optional, `0` is inserted if omitted)
         The following fields are being filled automatically:
         - unique_id
         - dirty
         """
+
+        data = self.filter_dictionary(input_data, CONTACT_FIELDS)
+        print(data)
+
+        call_data = self.get_or_add_callsign(input_data)
+        print(call_data)
+
         data[FIELD_UNIQUE_ID] = uuid.uuid4().hex
         data[FIELD_DIRTY] = 1
         self.__insert_in_table(TABLE_CONTACTS, data)
@@ -304,7 +342,7 @@ class LogDatabase(object):
             except sqlite3.Error as exception:
                 logging.info("DataBase delete_contact: %s", exception)
 
-    def change_contact(self, id: int, data : dict) -> None:
+    def change_contact(self, id: int, input_data : dict) -> None:
         '''
         Changes a contact in the db by the given id.
         The following values can be present in the dictionary:
@@ -313,7 +351,15 @@ class LogDatabase(object):
         - frequency
         - band
         - mode
+        - rst_rcvd
+        - rst_sent
         - id
         '''
+
+        callsign_data = self.get_or_add_callsign(input_data)
+        print(callsign_data)
+
+        data = self.filter_dictionary(input_data, CONTACT_FIELDS)
+
         self.__change_row_in_table(TABLE_CONTACTS, id, data)
 
