@@ -244,6 +244,8 @@ class LogDatabase(object):
             print(f'Callsign {callsign} is already in the database.')
             return result
 
+        data[FIELD_CALLSIGN] = data[FIELD_CALLSIGN].upper()
+
         result = self.__insert_callsign(data) 
         print(f'Callsign {callsign} added.')
         return result
@@ -331,6 +333,7 @@ class LogDatabase(object):
 
         data[FIELD_UNIQUE_ID] = uuid.uuid4().hex
         data[FIELD_DIRTY] = 1
+        data[FIELD_CALLSIGN] = data[FIELD_CALLSIGN].upper()
         self.__insert_in_table(TABLE_CONTACTS, data)
 
     def delete_contact(self, contact : int) -> None:
@@ -361,5 +364,6 @@ class LogDatabase(object):
 
         data = self.filter_dictionary(input_data, CONTACT_CHANGE_FIELDS)
 
+        data[FIELD_CALLSIGN] = data[FIELD_CALLSIGN].upper()
         self.__change_row_in_table(TABLE_CONTACTS, id, data)
 

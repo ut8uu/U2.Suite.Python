@@ -86,6 +86,13 @@ class DatabaseTests(unittest.TestCase):
         record = db.get_or_add_callsign({FIELD_CALLSIGN : UT8UU.lower()})
         self.assertEqual(UT8UU_ID, record[FIELD_ID])
 
+    def test_UpperCaseCallsign(self) -> None:
+        '''Tests how callsign case is converted to upper.'''
+        db = self.GetTestDatabase()
+        db.get_or_add_callsign({FIELD_CALLSIGN : 'a1a'})
+        record = db.get_callsign('a1a')
+        self.assertEqual('A1A', record[FIELD_CALLSIGN])
+
     def test_CanUpdateCallsign(self) -> None:
         '''
         This is to test updating of the callsign info.
@@ -138,23 +145,28 @@ class DatabaseTests(unittest.TestCase):
             FIELD_FREQUENCY : 14200123,
             FIELD_MODE : MODE_SSB,
             FIELD_TIMESTAMP : datetime.datetime.utcnow(),
-            FIELD_CALLSIGN : UT8UU,
+            FIELD_CALLSIGN : UT8UU.lower(),
             FIELD_OPNAME : 'Sergey'
         }
         db.log_contact(data)
 
         result1 = db.load_all_contacts()
         self.assertEqual(1, len(result1[1]))
+        data = result1[1]
+        callsign_index = result1[0].index(FIELD_CALLSIGN)
+        self.assertEqual(UT8UU, data[0][callsign_index])
 
         data_updated = {
             FIELD_BAND : '40m',
             FIELD_FREQUENCY : 7200123,
             FIELD_MODE : MODE_CW,
             FIELD_TIMESTAMP : datetime.datetime.utcnow(),
-            FIELD_CALLSIGN : UT3UBR,
+            FIELD_CALLSIGN : UT3UBR.lower(),
             FIELD_OPNAME : 'Alex'
         }
         db.change_contact(1, data_updated)
+
+        data_updated[FIELD_CALLSIGN] = data_updated[FIELD_CALLSIGN].upper()
 
         result2 = db.load_all_contacts()
         self.assertEqual(1, len(result2[1]))
