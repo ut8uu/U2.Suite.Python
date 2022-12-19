@@ -61,7 +61,9 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         self._datetime_24h = True
         self._datetime_realtime = True
 
-        self._db = LogDatabase(self.GetPathToDatabase(), DATABASE_DEFAULT)
+        path = self.GetPathToDatabase()
+        print(f'Path to db: {path}')
+        self._db = LogDatabase(path, DATABASE_DEFAULT)
 
         self.setupUi(self)
         LoggerMainWindowUiHelper.update_ui(self)
@@ -85,6 +87,8 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
 
         #self._realtime_thread = Thread(target = self.realTimeThread)
         #self._realtime_thread.start()
+
+        self.DisplayLog()
     
     def __del__(self):
         '''A class' destructor'''
@@ -108,7 +112,7 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
     def DisplayLog(self):
         '''Displays the entire log.'''
         contacts = self._db.load_all_contacts(FIELD_TIMESTAMP)
-        self.listLog.items().clear()
+        self.listLog.clear()
 
         fields = contacts[0]
         data = contacts[1]
@@ -117,18 +121,18 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         timestamp_index = fields.index(FIELD_TIMESTAMP)
         mode_index = fields.index(FIELD_MODE)
         band_index = fields.index(FIELD_BAND)
-        for qso in contacts:
+        for qso in data:
             id = qso[id_index]
-            timestamp = qso[timestamp_index]
+            timestamp = qso[timestamp_index].strftime('%Y-%m-%d %H:%M:%S')
             callsign = qso[callsign_index]
             band = qso[band_index]
             mode = qso[mode_index]
 
             logline = (
-                f"{str(id).rjust(3,'0')} "
-                f"{timestamp.ljust(16)} "
-                f"{callsign.ljust(10)} "
-                f"{band.rjust(5)} "
+                f"{str(id).rjust(3,'0')}  "
+                f"{callsign.ljust(10).upper()}  "
+                f"{timestamp.ljust(16)}  "
+                f"{band.rjust(5)}  "
                 f"{mode} "
             )
             self.listLog.addItem(logline)
@@ -172,7 +176,7 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         self._db.get_or_add_callsign(data)
         
         contact = {
-            FIELD_CALLSIGN : self.tbCallsign.text(),
+            FIELD_CALLSIGN : self.tbCallsign.text().upper(),
             FIELD_OPNAME : self.tbName.text(),
             FIELD_BAND : self.cbBand.currentText(),
             FIELD_MODE : self.cbMode.currentText(),
