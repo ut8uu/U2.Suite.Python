@@ -26,7 +26,7 @@ class LoggerMainWindowUiHelper(object):
     
     def update_ui(window : Ui_LoggerMainWindow) -> None:
         '''Updates the UI to handle some UI-specific stuff'''
-        font = QFont()
+        font = window.tbCallsign.font()
         font.setCapitalization(QFont.AllUppercase)
         font.setPointSizeF(16)
 
