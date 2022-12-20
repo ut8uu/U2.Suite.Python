@@ -31,3 +31,19 @@ class LoggerMainWindowUiHelper(object):
         font.setPointSizeF(16)
 
         window.tbCallsign.setFont(font)
+        
+        LoggerMainWindowUiHelper.update_timestamp_controls(window)
+
+    def update_timestamp_controls(window: Ui_LoggerMainWindow) -> None:
+        '''Updates the timestamp-related controls'''
+
+        if window.cbRealtime.isChecked():
+            window.tdDateTime.hide()
+            window.btnNow.hide()
+            window.lblTimestamp.show()
+            window.cbUtc.show()
+        else:
+            window.lblTimestamp.hide()
+            window.cbUtc.hide()
+            window.tdDateTime.show()
+            window.btnNow.show()

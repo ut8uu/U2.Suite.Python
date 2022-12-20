@@ -333,48 +333,6 @@
      </property>
     </item>
    </widget>
-   <widget class="QDateTimeEdit" name="tdDateTime">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>90</y>
-      <width>260</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>16</pointsize>
-     </font>
-    </property>
-    <property name="wrapping">
-     <bool>false</bool>
-    </property>
-    <property name="frame">
-     <bool>true</bool>
-    </property>
-    <property name="accelerated">
-     <bool>false</bool>
-    </property>
-    <property name="showGroupSeparator" stdset="0">
-     <bool>false</bool>
-    </property>
-    <property name="displayFormat">
-     <string>dd.MM.yyyy hh:mm:ss</string>
-    </property>
-    <property name="calendarPopup">
-     <bool>true</bool>
-    </property>
-    <property name="currentSectionIndex">
-     <number>0</number>
-    </property>
-    <property name="timeSpec">
-     <enum>Qt::LocalTime</enum>
-    </property>
-   </widget>
    <widget class="QLabel" name="lblDateTime">
     <property name="geometry">
      <rect>
@@ -391,7 +349,7 @@
    <widget class="QCheckBox" name="cbUtc">
     <property name="geometry">
      <rect>
-      <x>70</x>
+      <x>160</x>
       <y>70</y>
       <width>51</width>
       <height>17</height>
@@ -603,19 +561,6 @@
      <string>Propagation</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="btnNow">
-    <property name="geometry">
-     <rect>
-      <x>280</x>
-      <y>90</y>
-      <width>70</width>
-      <height>30</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>&lt; Now</string>
-    </property>
-   </widget>
    <widget class="QFrame" name="frame_2">
     <property name="geometry">
      <rect>
@@ -682,6 +627,102 @@
       <bool>true</bool>
      </property>
     </widget>
+   </widget>
+   <widget class="QCheckBox" name="cbRealtime">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>70</y>
+      <width>71</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Real-time</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>90</y>
+      <width>496</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="lblTimestamp">
+       <property name="font">
+        <font>
+         <pointsize>16</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>01.01.2022 11:22:33</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDateTimeEdit" name="tdDateTime">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>16</pointsize>
+        </font>
+       </property>
+       <property name="wrapping">
+        <bool>false</bool>
+       </property>
+       <property name="frame">
+        <bool>true</bool>
+       </property>
+       <property name="accelerated">
+        <bool>false</bool>
+       </property>
+       <property name="showGroupSeparator" stdset="0">
+        <bool>false</bool>
+       </property>
+       <property name="displayFormat">
+        <string>dd.MM.yyyy hh:mm:ss</string>
+       </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
+       </property>
+       <property name="currentSectionIndex">
+        <number>0</number>
+       </property>
+       <property name="timeSpec">
+        <enum>Qt::LocalTime</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnNow">
+       <property name="text">
+        <string>&lt; now</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -797,22 +838,6 @@
     <hint type="destinationlabel">
      <x>122</x>
      <y>42</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>btnNow</sender>
-   <signal>clicked()</signal>
-   <receiver>LoggerMainWindow</receiver>
-   <slot>SetCurrentDateTime()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>354</x>
-     <y>141</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>419</x>
-     <y>141</y>
     </hint>
    </hints>
   </connection>

@@ -19,7 +19,6 @@ from datetime import datetime
 import os
 from pathlib import Path
 import sys
-from threading import Thread
 import time
 from Logger_QsoEditorDialog import Logger_QsoEditorDialog
 from helpers.FileSystemHelper import FileSystemHelper
@@ -32,7 +31,7 @@ from logger.logger_main_window_keyboard import LoggerMainWindowKeyboard
 from logger.logger_main_window_ui import LoggerMainWindowUiHelper
 from logger.ui.Ui_LoggerMainWindow import Ui_LoggerMainWindow
 from PyQt5.QtCore import QAbstractEventDispatcher, pyqtSlot, QDateTime
-from PyQt5.QtCore import QDir
+from PyQt5.QtCore import QDir, QTimer
 from PyQt5.QtGui import QFontDatabase
 from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, qApp
 from pyqtkeybind import keybinder
@@ -59,22 +58,13 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
 
     _running : bool
 
-    _datetime_utc : bool
-    _datetime_24h : bool
-    _datetime_realtime : bool
+    _real_timer : QTimer
 
-    _realtime_thread : Thread
-    
     def __init__(self, parent=None):
         super().__init__(parent)
 
         self._running = True
         
-        # datetime stuff
-        self._datetime_utc = True
-        self._datetime_24h = True
-        self._datetime_realtime = True
-
         path = self.GetPathToDatabase()
         print(f'Path to db: {path}')
         self._db = LogDatabase(path, DATABASE_DEFAULT)
@@ -84,13 +74,15 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
 
         qApp.focusChanged.connect(self.on_focusChanged)
         self.listLog.itemDoubleClicked.connect(self.qso_double_clicked)
+        self.cbRealtime.stateChanged.connect(self.real_time_changed)
+        self.btnNow.clicked.connect(self.set_current_date_time)
 
         self._allControls = [
             self.tbCallsign, self.tbRcv, self.tbSnt, self.tbName, self.tbComment,
             self.btnF1, self.btnF2, self.btnF3, self.btnF4, self.btnF5, self.btnF6,
             self.btnF7, self.btnF8, self.btnF9, self.btnF10, self.btnF11, self.btnF12,
             self.cbBand, self.cbMode, self.cbUtc, 
-            #self.cbRealTime,
+            self.cbRealtime,
             self.tdDateTime,
             ]
 
@@ -98,16 +90,17 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         self._keyboard_handler.registerKeys()
         self._keyboard_handler.AddOnKeyPressHandler(self.on_keyPressed)
         self.tbCallsign.setFocus()
-        self.set_current_date_time()
-
-        #self._realtime_thread = Thread(target = self.realTimeThread)
-        #self._realtime_thread.start()
 
         self.cbMode.clear()
         self.cbMode.addItems(ALL_MODES)
 
         self.cbBand.clear()
         self.cbBand.addItems(ALL_BANDS)
+
+        self._real_timer = QTimer()
+        self._real_timer.timeout.connect(self.update_time)
+        self._real_timer.start(1000)
+
 
         self.display_log()
     
@@ -196,13 +189,21 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
             return
         data = {FIELD_CALLSIGN:callsign, FIELD_OPNAME:self.tbName.text()}
         self._db.get_or_add_callsign(data)
-        
+
+        if self.cbRealtime.isChecked():
+            if self.cbUtc.isChecked():
+                timestamp = datetime.utcnow()
+            else:
+                timestamp = datetime.now()
+        else:
+            timestamp = self.tdDateTime.dateTime().toPyDateTime()
+
         contact = {
             FIELD_CALLSIGN : self.tbCallsign.text().upper(),
             FIELD_OPNAME : self.tbName.text(),
             FIELD_BAND : self.cbBand.currentText(),
             FIELD_MODE : self.cbMode.currentText(),
-            FIELD_TIMESTAMP : datetime.utcnow(),
+            FIELD_TIMESTAMP : timestamp,
             FIELD_RST_SENT : self.tbSnt.text().lstrip().rstrip(),
             FIELD_RST_RCVD : self.tbRcv.text().lstrip().rstrip()
         }
@@ -224,21 +225,6 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         '''Handles losing the focus'''
         self._keyboard_handler.unregisterKeys()
 
-    def realTimeThread(self) -> None:
-        '''A code inside the realtime timer'''
-        while self._running:
-            try:
-                if self._datetime_realtime:
-                    focused_control = self.getSelectedControl()
-                    if self._datetime_utc:
-                        self.tdDateTime.setDateTime(QDateTime.currentDateTimeUtc())
-                    else:
-                        self.tdDateTime.setDateTime(QDateTime.currentDateTime())
-                    focused_control.setFocus()
-            except Exception as ex:
-                print(ex.args[0])
-            time.sleep(1)
-
     def getSelectedControl(self) -> QWidget:
         '''Locates and returns the control that is focused.'''
         for control in self._allControls:
@@ -252,7 +238,7 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
     @pyqtSlot()
     def set_current_date_time(self) -> None:
         '''Handles the clicking the Now button'''
-        if self._datetime_utc:
+        if self.cbUtc.isChecked():
             self.tdDateTime.setDateTime(QDateTime.currentDateTimeUtc())
         else:
             self.tdDateTime.setDateTime(QDateTime.currentDateTime())
@@ -309,6 +295,16 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         '''Handles post edit or delete event.'''
         self.display_log()
 
+    def update_time(self) -> None:
+        if self.cbUtc.isChecked():
+            timestamp = datetime.utcnow()
+        else:
+            timestamp = datetime.now()
+        self.lblTimestamp.setText(timestamp.strftime('%d.%m.%Y %H:%M:%S'))
+
+    def real_time_changed(self) -> None:
+        '''Handles the switching between real-time and manual input modes.'''
+        LoggerMainWindowUiHelper.update_timestamp_controls(self)
 
 if __name__ == '__main__':
     from logger.ui.Ui_LoggerMainWindow import Ui_LoggerMainWindow
