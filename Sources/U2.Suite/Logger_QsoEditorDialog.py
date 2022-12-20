@@ -59,6 +59,7 @@ class Logger_QsoEditorDialog(QDialog, Ui_QsoEditor):
         self._qso = qso
 
         self.buttonBox.accepted.connect(self.save_changes)
+        self.deleteButton.clicked.connect(self.delete_contact)
 
         keys = qso.keys()
 
@@ -95,6 +96,13 @@ class Logger_QsoEditorDialog(QDialog, Ui_QsoEditor):
 
         self._db.change_contact(self._qso[FIELD_ID], data)
         self.change.lineChanged.emit()
+        self.close()
+
+    def delete_contact(self) -> None:
+        '''Deletes a contact from the database'''
+        self._db.delete_contact_by_id(self._qso[FIELD_ID])
+        self.change.lineChanged.emit()
+        self.close()
 
 if __name__ == '__main__':
     import os

@@ -349,6 +349,7 @@ class LogDatabase(object):
         '''
         Retrieves a contact from the database.
         Returns a dictionary with column names as keys.
+        Returns empty dictionary if no record is found.
         '''
         sql = f'SELECT * FROM {TABLE_CONTACTS} WHERE id=?'
 
@@ -361,18 +362,21 @@ class LogDatabase(object):
             cursor.close()
 
             result = dict()
+            if len(data) == 0:
+                return result
+
             row = data[0]
             for i in range(len(self._table_descriptions[TABLE_CONTACTS])):
                 key = self._table_descriptions[TABLE_CONTACTS][i]
                 result[key] = row[i]
             return result        
 
-    def delete_contact(self, contact : int) -> None:
+    def delete_contact_by_id(self, id : int) -> None:
         """Deletes a contact from the db."""
-        if contact:
+        if id:
             try:
-                sql = f"delete from {TABLE_CONTACTS} where id={contact};"
-                self.__execute_non_query(sql)
+                sql = f"delete from {TABLE_CONTACTS} where id=?"
+                self.__execute_non_query(sql, (id,))
             except sqlite3.Error as exception:
                 logging.info("DataBase delete_contact: %s", exception)
 

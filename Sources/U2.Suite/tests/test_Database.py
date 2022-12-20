@@ -181,3 +181,9 @@ class DatabaseTests(unittest.TestCase):
             actual = all_values[0][actual_index]
             self.assertEqual(expected, actual)
             
+    def test_CanDeleteContact(self) -> None:
+        '''Tests how to delete the contact'''
+        db = self.GetTestDatabase()
+        db.delete_contact_by_id(UT8UU_ID)
+        record = db.get_contact_by_id(UT8UU_ID)
+        self.assertEqual(0, len(record))
