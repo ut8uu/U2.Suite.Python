@@ -50,9 +50,18 @@ class LogDatabase(object):
             TABLE_CALLS : ( FIELD_ID, FIELD_CALLSIGN, FIELD_OPNAME, 
                             FIELD_EMAIL, FIELD_ADDRESS, FIELD_SOURCE, FIELD_HAS_DATA),
             TABLE_CONTACTS : ( 
-                            FIELD_ID, FIELD_CALLSIGN, FIELD_TIMESTAMP, FIELD_FREQUENCY,
-                            FIELD_BAND, FIELD_MODE, FIELD_OPNAME, FIELD_IS_RUN_QSO,
-                            FIELD_UNIQUE_ID, FIELD_DIRTY
+                            FIELD_ID, 
+                            FIELD_CALLSIGN, 
+                            FIELD_TIMESTAMP, 
+                            FIELD_FREQUENCY,
+                            FIELD_BAND, 
+                            FIELD_MODE, 
+                            FIELD_OPNAME, 
+                            FIELD_RST_SENT, 
+                            FIELD_RST_RCVD,
+                            FIELD_IS_RUN_QSO, 
+                            FIELD_UNIQUE_ID, 
+                            FIELD_DIRTY
                             ),
             TABLE_VERSION : (FIELD_VERSION_MAJOR, FIELD_VERSION_MINOR)
         }
