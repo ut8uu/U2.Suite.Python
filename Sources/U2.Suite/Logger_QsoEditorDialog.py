@@ -22,7 +22,16 @@ from helpers.FileSystemHelper import FileSystemHelper
 from logger.log_database import LogDatabase
 from logger.logger_constants import *
 from logger.ui.Ui_QsoEditorWindow import Ui_QsoEditor
+from PyQt5 import QtCore
+from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QApplication, QDialog
+
+class QSOEdit(QtCore.QObject):
+    """
+    Custom qt event signal used when qso edited or deleted.
+    """
+
+    lineChanged = QtCore.pyqtSignal()
 
 class Logger_QsoEditorDialog(QDialog, Ui_QsoEditor):
 
@@ -34,6 +43,16 @@ class Logger_QsoEditorDialog(QDialog, Ui_QsoEditor):
 
         self.setupUi(self)
 
+        self.editMode.clear()
+        self.editMode.addItems(ALL_MODES)
+
+        font = self.editCallsign.font()
+        font.setCapitalization(QFont.AllUppercase)
+        font.setPointSizeF(16)
+
+        self.editCallsign.setFont(font)
+        self.change = QSOEdit()
+
     def setup(self, qso : dict, db : LogDatabase) -> None:
         '''Performs an initial setup'''
         self._db = db
@@ -41,13 +60,18 @@ class Logger_QsoEditorDialog(QDialog, Ui_QsoEditor):
 
         self.buttonBox.accepted.connect(self.save_changes)
 
+        keys = qso.keys()
+
         self.editBand.setCurrentText(qso[FIELD_BAND])
         self.editMode.setCurrentText(qso[FIELD_MODE])
         self.editOpName.setText(qso[FIELD_OPNAME])
-        self.editFreq.setText(str(qso[FIELD_FREQUENCY]))
+        if qso[FIELD_FREQUENCY] > 0:
+            self.editFreq.setText(str(qso[FIELD_FREQUENCY]))
         self.editCallsign.setText(qso[FIELD_CALLSIGN])
-        self.editRstRcvd.setText(qso[FIELD_RST_RCVD])
-        self.editRstSent.setText(qso[FIELD_RST_SENT])
+        if FIELD_RST_RCVD in keys:
+            self.editRstRcvd.setText(qso[FIELD_RST_RCVD])
+        if FIELD_RST_SENT in keys:
+            self.editRstSent.setText(qso[FIELD_RST_SENT])
         self.editDateTime.setDateTime(qso[FIELD_TIMESTAMP])
 
     def save_changes(self) -> None:
@@ -56,7 +80,7 @@ class Logger_QsoEditorDialog(QDialog, Ui_QsoEditor):
             FIELD_BAND : self.editBand.currentText(),
             FIELD_MODE : self.editMode.currentText(),
             FIELD_TIMESTAMP : self.editDateTime.dateTime().toPyDateTime(),
-            FIELD_CALLSIGN : self.editCallsign.text(),
+            FIELD_CALLSIGN : self.editCallsign.text().upper(),
             FIELD_OPNAME : self.editOpName.text(),
             FIELD_RST_SENT : self.editRstSent.text(),
             FIELD_RST_RCVD : self.editRstRcvd.text()
@@ -69,7 +93,8 @@ class Logger_QsoEditorDialog(QDialog, Ui_QsoEditor):
             print(ex)
             return
 
-        db.change_contact(self._qso[FIELD_ID], data)        
+        self._db.change_contact(self._qso[FIELD_ID], data)
+        self.change.lineChanged.emit()
 
 if __name__ == '__main__':
     import os
