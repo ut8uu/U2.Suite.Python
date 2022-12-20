@@ -19,7 +19,6 @@ from datetime import datetime
 import os
 from pathlib import Path
 import sys
-import time
 from Logger_QsoEditorDialog import Logger_QsoEditorDialog
 from helpers.FileSystemHelper import FileSystemHelper
 
@@ -100,7 +99,6 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         self._real_timer = QTimer()
         self._real_timer.timeout.connect(self.update_time)
         self._real_timer.start(1000)
-
 
         self.display_log()
     
