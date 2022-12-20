@@ -16,10 +16,12 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from datetime import datetime
+import os
 from pathlib import Path
 import sys
 from threading import Thread
 import time
+from Logger_QsoEditorDialog import Logger_QsoEditorDialog
 from helpers.FileSystemHelper import FileSystemHelper
 
 import helpers.KeyBinderKeys as kbk
@@ -29,10 +31,22 @@ from logger.logger_constants import *
 from logger.logger_main_window_keyboard import LoggerMainWindowKeyboard
 from logger.logger_main_window_ui import LoggerMainWindowUiHelper
 from logger.ui.Ui_LoggerMainWindow import Ui_LoggerMainWindow
-from PyQt5.QtCore import QAbstractEventDispatcher, pyqtSlot, QDateTime, pyqtSignal
+from PyQt5.QtCore import QAbstractEventDispatcher, pyqtSlot, QDateTime
+from PyQt5.QtCore import QDir
+from PyQt5.QtGui import QFontDatabase
 from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, qApp
 from pyqtkeybind import keybinder
 from typing import List
+
+def load_fonts_from_dir(directory: str) -> set:
+    """
+    Well it loads fonts from a directory...
+    """
+    font_families = set()
+    for _fi in QDir(directory).entryInfoList(["*.ttf", "*.woff", "*.woff2"]):
+        _id = QFontDatabase.addApplicationFont(_fi.absoluteFilePath())
+        font_families |= set(QFontDatabase.applicationFontFamilies(_id))
+    return font_families
 
 class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
     _keyboard_handler : LoggerMainWindowKeyboard
@@ -69,7 +83,8 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         LoggerMainWindowUiHelper.update_ui(self)
 
         qApp.focusChanged.connect(self.on_focusChanged)
-        
+        self.listLog.itemDoubleClicked.connect(self.qso_double_clicked)
+
         self._allControls = [
             self.tbCallsign, self.tbRcv, self.tbSnt, self.tbName, self.tbComment,
             self.btnF1, self.btnF2, self.btnF3, self.btnF4, self.btnF5, self.btnF6,
@@ -83,12 +98,18 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         self._keyboard_handler.registerKeys()
         self._keyboard_handler.AddOnKeyPressHandler(self.on_keyPressed)
         self.tbCallsign.setFocus()
-        self.SetCurrentDateTime()
+        self.set_current_date_time()
 
         #self._realtime_thread = Thread(target = self.realTimeThread)
         #self._realtime_thread.start()
 
-        self.DisplayLog()
+        self.cbMode.clear()
+        self.cbMode.addItems(ALL_MODES)
+
+        self.cbBand.clear()
+        self.cbBand.addItems(ALL_BANDS)
+
+        self.display_log()
     
     def __del__(self):
         '''A class' destructor'''
@@ -102,14 +123,14 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
     def on_keyPressed(self, key: str) -> None:
         '''Handles the key_pressed event'''
         if key == kbk.KEY_RETURN:
-            self.SaveQSO()
-            self.DisplayLog()
+            self.save_qso()
+            self.display_log()
         elif key == kbk.KEY_SPACE:
             self.MoveFocus()
         else:
             print(f"Key '{key}' not supported.")
 
-    def DisplayLog(self):
+    def display_log(self):
         '''Displays the entire log.'''
         contacts = self._db.load_all_contacts(FIELD_TIMESTAMP)
         self.listLog.clear()
@@ -124,13 +145,14 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         for qso in data:
             id = qso[id_index]
             timestamp = qso[timestamp_index].strftime('%Y-%m-%d %H:%M:%S')
-            callsign = qso[callsign_index]
+            callsign = qso[callsign_index].ljust(10).upper()
+            l = len(callsign)
             band = qso[band_index]
             mode = qso[mode_index]
 
             logline = (
                 f"{str(id).rjust(3,'0')}  "
-                f"{callsign.ljust(10).upper()}  "
+                f"{callsign}  "
                 f"{timestamp.ljust(16)}  "
                 f"{band.rjust(5)}  "
                 f"{mode} "
@@ -167,7 +189,7 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         '''Calculates the full path to the database'''
         return FileSystemHelper.get_appdata_path(Path('U2.Suite') / 'Logger' / 'Database', create_if_not_exists=True)
 
-    def SaveQSO(self) -> None:
+    def save_qso(self) -> None:
         '''Saves the current session'''
         callsign = self.tbCallsign.text().lstrip().rstrip()
         if len(callsign) == 0:
@@ -228,7 +250,7 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         return self.tbCallsign
 
     @pyqtSlot()
-    def SetCurrentDateTime(self) -> None:
+    def set_current_date_time(self) -> None:
         '''Handles the clicking the Now button'''
         if self._datetime_utc:
             self.tdDateTime.setDateTime(QDateTime.currentDateTimeUtc())
@@ -269,9 +291,30 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         self.tbRcv.setText(report)
         self.tbSnt.setText(report)
 
+    def qso_double_clicked(self) -> None:
+        """
+        Gets the line of the log clicked on, and passes that line to the edit dialog.
+        """
+        item = self.listLog.currentItem()
+        contactnumber = int(item.text().split()[0])
+        result = self._db.get_contact_by_id(contactnumber)
+        dialog = Logger_QsoEditorDialog(self)
+        dialog.setup(result, self._db)
+        dialog.change.lineChanged.connect(self.qso_edited)
+        dialog.open()
+
+    def qso_edited(self) -> None:
+        '''Handles post edit or delete event.'''
+        self.display_log()
+
+
 if __name__ == '__main__':
     from logger.ui.Ui_LoggerMainWindow import Ui_LoggerMainWindow
     app = QApplication(sys.argv)
+    app.setStyle("Fusion")
+    font_dir = FileSystemHelper.relpath("font")
+    families = load_fonts_from_dir(os.fspath(font_dir))
+
     window = Logger_MainWindow()
 
     window.show()
