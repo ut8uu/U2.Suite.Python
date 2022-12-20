@@ -253,7 +253,7 @@ class Ui_LoggerMainWindow(object):
         self.cbMode.currentIndexChanged['QString'].connect(LoggerMainWindow.modeChanged) # type: ignore
         self.cbBand.currentIndexChanged['QString'].connect(LoggerMainWindow.bandChanged) # type: ignore
         self.cbUtc.stateChanged['int'].connect(LoggerMainWindow.dateTimeCheckBoxChanged) # type: ignore
-        self.btnNow.clicked.connect(LoggerMainWindow.SetCurrentDateTime) # type: ignore
+        self.btnNow.clicked.connect(LoggerMainWindow.set_current_date_time) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(LoggerMainWindow)
         LoggerMainWindow.setTabOrder(self.tbCallsign, self.tbSnt)
         LoggerMainWindow.setTabOrder(self.tbSnt, self.tbRcv)
