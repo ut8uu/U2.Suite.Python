@@ -295,7 +295,7 @@ class Ui_LoggerMainWindow(object):
 
     def retranslateUi(self, LoggerMainWindow):
         _translate = QtCore.QCoreApplication.translate
-        LoggerMainWindow.setWindowTitle(_translate("LoggerMainWindow", "U2.Suite Logger"))
+        LoggerMainWindow.setWindowTitle(_translate("LoggerMainWindow", "U2.Suite Logger by UT8UU"))
         self.lblCallsign.setText(_translate("LoggerMainWindow", "Callsign"))
         self.lblSent.setText(_translate("LoggerMainWindow", "Snt"))
         self.tbSnt.setText(_translate("LoggerMainWindow", "599"))

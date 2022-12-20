@@ -82,7 +82,7 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
             self.btnF1, self.btnF2, self.btnF3, self.btnF4, self.btnF5, self.btnF6,
             self.btnF7, self.btnF8, self.btnF9, self.btnF10, self.btnF11, self.btnF12,
             self.cbBand, self.cbMode, self.cbUtc, 
-            self.cbRealtime,
+            self.cbRealtime, self.btnNow,
             self.tdDateTime,
             ]
 
