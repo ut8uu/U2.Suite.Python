@@ -156,6 +156,10 @@ class DatabaseTests(unittest.TestCase):
         callsign_index = result1[0].index(FIELD_CALLSIGN)
         self.assertEqual(UT8UU, data[0][callsign_index])
 
+        record1 = db.get_callsign_by_id(1)
+        self.assertEqual(1, record1[FIELD_ID])
+        self.assertEqual(UT8UU, record1[FIELD_CALLSIGN])
+
         data_updated = {
             FIELD_BAND : '40m',
             FIELD_FREQUENCY : 7200123,

@@ -336,6 +336,28 @@ class LogDatabase(object):
         data[FIELD_CALLSIGN] = data[FIELD_CALLSIGN].upper()
         self.__insert_in_table(TABLE_CONTACTS, data)
 
+    def get_contact_by_id(self, id : int) -> dict:
+        '''
+        Retrieves a contact from the database.
+        Returns a dictionary with column names as keys.
+        '''
+        sql = f'SELECT * FROM {TABLE_CONTACTS} WHERE id=?'
+
+        with sqlite3.connect(self._db_full_path,
+                detect_types=sqlite3.PARSE_DECLTYPES |
+                             sqlite3.PARSE_COLNAMES) as conn:
+            cursor = conn.cursor()
+            cursor.execute(sql, (id,))
+            data = cursor.fetchall()
+            cursor.close()
+
+            result = dict()
+            row = data[0]
+            for i in range(len(self._table_descriptions[TABLE_CONTACTS])):
+                key = self._table_descriptions[TABLE_CONTACTS][i]
+                result[key] = row[i]
+            return result        
+
     def delete_contact(self, contact : int) -> None:
         """Deletes a contact from the db."""
         if contact:
