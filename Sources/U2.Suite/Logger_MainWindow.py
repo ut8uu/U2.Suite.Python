@@ -301,7 +301,9 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         dialog = Logger_QsoEditorDialog(self)
         dialog.setup(result, self._db)
         dialog.change.lineChanged.connect(self.qso_edited)
+        self._keyboard_handler.unregisterKeys()
         dialog.open()
+        self._keyboard_handler.registerKeys()
 
     def qso_edited(self) -> None:
         '''Handles post edit or delete event.'''
