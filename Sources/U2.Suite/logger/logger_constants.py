@@ -15,9 +15,20 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+MODE_AM = 'AM'
 MODE_CW = 'CW'
 MODE_DIGITALVOICE = 'DIGITALVOICE'
+MODE_FM = 'FM'
+MODE_FT4 = 'FT4'
+MODE_FT8 = 'FT8'
+MODE_OLIVIA = 'OLIVIA'
+MODE_RTTY = 'RTTY'
 MODE_SSB = 'SSB'
+MODE_THOR = 'THOR'
+MODE_THROB = 'THROB'
+
+ALL_MODES = (MODE_AM, MODE_CW, MODE_DIGITALVOICE, MODE_FM, MODE_FT4, MODE_FT8,
+            MODE_OLIVIA, MODE_RTTY, MODE_SSB, MODE_THOR, MODE_THROB)
 
 DISPLAY_FORMAT_MMDDYY_HHMMSS_AP = 'MM/dd/yyyy hh:mm:ss AP'
 DISPLAY_FORMAT_MMDDYY_HHMMSS = 'MM/dd/yyyy HH:mm:ss'
