@@ -16,96 +16,145 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from datetime import datetime
+import os
+from pathlib import Path
 import sys
-from threading import Thread
-import time
+from Logger_QsoEditorDialog import Logger_QsoEditorDialog
+from helpers.FileSystemHelper import FileSystemHelper
 
 import helpers.KeyBinderKeys as kbk
+from helpers.WinEventFilter import WinEventFilter
+from logger.log_database import LogDatabase
 from logger.logger_constants import *
+from logger.logger_main_window_keyboard import LoggerMainWindowKeyboard
+from logger.logger_main_window_ui import LoggerMainWindowUiHelper
 from logger.ui.Ui_LoggerMainWindow import Ui_LoggerMainWindow
 from PyQt5.QtCore import QAbstractEventDispatcher, pyqtSlot, QDateTime
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget
+from PyQt5.QtCore import QDir, QTimer
+from PyQt5.QtGui import QFontDatabase
+from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, qApp
 from pyqtkeybind import keybinder
 from typing import List
 
-from trainings.keybinding import WinEventFilter
+def load_fonts_from_dir(directory: str) -> set:
+    """
+    Well it loads fonts from a directory...
+    """
+    font_families = set()
+    for _fi in QDir(directory).entryInfoList(["*.ttf", "*.woff", "*.woff2"]):
+        _id = QFontDatabase.addApplicationFont(_fi.absoluteFilePath())
+        font_families |= set(QFontDatabase.applicationFontFamilies(_id))
+    return font_families
 
 class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
+    _keyboard_handler : LoggerMainWindowKeyboard
     _lastSelectedControl: QWidget
     _allControls : List[QWidget]
     _registered = False
     _win_event_filter : WinEventFilter
     _event_dispatcher : QAbstractEventDispatcher
+    _db : LogDatabase
 
     _running : bool
 
-    _datetime_utc : bool
-    _datetime_24h : bool
-    _datetime_realtime : bool
+    _real_timer : QTimer
 
-    _realtime_thread : Thread
-    
     def __init__(self, parent=None):
         super().__init__(parent)
 
         self._running = True
         
-        # datetime stuff
-        self._datetime_utc = True
-        self._datetime_24h = True
-        self._datetime_realtime = True
+        path = self.GetPathToDatabase()
+        print(f'Path to db: {path}')
+        self._db = LogDatabase(path, DATABASE_DEFAULT)
 
         self.setupUi(self)
+        LoggerMainWindowUiHelper.update_ui(self)
+
+        qApp.focusChanged.connect(self.on_focusChanged)
+        self.listLog.itemDoubleClicked.connect(self.qso_double_clicked)
+        self.cbRealtime.stateChanged.connect(self.real_time_changed)
+        self.btnNow.clicked.connect(self.set_current_date_time)
+
         self._allControls = [
             self.tbCallsign, self.tbRcv, self.tbSnt, self.tbName, self.tbComment,
             self.btnF1, self.btnF2, self.btnF3, self.btnF4, self.btnF5, self.btnF6,
             self.btnF7, self.btnF8, self.btnF9, self.btnF10, self.btnF11, self.btnF12,
             self.cbBand, self.cbMode, self.cbUtc, 
-            #self.cbRealTime,
+            self.cbRealtime, self.btnNow,
             self.tdDateTime,
             ]
-        self.registerKeys()
-        self.tbCallsign.setFocus()
-        self.SetCurrentDateTime()
 
-        #self._realtime_thread = Thread(target = self.realTimeThread)
-        #self._realtime_thread.start()
+        self._keyboard_handler = LoggerMainWindowKeyboard(self, self.winId())
+        self._keyboard_handler.registerKeys()
+        self._keyboard_handler.AddOnKeyPressHandler(self.on_keyPressed)
+        self.tbCallsign.setFocus()
+
+        self.cbMode.clear()
+        self.cbMode.addItems(ALL_MODES)
+
+        self.cbBand.clear()
+        self.cbBand.addItems(ALL_BANDS)
+
+        self._real_timer = QTimer()
+        self._real_timer.timeout.connect(self.update_time)
+        self._real_timer.start(1000)
+
+        self.display_log()
     
     def __del__(self):
         '''A class' destructor'''
         self._running = False
-        self.unregisterKeys()
+        self._keyboard_handler.unregisterKeys()
+        self._keyboard_handler.RemoveOnKeyPressHandler(self.on_keyPressed)
 
     def destroy(self) -> None:
         self._running = False
 
-    def realTimeThread(self) -> None:
-        '''A code inside the realtime timer'''
-        while self._running:
-            try:
-                if self._datetime_realtime:
-                    focused_control = self.getSelectedControl()
-                    if self._datetime_utc:
-                        self.tdDateTime.setDateTime(QDateTime.currentDateTimeUtc())
-                    else:
-                        self.tdDateTime.setDateTime(QDateTime.currentDateTime())
-                    focused_control.setFocus()
-            except Exception as ex:
-                print(ex.args[0])
-            time.sleep(1)
+    def on_keyPressed(self, key: str) -> None:
+        '''Handles the key_pressed event'''
+        if key == kbk.KEY_RETURN:
+            self.save_qso()
+            self.display_log()
+        elif key == kbk.KEY_SPACE:
+            self.MoveFocus()
+        else:
+            print(f"Key '{key}' not supported.")
 
-    def getSelectedControl(self) -> QWidget:
-        '''Locates and returns the control that is focused.'''
-        for control in self._allControls:
-            if control.hasFocus():
-                return control
+    def display_log(self):
+        '''Displays the entire log.'''
+        contacts = self._db.load_all_contacts(FIELD_TIMESTAMP)
+        self.listLog.clear()
 
-        # in case no control found, the Callsign is concidered focused
-        self.tbCallsign.setFocus()
-        return self.tbCallsign
+        fields = contacts[0]
+        data = contacts[1]
+        id_index = fields.index(FIELD_ID)
+        callsign_index = fields.index(FIELD_CALLSIGN)
+        timestamp_index = fields.index(FIELD_TIMESTAMP)
+        mode_index = fields.index(FIELD_MODE)
+        band_index = fields.index(FIELD_BAND)
+        for qso in data:
+            id = qso[id_index]
+            timestamp = qso[timestamp_index].strftime('%Y-%m-%d %H:%M:%S')
+            callsign = qso[callsign_index].ljust(10).upper()
+            l = len(callsign)
+            band = qso[band_index]
+            mode = qso[mode_index]
 
-    def handleKeySpace(self) -> None:
-        '''Handles the SPACE key'''
+            logline = (
+                f"{str(id).rjust(3,'0')}  "
+                f"{callsign}  "
+                f"{timestamp.ljust(16)}  "
+                f"{band.rjust(5)}  "
+                f"{mode} "
+            )
+            self.listLog.addItem(logline)
+
+    def MoveFocus(self) -> None:
+        '''
+        Circularly moves focus among Callsign, Name, and Comment.
+        Does nothing if none of the controls mentioned above is selected.
+        '''
         try:
             # Callsign
             if self.tbCallsign.hasFocus():
@@ -122,118 +171,72 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
                     self.tbComment.setText(self.tbComment.text() + ' ')
                 else:
                     self.tbCallsign.setFocus()
+            else:
+                print(f'Focus remains on the "{self.getSelectedControl().objectName()}" control.')
         except Exception as ex:
             print(ex.args[0])
 
-    def keyPress(self, key_string : str):
-        '''Handles the key by its name'''
-        match key_string:
-            case kbk.KEY_SPACE:
-                self.handleKeySpace()
+    def GetPathToDatabase(self) -> Path:
+        '''Calculates the full path to the database'''
+        return FileSystemHelper.get_appdata_path(Path('U2.Suite') / 'Logger' / 'Database', create_if_not_exists=True)
 
-    def keyEnterPress(self) -> None:
-        self.keyPress(kbk.KEY_RETURN)
-
-    def keyEscPress(self) -> None:
-        self.keyPress(kbk.KEY_ESC)
-
-    def keyF1Press(self) -> None:
-        self.keyPress(kbk.KEY_F1)
-
-    def keyF2Press(self) -> None:
-        self.keyPress(kbk.KEY_F2)
-
-    def keyF3Press(self) -> None:
-        self.keyPress(kbk.KEY_F3)
-
-    def keyF4Press(self) -> None:
-        self.keyPress(kbk.KEY_F4)
-
-    def keyF5Press(self) -> None:
-        self.keyPress(kbk.KEY_F5)
-
-    def keyF6Press(self) -> None:
-        self.keyPress(kbk.KEY_F6)
-
-    def keyF7Press(self) -> None:
-        self.keyPress(kbk.KEY_F7)
-
-    def keyF8Press(self) -> None:
-        self.keyPress(kbk.KEY_F8)
-
-    def keyF9Press(self) -> None:
-        self.keyPress(kbk.KEY_F9)
-
-    def keyF10Press(self) -> None:
-        self.keyPress(kbk.KEY_F10)
-
-    def keyF11Press(self) -> None:
-        self.keyPress(kbk.KEY_F11)
-
-    def keyF12Press(self) -> None:
-        self.keyPress(kbk.KEY_F12)
-
-    def keySpacePress(self) -> None:
-        self.keyPress(kbk.KEY_SPACE)
-
-    def registerKeys(self) -> None:
-        '''
-        Registers all hotkeys
-        '''
-        if self._registered:
+    def save_qso(self) -> None:
+        '''Saves the current session'''
+        callsign = self.tbCallsign.text().lstrip().rstrip()
+        if len(callsign) == 0:
             return
+        data = {FIELD_CALLSIGN:callsign, FIELD_OPNAME:self.tbName.text()}
+        self._db.get_or_add_callsign(data)
 
-        keybinder.init()
+        if self.cbRealtime.isChecked():
+            if self.cbUtc.isChecked():
+                timestamp = datetime.utcnow()
+            else:
+                timestamp = datetime.now()
+        else:
+            timestamp = self.tdDateTime.dateTime().toPyDateTime()
 
-        keybinder.register_hotkey(self.winId(), kbk.KEY_RETURN, self.keyEnterPress)
-        keybinder.register_hotkey(self.winId(), kbk.KEY_SPACE, self.keySpacePress)
-        keybinder.register_hotkey(self.winId(), kbk.KEY_ESC, self.keyEscPress)
-        keybinder.register_hotkey(self.winId(), kbk.KEY_F1, self.keyF1Press)
-        keybinder.register_hotkey(self.winId(), kbk.KEY_F2, self.keyF2Press)
-        keybinder.register_hotkey(self.winId(), kbk.KEY_F3, self.keyF3Press)
-        keybinder.register_hotkey(self.winId(), kbk.KEY_F4, self.keyF4Press)
-        keybinder.register_hotkey(self.winId(), kbk.KEY_F5, self.keyF5Press)
-        keybinder.register_hotkey(self.winId(), kbk.KEY_F6, self.keyF6Press)
-        keybinder.register_hotkey(self.winId(), kbk.KEY_F7, self.keyF7Press)
-        keybinder.register_hotkey(self.winId(), kbk.KEY_F8, self.keyF8Press)
-        keybinder.register_hotkey(self.winId(), kbk.KEY_F9, self.keyF9Press)
-        keybinder.register_hotkey(self.winId(), kbk.KEY_F10, self.keyF10Press)
-        keybinder.register_hotkey(self.winId(), kbk.KEY_F11, self.keyF11Press)
-        keybinder.register_hotkey(self.winId(), kbk.KEY_F12, self.keyF12Press)
+        contact = {
+            FIELD_CALLSIGN : self.tbCallsign.text().upper(),
+            FIELD_OPNAME : self.tbName.text(),
+            FIELD_BAND : self.cbBand.currentText(),
+            FIELD_MODE : self.cbMode.currentText(),
+            FIELD_TIMESTAMP : timestamp,
+            FIELD_RST_SENT : self.tbSnt.text().lstrip().rstrip(),
+            FIELD_RST_RCVD : self.tbRcv.text().lstrip().rstrip()
+        }
+        self._db.log_contact(contact)
 
-        self._win_event_filter = WinEventFilter(keybinder)
-        self._event_dispatcher = QAbstractEventDispatcher.instance()
-        self._event_dispatcher.installNativeEventFilter(self._win_event_filter)
+    @pyqtSlot("QWidget*", "QWidget*")
+    def on_focusChanged(self, old, new) -> None:
+        '''Handles obtaining the focus'''
 
-        self._registered = True
+        if new == None:
+            try:
+                self._keyboard_handler.unregisterKeys()
+            except Exception as ex:
+                print(ex)
+        else:
+            self._keyboard_handler.registerKeys()
 
-    def unregisterKeys(self) -> None:
-        '''
-        Unregisters previously registered keys
-        '''
-        if not self._registered:
-            return
-        self._registered = False
-        keybinder.unregister_hotkey(self, kbk.KEY_RETURN)
-        keybinder.unregister_hotkey(self, kbk.KEY_SPACE)
-        keybinder.unregister_hotkey(self, kbk.KEY_ESC)
-        keybinder.unregister_hotkey(self, kbk.KEY_F1)
-        keybinder.unregister_hotkey(self, kbk.KEY_F2)
-        keybinder.unregister_hotkey(self, kbk.KEY_F3)
-        keybinder.unregister_hotkey(self, kbk.KEY_F4)
-        keybinder.unregister_hotkey(self, kbk.KEY_F5)
-        keybinder.unregister_hotkey(self, kbk.KEY_F6)
-        keybinder.unregister_hotkey(self, kbk.KEY_F7)
-        keybinder.unregister_hotkey(self, kbk.KEY_F8)
-        keybinder.unregister_hotkey(self, kbk.KEY_F9)
-        keybinder.unregister_hotkey(self, kbk.KEY_F10)
-        keybinder.unregister_hotkey(self, kbk.KEY_F11)
-        keybinder.unregister_hotkey(self, kbk.KEY_F12)
+    def focusOut(self) -> None:
+        '''Handles losing the focus'''
+        self._keyboard_handler.unregisterKeys()
+
+    def getSelectedControl(self) -> QWidget:
+        '''Locates and returns the control that is focused.'''
+        for control in self._allControls:
+            if control.hasFocus():
+                return control
+
+        # in case no control found, the Callsign is concidered focused
+        self.tbCallsign.setFocus()
+        return self.tbCallsign
 
     @pyqtSlot()
-    def SetCurrentDateTime(self) -> None:
+    def set_current_date_time(self) -> None:
         '''Handles the clicking the Now button'''
-        if self._datetime_utc:
+        if self.cbUtc.isChecked():
             self.tdDateTime.setDateTime(QDateTime.currentDateTimeUtc())
         else:
             self.tdDateTime.setDateTime(QDateTime.currentDateTime())
@@ -272,9 +275,42 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         self.tbRcv.setText(report)
         self.tbSnt.setText(report)
 
+    def qso_double_clicked(self) -> None:
+        """
+        Gets the line of the log clicked on, and passes that line to the edit dialog.
+        """
+        item = self.listLog.currentItem()
+        contactnumber = int(item.text().split()[0])
+        result = self._db.get_contact_by_id(contactnumber)
+        dialog = Logger_QsoEditorDialog(self)
+        dialog.setup(result, self._db)
+        dialog.change.lineChanged.connect(self.qso_edited)
+        self._keyboard_handler.unregisterKeys()
+        dialog.open()
+        self._keyboard_handler.registerKeys()
+
+    def qso_edited(self) -> None:
+        '''Handles post edit or delete event.'''
+        self.display_log()
+
+    def update_time(self) -> None:
+        if self.cbUtc.isChecked():
+            timestamp = datetime.utcnow()
+        else:
+            timestamp = datetime.now()
+        self.lblTimestamp.setText(timestamp.strftime('%d.%m.%Y %H:%M:%S'))
+
+    def real_time_changed(self) -> None:
+        '''Handles the switching between real-time and manual input modes.'''
+        LoggerMainWindowUiHelper.update_timestamp_controls(self)
+
 if __name__ == '__main__':
     from logger.ui.Ui_LoggerMainWindow import Ui_LoggerMainWindow
     app = QApplication(sys.argv)
+    app.setStyle("Fusion")
+    font_dir = FileSystemHelper.relpath("font")
+    families = load_fonts_from_dir(os.fspath(font_dir))
+
     window = Logger_MainWindow()
 
     window.show()
