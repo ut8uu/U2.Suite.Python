@@ -20,6 +20,7 @@ if __name__ == '__main__':
     exit(0)
 
 import logging
+import semver
 from typing import Any, List, Tuple
 import uuid
 from common.exceptions.ArgumentException import ArgumentException
@@ -28,28 +29,29 @@ from pathlib import Path
 import sqlite3
 from common.exceptions.ArgumentMismatchException import ArgumentMismatchException
 from common.exceptions.logger.CallsignNotFoundException import CallsignNotFoundException
+from database.database_core import DatabaseCore
 
 from helpers.FileSystemHelper import FileSystemHelper
+from logger.log_database_options import DatabaseOptionsHelper
 from logger.logger_constants import *
 
 class LogDatabase(object):
     '''Class handles all requests to the database'''
 
-    DB_VERSION_MAJOR : int = 1
-    DB_VERSION_MINOR : int = 0
+    _db : DatabaseCore
+    _db_version : str = '1.0'
 
-    _db_name : str
-    _db_full_path : Path
-    _table_descriptions : dict[str, tuple]
+    _options : DatabaseOptionsHelper
 
     def __init__(self, path : Path, db_name : str = DATABASE_DEFAULT) -> None:
         self._db_name = db_name
         self._db_full_path = path / db_name
+        self._db = DatabaseCore(self._db_full_path, self._db_name)
+
         # TODO consider collecting fields from the database
-        self._table_descriptions = {
-            TABLE_CALLS : ( FIELD_ID, FIELD_CALLSIGN, FIELD_OPNAME, 
-                            FIELD_EMAIL, FIELD_ADDRESS, FIELD_SOURCE, FIELD_HAS_DATA),
-            TABLE_CONTACTS : ( 
+        self._db._table_descriptions[TABLE_CALLS] = ( FIELD_ID, FIELD_CALLSIGN, FIELD_OPNAME, 
+                            FIELD_EMAIL, FIELD_ADDRESS, FIELD_SOURCE, FIELD_HAS_DATA)
+        self._db._table_descriptions[TABLE_CONTACTS] = ( 
                             FIELD_ID, 
                             FIELD_CALLSIGN, 
                             FIELD_TIMESTAMP, 
@@ -62,9 +64,8 @@ class LogDatabase(object):
                             FIELD_IS_RUN_QSO, 
                             FIELD_UNIQUE_ID, 
                             FIELD_DIRTY
-                            ),
-            TABLE_VERSION : (FIELD_VERSION_MAJOR, FIELD_VERSION_MINOR)
-        }
+                            )
+        self._options = DatabaseOptionsHelper(self._db)
         self.__check_db()
         pass
 
@@ -77,16 +78,9 @@ class LogDatabase(object):
     def __create_db(self) -> None:
         '''Creates a database by the given path'''
         try:
-            # create a table for version
-            sql = (
-                f'CREATE TABLE IF NOT EXISTS "{TABLE_VERSION}" ('
-                '    "major" INTEGER,'
-                '    "minor" INTEGER'
-                '    );'
-                )
-            self.__execute_non_query(sql)
-            sql = f'INSERT INTO {TABLE_VERSION} (major, minor) VALUES (?, ?)'
-            self.__execute_non_query(sql, (self.DB_VERSION_MAJOR, self.DB_VERSION_MINOR))
+            self._options.create_table()
+            version = semver.VersionInfo.parse(self._db_version)
+            self._options.get_or_insert_version(version)
 
             # create a table for calls
             sql = (
@@ -99,7 +93,7 @@ class LogDatabase(object):
                 f'"{FIELD_SOURCE}"    TEXT,'
                 f'"{FIELD_HAS_DATA}"  INTEGER DEFAULT 0);'
             )
-            self.__execute_non_query(sql)
+            self._db.execute_non_query(sql)
 
             # create a table for QSO
             sql = (
@@ -118,37 +112,9 @@ class LogDatabase(object):
                 f"{FIELD_UNIQUE_ID} text NOT NULL, "
                 f"{FIELD_DIRTY} INTEGER DEFAULT 1);"
             )
-            self.__execute_non_query(sql)
+            self._db.execute_non_query(sql)
         except sqlite3.Error as error:
             print("Error while connecting to the database.", error)
-
-    def __execute_scalar(self, sql : str, params = ()) -> Any:
-        '''Executes given query and returns the first column of the first row.'''
-        try:
-            with sqlite3.connect(self._db_full_path) as conn:
-                cursor = conn.cursor()
-                cursor.execute(sql, params)
-                data = cursor.fetchone()
-                cursor.close()
-
-            if data == None:
-                return None
-
-            return data[0]
-        except sqlite3.Error as error:
-            print('Error during executing scalar query.', error)
-
-    def __execute_non_query(self, sql : str, params = ()) -> None:
-        '''Executes given SQL against the database'''
-        try:
-            with sqlite3.connect(self._db_full_path) as conn:
-                cursor = conn.cursor()
-                cursor.execute(sql, params)
-                conn.commit()
-                cursor.close()
-        except sqlite3.Error as ex:
-            print(f'SqLite error: {ex}')
-        print(f'Query {sql} executed successfully.')
 
     def get_callsign(self, callsign : str) -> dict:
         '''
@@ -170,28 +136,10 @@ class LogDatabase(object):
         if data == None:
             return None
 
-        for index, col_name in enumerate(self._table_descriptions[TABLE_CALLS]):
+        for index, col_name in enumerate(self._db._table_descriptions[TABLE_CALLS]):
             result[col_name] = data[index]
 
         return result
-
-    def __insert_in_table(self, table : str, data : dict) -> None:
-        '''Inserts a record in the given table'''
-        sql_fields = ', '.join(data)
-        sql_values = ', '.join(['?' for key in data])
-        values = tuple(data.values())
-
-        sql = f'INSERT INTO {table} ({sql_fields}) VALUES ({sql_values})'
-        self.__execute_non_query(sql, values)
-
-    def __change_row_in_table(self, table : str, id : int, data : dict) -> None:
-        '''Updates row in the given table by its identifier.'''
-        sql_fields = ', '.join([f'{key}=?' for key in data])
-        sql_values = [data[key] for key in data]
-
-        sql = f'UPDATE {table} SET {sql_fields} WHERE {FIELD_ID}={id}'
-        self.__execute_non_query(sql, sql_values)
-
     def __insert_callsign(self, input_data : dict) -> dict:
         '''
         Inserts given callsign in the database.
@@ -219,18 +167,9 @@ class LogDatabase(object):
 
         result = dict()
 
-        for index, col_name in enumerate(self._table_descriptions[TABLE_CALLS]):
+        for index, col_name in enumerate(self._db._table_descriptions[TABLE_CALLS]):
             result[col_name] = data[index]
 
-        return result
-
-    def filter_dictionary(self, input : dict, allowed_keys : tuple) -> dict:
-        '''Creates new dictionary containing only allowed keys.'''
-        result = dict()
-        all_keys = input.keys()
-        for key in allowed_keys:
-            if key in all_keys:
-                result[key] = input[key]
         return result
 
     def get_or_add_callsign(self, input_data : dict) -> dict:
@@ -282,7 +221,7 @@ class LogDatabase(object):
         Does nothing if identifier not found.
         '''
         sql = f'DELETE FROM {TABLE_CALLS} WHERE {FIELD_ID}={id}'
-        self.__execute_non_query(sql)
+        self._db.execute_non_query(sql)
         
     def delete_callsign_by_callsign(self, callsign : str) -> None:
         '''
@@ -290,7 +229,7 @@ class LogDatabase(object):
         Does nothing if identifier not found.
         '''
         sql = f'DELETE FROM {TABLE_CALLS} WHERE {FIELD_CALLSIGN}=?'
-        self.__execute_non_query(sql, (callsign,))  
+        self._db.execute_non_query(sql, (callsign,))  
 
     def load_all_contacts(self, order_by_field : str = '') -> tuple[tuple, List[tuple]]:
         '''
@@ -309,7 +248,7 @@ class LogDatabase(object):
                              sqlite3.PARSE_COLNAMES) as conn:
             cursor = conn.cursor()
             cursor.execute(sql)
-            result = (self._table_descriptions[TABLE_CONTACTS], cursor.fetchall())
+            result = (self._db._table_descriptions[TABLE_CONTACTS], cursor.fetchall())
             cursor.close()
             return result
 
@@ -366,8 +305,8 @@ class LogDatabase(object):
                 return result
 
             row = data[0]
-            for i in range(len(self._table_descriptions[TABLE_CONTACTS])):
-                key = self._table_descriptions[TABLE_CONTACTS][i]
+            for i in range(len(self._db._table_descriptions[TABLE_CONTACTS])):
+                key = self._db._table_descriptions[TABLE_CONTACTS][i]
                 result[key] = row[i]
             return result        
 
@@ -376,7 +315,7 @@ class LogDatabase(object):
         if id:
             try:
                 sql = f"delete from {TABLE_CONTACTS} where id=?"
-                self.__execute_non_query(sql, (id,))
+                self._db.execute_non_query(sql, (id,))
             except sqlite3.Error as exception:
                 logging.info("DataBase delete_contact: %s", exception)
 
