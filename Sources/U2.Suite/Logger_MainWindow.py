@@ -76,6 +76,8 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         self.cbRealtime.stateChanged.connect(self.real_time_changed)
         self.btnNow.clicked.connect(self.set_current_date_time)
 
+        self.actionStation_info.triggered.connect(self.display_station_info)
+
         self._allControls = [
             self.tbCallsign, self.tbRcv, self.tbSnt, self.tbName, self.tbComment,
             self.btnF1, self.btnF2, self.btnF3, self.btnF4, self.btnF5, self.btnF6,
@@ -303,6 +305,9 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
     def real_time_changed(self) -> None:
         '''Handles the switching between real-time and manual input modes.'''
         LoggerMainWindowUiHelper.update_timestamp_controls(self)
+
+    def display_station_info(self) -> None:
+        '''Handles clicking the `Show Station Info` menu'''
 
 if __name__ == '__main__':
     from logger.ui.Ui_LoggerMainWindow import Ui_LoggerMainWindow
