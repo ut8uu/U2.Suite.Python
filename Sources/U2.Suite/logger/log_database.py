@@ -24,29 +24,27 @@ import semver
 from typing import Any, List, Tuple
 import uuid
 from common.exceptions.ArgumentException import ArgumentException
-import os
 from pathlib import Path
 import sqlite3
 from common.exceptions.ArgumentMismatchException import ArgumentMismatchException
 from common.exceptions.logger.CallsignNotFoundException import CallsignNotFoundException
 from database.database_core import DatabaseCore
 
-from helpers.FileSystemHelper import FileSystemHelper
-from logger.log_database_options import DatabaseOptionsHelper
+from database.database_options import DatabaseOptions
 from logger.logger_constants import *
 
 class LogDatabase(object):
     '''Class handles all requests to the database'''
 
     _db : DatabaseCore
-    _db_version : str = '1.0'
+    _db_version : str = '1.0.0'
 
-    _options : DatabaseOptionsHelper
+    _options : DatabaseOptions
 
     def __init__(self, path : Path, db_name : str = DATABASE_DEFAULT) -> None:
         self._db_name = db_name
         self._db_full_path = path / db_name
-        self._db = DatabaseCore(self._db_full_path, self._db_name)
+        self._db = DatabaseCore(path, db_name)
 
         # TODO consider collecting fields from the database
         self._db._table_descriptions[TABLE_CALLS] = ( FIELD_ID, FIELD_CALLSIGN, FIELD_OPNAME, 
@@ -65,18 +63,12 @@ class LogDatabase(object):
                             FIELD_UNIQUE_ID, 
                             FIELD_DIRTY
                             )
-        self._options = DatabaseOptionsHelper(self._db)
+        self._options = DatabaseOptions(self._db)
+
         self.__check_db()
         pass
 
     def __check_db(self) -> None:
-        '''Check the presence of the database and creates it if it does not exist.'''
-        if not os.path.exists(self._db_full_path):
-            # a database does not exist. We have to create it first.
-            self.__create_db()
-
-    def __create_db(self) -> None:
-        '''Creates a database by the given path'''
         try:
             self._options.create_table()
             version = semver.VersionInfo.parse(self._db_version)
@@ -140,14 +132,15 @@ class LogDatabase(object):
             result[col_name] = data[index]
 
         return result
+
     def __insert_callsign(self, input_data : dict) -> dict:
         '''
         Inserts given callsign in the database.
         A duplicate check is not performed.
         '''
 
-        data = self.filter_dictionary(input_data, CALLSIGN_FIELDS)
-        self.__insert_in_table(TABLE_CALLS, data)
+        data = self._db.filter_dictionary(input_data, CALLSIGN_FIELDS)
+        self._db.insert_in_table(TABLE_CALLS, data)
         return self.get_callsign(data[FIELD_CALLSIGN])
 
     def get_callsign_by_id(self, i_id : int) -> dict:
@@ -180,7 +173,7 @@ class LogDatabase(object):
         `data` - a dictionary containing the callsign data.
         '''
 
-        data = self.filter_dictionary(input_data, CALLSIGN_FIELDS)
+        data = self._db.filter_dictionary(input_data, CALLSIGN_FIELDS)
         print(data)
 
         callsign = input_data[FIELD_CALLSIGN]
@@ -213,7 +206,7 @@ class LogDatabase(object):
         if len(data[FIELD_CALLSIGN].lstrip().rstrip()) == 0:
             raise ArgumentException('Callsign is a mandatory parameter.')
 
-        self.__change_row_in_table(TABLE_CALLS, id, data)
+        self._db.change_row_in_table(TABLE_CALLS, id, data)
 
     def delete_callsign_by_id(self, id : int) -> None:
         '''
@@ -273,7 +266,7 @@ class LogDatabase(object):
         - dirty
         """
 
-        data = self.filter_dictionary(input_data, CONTACT_FIELDS)
+        data = self._db.filter_dictionary(input_data, CONTACT_FIELDS)
         print(data)
 
         call_data = self.get_or_add_callsign(input_data)
@@ -282,7 +275,7 @@ class LogDatabase(object):
         data[FIELD_UNIQUE_ID] = uuid.uuid4().hex
         data[FIELD_DIRTY] = 1
         data[FIELD_CALLSIGN] = data[FIELD_CALLSIGN].upper()
-        self.__insert_in_table(TABLE_CONTACTS, data)
+        self._db.insert_in_table(TABLE_CONTACTS, data)
 
     def get_contact_by_id(self, id : int) -> dict:
         '''
@@ -336,8 +329,8 @@ class LogDatabase(object):
         callsign_data = self.get_or_add_callsign(input_data)
         print(callsign_data)
 
-        data = self.filter_dictionary(input_data, CONTACT_CHANGE_FIELDS)
+        data = self._db.filter_dictionary(input_data, CONTACT_CHANGE_FIELDS)
 
         data[FIELD_CALLSIGN] = data[FIELD_CALLSIGN].upper()
-        self.__change_row_in_table(TABLE_CONTACTS, id, data)
+        self._db.change_row_in_table(TABLE_CONTACTS, id, data)
 

@@ -24,6 +24,7 @@ from common.contracts.QueueItem import QueueItem
 from common.exceptions.ArgumentMismatchException import ArgumentMismatchException
 from helpers.FileSystemHelper import FileSystemHelper
 from logger.logger_constants import *
+from logger.logger_options import LoggerOptions
 from manyrig.rig.enums.CommandKind import CommandKind
 from logger.log_database import LogDatabase
 import unittest
@@ -187,3 +188,22 @@ class DatabaseTests(unittest.TestCase):
         db.delete_contact_by_id(UT8UU_ID)
         record = db.get_contact_by_id(UT8UU_ID)
         self.assertEqual(0, len(record))
+
+    def test_CanWorkWithOptions(self) -> None:
+        '''Tests how options can be accessed.'''
+        db = self.GetTestDatabase()
+
+        options = LoggerOptions(db._db)
+
+        self.assertEqual('', options.StationCallsign)
+        self.assertEqual('', options.OperatorName)
+
+        options.StationCallsign = UT8UU
+        options.OperatorName = 'Sergey'
+
+        # reopen the database to test the setters
+        db = self.GetTestDatabase()
+        options = LoggerOptions(db._db)
+        self.assertEqual(UT8UU, options.StationCallsign)
+        self.assertEqual('Sergey', options.OperatorName)
+        

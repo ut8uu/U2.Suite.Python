@@ -76,7 +76,11 @@ class DatabaseCore(object):
             print("Error while connecting to the database.", error)
 
     def execute_scalar(self, sql : str, params = ()) -> Any:
-        '''Executes given query and returns the first column of the first row.'''
+        '''
+        Executes given query and returns the first column of the first row.
+        Returns the value of the very first column in the first row.
+        Returns `None` if query has brough no results.
+        '''
         try:
             with sqlite3.connect(self._db_full_path) as conn:
                 cursor = conn.cursor()
