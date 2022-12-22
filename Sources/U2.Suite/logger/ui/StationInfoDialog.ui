@@ -2,9 +2,6 @@
 <ui version="4.0">
  <class>StationInfoDialog</class>
  <widget class="QDialog" name="StationInfoDialog">
-  <property name="windowModality">
-   <enum>Qt::ApplicationModal</enum>
-  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -14,13 +11,13 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Station Info</string>
   </property>
   <property name="styleSheet">
    <string notr="true">background-color: rgb(46, 52, 54); color: rgb(211, 215, 207);</string>
   </property>
   <property name="modal">
-   <bool>true</bool>
+   <bool>false</bool>
   </property>
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
@@ -87,7 +84,7 @@
      </widget>
     </item>
     <item row="1" column="1">
-     <widget class="QLineEdit" name="tbCallsign_2">
+     <widget class="QLineEdit" name="tbOoperatorName">
       <property name="font">
        <font>
         <pointsize>12</pointsize>

@@ -117,7 +117,7 @@ class LoggerMainWindowKeyboard():
         keybinder.register_hotkey(self._win_id, kbk.KEY_F9, self.keyF9Press)
         keybinder.register_hotkey(self._win_id, kbk.KEY_F10, self.keyF10Press)
         keybinder.register_hotkey(self._win_id, kbk.KEY_F11, self.keyF11Press)
-        keybinder.register_hotkey(self._win_id, kbk.KEY_F12, self.keyF12Press)
+        #keybinder.register_hotkey(self._win_id, kbk.KEY_F12, self.keyF12Press)
 
         self._win_event_filter = WinEventFilter(keybinder)
         self._event_dispatcher = QAbstractEventDispatcher.instance()
@@ -146,5 +146,5 @@ class LoggerMainWindowKeyboard():
         keybinder.unregister_hotkey(self._win_id, kbk.KEY_F9)
         keybinder.unregister_hotkey(self._win_id, kbk.KEY_F10)
         keybinder.unregister_hotkey(self._win_id, kbk.KEY_F11)
-        keybinder.unregister_hotkey(self._win_id, kbk.KEY_F12)
+        #keybinder.unregister_hotkey(self._win_id, kbk.KEY_F12)
 

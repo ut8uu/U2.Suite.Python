@@ -50,12 +50,12 @@ class Ui_StationInfoDialog(object):
         self.lblOperatorName.setFont(font)
         self.lblOperatorName.setObjectName("lblOperatorName")
         self.gridLayout.addWidget(self.lblOperatorName, 1, 0, 1, 1)
-        self.tbCallsign_2 = QtWidgets.QLineEdit(self.layoutWidget)
+        self.tbOoperatorName = QtWidgets.QLineEdit(self.layoutWidget)
         font = QtGui.QFont()
         font.setPointSize(12)
-        self.tbCallsign_2.setFont(font)
-        self.tbCallsign_2.setObjectName("tbCallsign_2")
-        self.gridLayout.addWidget(self.tbCallsign_2, 1, 1, 1, 1)
+        self.tbOoperatorName.setFont(font)
+        self.tbOoperatorName.setObjectName("tbOoperatorName")
+        self.gridLayout.addWidget(self.tbOoperatorName, 1, 1, 1, 1)
 
         self.retranslateUi(StationInfoDialog)
         self.buttonBox.accepted.connect(StationInfoDialog.accept) # type: ignore
@@ -64,6 +64,6 @@ class Ui_StationInfoDialog(object):
 
     def retranslateUi(self, StationInfoDialog):
         _translate = QtCore.QCoreApplication.translate
-        StationInfoDialog.setWindowTitle(_translate("StationInfoDialog", "Dialog"))
+        StationInfoDialog.setWindowTitle(_translate("StationInfoDialog", "Station Info"))
         self.lblCallsign.setText(_translate("StationInfoDialog", "Callsign"))
         self.lblOperatorName.setText(_translate("StationInfoDialog", "Operator"))

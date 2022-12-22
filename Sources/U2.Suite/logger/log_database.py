@@ -32,6 +32,7 @@ from database.database_core import DatabaseCore
 
 from database.database_options import DatabaseOptions
 from logger.logger_constants import *
+from logger.logger_options import LoggerOptions
 
 class LogDatabase(object):
     '''Class handles all requests to the database'''
@@ -40,11 +41,13 @@ class LogDatabase(object):
     _db_version : str = '1.0.0'
 
     _options : DatabaseOptions
+    _logger_options : LoggerOptions
 
     def __init__(self, path : Path, db_name : str = DATABASE_DEFAULT) -> None:
         self._db_name = db_name
         self._db_full_path = path / db_name
         self._db = DatabaseCore(path, db_name)
+        self._logger_options = LoggerOptions(self._db)
 
         # TODO consider collecting fields from the database
         self._db._table_descriptions[TABLE_CALLS] = ( FIELD_ID, FIELD_CALLSIGN, FIELD_OPNAME, 
@@ -67,6 +70,10 @@ class LogDatabase(object):
 
         self.__check_db()
         pass
+
+    @property
+    def LoggerOptions(self) -> LoggerOptions:
+        return self._logger_options
 
     def __check_db(self) -> None:
         try:

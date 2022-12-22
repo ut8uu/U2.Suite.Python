@@ -20,6 +20,7 @@ import os
 from pathlib import Path
 import sys
 from Logger_QsoEditorDialog import Logger_QsoEditorDialog
+from Logger_StationInfoDialog import Logger_StationInfoDialog
 from helpers.FileSystemHelper import FileSystemHelper
 
 import helpers.KeyBinderKeys as kbk
@@ -28,6 +29,7 @@ from logger.log_database import LogDatabase
 from logger.logger_constants import *
 from logger.logger_main_window_keyboard import LoggerMainWindowKeyboard
 from logger.logger_main_window_ui import LoggerMainWindowUiHelper
+from logger.logger_options import LoggerOptions
 from logger.ui.Ui_LoggerMainWindow import Ui_LoggerMainWindow
 from PyQt5.QtCore import QAbstractEventDispatcher, pyqtSlot, QDateTime
 from PyQt5.QtCore import QDir, QTimer
@@ -76,7 +78,7 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         self.cbRealtime.stateChanged.connect(self.real_time_changed)
         self.btnNow.clicked.connect(self.set_current_date_time)
 
-        self.actionStation_info.triggered.connect(self.display_station_info)
+        self.actionStation_info.triggered.connect(self.display_station_info_dialog)
 
         self._allControls = [
             self.tbCallsign, self.tbRcv, self.tbSnt, self.tbName, self.tbComment,
@@ -295,6 +297,7 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         '''Handles post edit or delete event.'''
         self.display_log()
 
+    '''==========================================================================='''
     def update_time(self) -> None:
         if self.cbUtc.isChecked():
             timestamp = datetime.utcnow()
@@ -302,12 +305,20 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
             timestamp = datetime.now()
         self.lblTimestamp.setText(timestamp.strftime('%d.%m.%Y %H:%M:%S'))
 
+    '''==========================================================================='''
     def real_time_changed(self) -> None:
         '''Handles the switching between real-time and manual input modes.'''
         LoggerMainWindowUiHelper.update_timestamp_controls(self)
 
-    def display_station_info(self) -> None:
+    '''==========================================================================='''
+    def display_station_info_dialog(self) -> None:
         '''Handles clicking the `Show Station Info` menu'''
+        dialog = Logger_StationInfoDialog(self)
+        dialog.setup(self._db.LoggerOptions)
+        self._keyboard_handler.unregisterKeys()
+        dialog.open()
+        self._keyboard_handler.registerKeys()
+
 
 if __name__ == '__main__':
     from logger.ui.Ui_LoggerMainWindow import Ui_LoggerMainWindow
