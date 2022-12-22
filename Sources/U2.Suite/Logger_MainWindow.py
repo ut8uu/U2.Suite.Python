@@ -105,6 +105,9 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         self._real_timer.start(1000)
 
         self.display_log()
+
+        if len(self._db.LoggerOptions.StationCallsign) == 0:
+            self.display_station_info_dialog()
     
     def __del__(self):
         '''A class' destructor'''

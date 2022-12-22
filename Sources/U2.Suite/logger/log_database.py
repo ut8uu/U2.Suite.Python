@@ -44,6 +44,10 @@ class LogDatabase(object):
         self._db_name = db_name
         self._db_full_path = path / db_name
         self._db = DatabaseCore(path, db_name)
+        #options-related stuff must be created before using it
+        self._options = DatabaseOptions(self._db)
+        self._options.create_table()
+
         self._logger_options = LoggerOptions(self._db)
 
         # TODO consider collecting fields from the database
@@ -63,7 +67,6 @@ class LogDatabase(object):
                             FIELD_UNIQUE_ID, 
                             FIELD_DIRTY
                             )
-        self._options = DatabaseOptions(self._db)
 
         self.__check_db()
         pass
@@ -74,7 +77,7 @@ class LogDatabase(object):
 
     def __check_db(self) -> None:
         try:
-            self._options.create_table()
+            #self._options.create_table()
             #version = semver.VersionInfo.parse(self._db_version)
             #self._options.get_or_insert_version(version)
 
