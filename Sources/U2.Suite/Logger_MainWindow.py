@@ -115,9 +115,11 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         self._keyboard_handler.unregisterKeys()
         self._keyboard_handler.RemoveOnKeyPressHandler(self.on_keyPressed)
 
+    '''==========================================================================='''
     def destroy(self) -> None:
         self._running = False
 
+    '''==========================================================================='''
     def on_keyPressed(self, key: str) -> None:
         '''Handles the key_pressed event'''
         if key == kbk.KEY_RETURN:
@@ -128,6 +130,7 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         else:
             print(f"Key '{key}' not supported.")
 
+    '''==========================================================================='''
     def display_log(self):
         '''Displays the entire log.'''
         contacts = self._db.load_all_contacts(FIELD_TIMESTAMP)
@@ -157,6 +160,7 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
             )
             self.listLog.addItem(logline)
 
+    '''==========================================================================='''
     def MoveFocus(self) -> None:
         '''
         Circularly moves focus among Callsign, Name, and Comment.
@@ -183,10 +187,12 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         except Exception as ex:
             print(ex.args[0])
 
+    '''==========================================================================='''
     def GetPathToDatabase(self) -> Path:
         '''Calculates the full path to the database'''
         return FileSystemHelper.get_appdata_path(Path('U2.Suite') / 'Logger' / 'Database', create_if_not_exists=True)
 
+    '''==========================================================================='''
     def save_qso(self) -> None:
         '''Saves the current session'''
         callsign = self.tbCallsign.text().lstrip().rstrip()
@@ -214,6 +220,7 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         }
         self._db.log_contact(contact)
 
+    '''==========================================================================='''
     @pyqtSlot("QWidget*", "QWidget*")
     def on_focusChanged(self, old, new) -> None:
         '''Handles obtaining the focus'''
@@ -226,10 +233,12 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         else:
             self._keyboard_handler.registerKeys()
 
+    '''==========================================================================='''
     def focusOut(self) -> None:
         '''Handles losing the focus'''
         self._keyboard_handler.unregisterKeys()
 
+    '''==========================================================================='''
     def getSelectedControl(self) -> QWidget:
         '''Locates and returns the control that is focused.'''
         for control in self._allControls:
@@ -240,6 +249,7 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         self.tbCallsign.setFocus()
         return self.tbCallsign
 
+    '''==========================================================================='''
     @pyqtSlot()
     def set_current_date_time(self) -> None:
         '''Handles the clicking the Now button'''
@@ -248,25 +258,18 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         else:
             self.tdDateTime.setDateTime(QDateTime.currentDateTime())
 
+    '''==========================================================================='''
     @pyqtSlot()
     def dateTimeCheckBoxChanged(self):
         '''Handles changing of the date and time related checkboxes'''
-        '''
-        if self.cb24hour.isChecked():
-            self.tdDateTime.setDisplayFormat(DISPLAY_FORMAT_DDMMYY_HHMMSS)
-        else:
-            self.tdDateTime.setDisplayFormat(DISPLAY_FORMAT_MMDDYY_HHMMSS_AP)
-        self._datetime_realtime = self.cbRealTime.isChecked()
-        if self._datetime_realtime and self.tdDateTime.hasFocus():
-            self.tbCallsign.setFocus()
-        self.tdDateTime.setEnabled(not self._datetime_realtime)
-        '''
         self._datetime_utc = self.cbUtc.isChecked()
 
+    '''==========================================================================='''
     @pyqtSlot()
     def bandChanged(self):
         '''Handles changing of the band'''
 
+    '''==========================================================================='''
     @pyqtSlot()
     def modeChanged(self):
         '''Handles changing of the mode'''
@@ -282,6 +285,7 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         self.tbRcv.setText(report)
         self.tbSnt.setText(report)
 
+    '''==========================================================================='''
     def qso_double_clicked(self) -> None:
         """
         Gets the line of the log clicked on, and passes that line to the edit dialog.
@@ -296,6 +300,7 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         dialog.open()
         self._keyboard_handler.registerKeys()
 
+    '''==========================================================================='''
     def qso_edited(self) -> None:
         '''Handles post edit or delete event.'''
         self.display_log()
@@ -323,6 +328,7 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         self._keyboard_handler.registerKeys()
 
 
+'''==========================================================================='''
 if __name__ == '__main__':
     from logger.ui.Ui_LoggerMainWindow import Ui_LoggerMainWindow
     app = QApplication(sys.argv)
