@@ -20,6 +20,7 @@ from pathlib import Path
 from PyQt5 import QtCore
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QApplication, QDialog
+from matplotlib.backend_bases import CloseEvent
 
 from logger.log_database import LogDatabase
 from logger.logger_options import LoggerOptions
@@ -30,12 +31,13 @@ class StationInfoDialogEvent(QtCore.QObject):
     Custom qt event signal used when something in station info was updated.
     """
     changed = QtCore.pyqtSignal()
+    dialogClosed = QtCore.pyqtSignal()
 
 class Logger_StationInfoDialog(QDialog, Ui_StationInfoDialog):
     '''Represents a station info dialog.'''
 
     _options : LoggerOptions
-    _change_event : StationInfoDialogEvent
+    change_event : StationInfoDialogEvent
 
     '''---------------------------------------------------------------------------'''
     def __init__(self, parent = None):
@@ -51,7 +53,7 @@ class Logger_StationInfoDialog(QDialog, Ui_StationInfoDialog):
     '''---------------------------------------------------------------------------'''
     def setup(self, options: LoggerOptions) -> None:
         '''Initiates the dialog with data.'''
-        self._change_event = StationInfoDialogEvent()
+        self.change_event = StationInfoDialogEvent()
 
         self.buttonBox.accepted.connect(self.save_changes)
 
@@ -65,8 +67,12 @@ class Logger_StationInfoDialog(QDialog, Ui_StationInfoDialog):
         self._options.OperatorName = self.tbOoperatorName.text()
         self._options.StationCallsign = self.tbCallsign.text()
 
-        self._change_event.changed.emit()
+        self.change_event.changed.emit()
         self.close()
+
+    def closeEvent(self, a0: CloseEvent) -> None:
+        self.change_event.dialogClosed.emit()
+        return super().closeEvent(a0)
 
 if __name__ == '__main__':
     import os

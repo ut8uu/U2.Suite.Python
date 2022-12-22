@@ -122,6 +122,10 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
     '''==========================================================================='''
     def on_keyPressed(self, key: str) -> None:
         '''Handles the key_pressed event'''
+        current_control = self.getSelectedControl()
+        if current_control == None:
+            return
+
         if key == kbk.KEY_RETURN:
             self.save_qso()
             self.display_log()
@@ -227,16 +231,16 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
 
         if new == None:
             try:
-                self._keyboard_handler.unregisterKeys()
+                self._keyboard_handler.disable()
             except Exception as ex:
                 print(ex)
         else:
-            self._keyboard_handler.registerKeys()
+            self._keyboard_handler.enable()
 
     '''==========================================================================='''
     def focusOut(self) -> None:
         '''Handles losing the focus'''
-        self._keyboard_handler.unregisterKeys()
+        self._keyboard_handler.disable()
 
     '''==========================================================================='''
     def getSelectedControl(self) -> QWidget:
@@ -296,14 +300,19 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         dialog = Logger_QsoEditorDialog(self)
         dialog.setup(result, self._db)
         dialog.change.lineChanged.connect(self.qso_edited)
-        self._keyboard_handler.unregisterKeys()
+        dialog.change.dialogClosed.connect(self.edit_qso_dialog_closed)
+        self._keyboard_handler.disable()
         dialog.open()
-        self._keyboard_handler.registerKeys()
 
     '''==========================================================================='''
     def qso_edited(self) -> None:
         '''Handles post edit or delete event.'''
         self.display_log()
+
+    '''==========================================================================='''
+    def edit_qso_dialog_closed(self) -> None:
+        '''Handles closing of the EditQSO dialog'''
+        self._keyboard_handler.enable()
 
     '''==========================================================================='''
     def update_time(self) -> None:
@@ -321,11 +330,17 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
     '''==========================================================================='''
     def display_station_info_dialog(self) -> None:
         '''Handles clicking the `Show Station Info` menu'''
+        self._keyboard_handler.disable()
         dialog = Logger_StationInfoDialog(self)
         dialog.setup(self._db.LoggerOptions)
-        self._keyboard_handler.unregisterKeys()
+        dialog.change_event.dialogClosed.connect(self.station_info_dialog_closed)
         dialog.open()
-        self._keyboard_handler.registerKeys()
+
+    '''==========================================================================='''
+    def station_info_dialog_closed(self) -> None:
+        '''Handles closing of the Station Info dialog'''
+        self._keyboard_handler.enable()
+
 
 
 '''==========================================================================='''

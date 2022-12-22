@@ -18,6 +18,8 @@
 import datetime
 from pathlib import Path
 import sys
+
+from matplotlib.backend_bases import CloseEvent
 from helpers.FileSystemHelper import FileSystemHelper
 from logger.log_database import LogDatabase
 from logger.logger_constants import *
@@ -32,6 +34,7 @@ class QSOEdit(QtCore.QObject):
     """
 
     lineChanged = QtCore.pyqtSignal()
+    dialogClosed = QtCore.pyqtSignal()
 
 class Logger_QsoEditorDialog(QDialog, Ui_QsoEditor):
 
@@ -103,6 +106,10 @@ class Logger_QsoEditorDialog(QDialog, Ui_QsoEditor):
         self._db.delete_contact_by_id(self._qso[FIELD_ID])
         self.change.lineChanged.emit()
         self.close()
+
+    def closeEvent(self, a0: CloseEvent) -> None:
+        self.change.dialogClosed.emit()
+        return super().closeEvent(a0)
 
 if __name__ == '__main__':
     import os
