@@ -132,3 +132,4 @@ dmypy.json
 .scannerwork
 .vscode
 .test_data
+test.sqlite
