@@ -19,20 +19,17 @@ if __name__ == '__main__':
     print('This module cannot be executed directly')
     exit(0)
 
-import logging
-import semver
-from typing import Any, List, Tuple
-import uuid
 from common.exceptions.ArgumentException import ArgumentException
-from pathlib import Path
-import sqlite3
-from common.exceptions.ArgumentMismatchException import ArgumentMismatchException
-from common.exceptions.logger.CallsignNotFoundException import CallsignNotFoundException
 from database.database_core import DatabaseCore
-
 from database.database_options import DatabaseOptions
 from logger.logger_constants import *
 from logger.logger_options import LoggerOptions
+import logging
+from pathlib import Path
+#import semver
+import sqlite3
+from typing import Any, List, Tuple
+import uuid
 
 class LogDatabase(object):
     '''Class handles all requests to the database'''
@@ -78,8 +75,8 @@ class LogDatabase(object):
     def __check_db(self) -> None:
         try:
             self._options.create_table()
-            version = semver.VersionInfo.parse(self._db_version)
-            self._options.get_or_insert_version(version)
+            #version = semver.VersionInfo.parse(self._db_version)
+            #self._options.get_or_insert_version(version)
 
             # create a table for calls
             sql = (
