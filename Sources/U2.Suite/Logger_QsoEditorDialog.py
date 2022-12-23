@@ -62,6 +62,7 @@ class Logger_QsoEditorDialog(QDialog, Ui_QsoEditor):
         self._qso = qso
 
         self.buttonBox.accepted.connect(self.save_changes)
+        self.buttonBox.rejected.connect(self.close_dialog)
         self.deleteButton.clicked.connect(self.delete_contact)
 
         keys = qso.keys()
@@ -77,6 +78,10 @@ class Logger_QsoEditorDialog(QDialog, Ui_QsoEditor):
         if FIELD_RST_SENT in keys:
             self.editRstSent.setText(qso[FIELD_RST_SENT])
         self.editDateTime.setDateTime(qso[FIELD_TIMESTAMP])
+
+    def close_dialog(self) -> None:
+        '''Does nothing but closes the window.'''
+        self.close()
 
     def save_changes(self) -> None:
         '''Updates a content of the contact.'''

@@ -56,6 +56,7 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
     _win_event_filter : WinEventFilter
     _event_dispatcher : QAbstractEventDispatcher
     _db : LogDatabase
+    _is_active : bool
 
     _running : bool
 
@@ -65,6 +66,7 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         super().__init__(parent)
 
         self._running = True
+        self._is_active = True
         
         path = self.GetPathToDatabase()
         print(f'Path to db: {path}')
@@ -122,12 +124,12 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
     '''==========================================================================='''
     def on_keyPressed(self, key: str) -> None:
         '''Handles the key_pressed event'''
-        current_control = self.getSelectedControl()
-        if current_control == None:
+        if not self._is_active:
             return
 
         if key == kbk.KEY_RETURN:
             self.save_qso()
+            self.clear_fields()
             self.display_log()
         elif key == kbk.KEY_SPACE:
             self.MoveFocus()
@@ -225,6 +227,13 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         self._db.log_contact(contact)
 
     '''==========================================================================='''
+    def clear_fields(self) -> None:
+        '''Removes all information from inputs'''
+        self.tbCallsign.setText('')
+        self.tbName.setText('')
+        self.tbComment.setText('')
+
+    '''==========================================================================='''
     @pyqtSlot("QWidget*", "QWidget*")
     def on_focusChanged(self, old, new) -> None:
         '''Handles obtaining the focus'''
@@ -302,17 +311,20 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         dialog.change.lineChanged.connect(self.qso_edited)
         dialog.change.dialogClosed.connect(self.edit_qso_dialog_closed)
         self._keyboard_handler.disable()
+        self._is_active = False
         dialog.open()
 
     '''==========================================================================='''
     def qso_edited(self) -> None:
         '''Handles post edit or delete event.'''
         self.display_log()
+        self._is_active = True
 
     '''==========================================================================='''
     def edit_qso_dialog_closed(self) -> None:
         '''Handles closing of the EditQSO dialog'''
         self._keyboard_handler.enable()
+        self._is_active = True
 
     '''==========================================================================='''
     def update_time(self) -> None:
@@ -334,14 +346,14 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         dialog = Logger_StationInfoDialog(self)
         dialog.setup(self._db.LoggerOptions)
         dialog.change_event.dialogClosed.connect(self.station_info_dialog_closed)
+        self._is_active = False
         dialog.open()
 
     '''==========================================================================='''
     def station_info_dialog_closed(self) -> None:
         '''Handles closing of the Station Info dialog'''
         self._keyboard_handler.enable()
-
-
+        self._is_active = True
 
 '''==========================================================================='''
 if __name__ == '__main__':
