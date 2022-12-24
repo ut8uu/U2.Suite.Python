@@ -41,9 +41,7 @@ class LoggerMainWindowUiHelper(object):
             window.tdDateTime.hide()
             window.btnNow.hide()
             window.lblTimestamp.show()
-            window.cbUtc.show()
         else:
-            window.lblTimestamp.hide()
-            window.cbUtc.hide()
             window.tdDateTime.show()
             window.btnNow.show()
+            window.lblTimestamp.hide()
