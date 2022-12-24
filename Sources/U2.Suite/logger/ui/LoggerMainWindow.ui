@@ -738,6 +738,7 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actionStation_info"/>
     <addaction name="actionNewLog"/>
     <addaction name="actionOpenLog"/>
     <addaction name="separator"/>
@@ -746,6 +747,11 @@
    <addaction name="menuFile"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionStation_info">
+   <property name="text">
+    <string>Station info</string>
+   </property>
+  </action>
   <action name="actionNewLog">
    <property name="text">
     <string>New log</string>

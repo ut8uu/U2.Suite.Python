@@ -29,6 +29,7 @@ from pyqtkeybind import keybinder
 class LoggerMainWindowKeyboard():
 
     _registered : bool
+    _enabled : bool
     _window : Ui_LoggerMainWindow
     _on_key_pressed : Event
 
@@ -36,8 +37,15 @@ class LoggerMainWindowKeyboard():
         self._registered = False
         self._window = window
         self._win_id = win_id
+        self._enabled = True
 
         self._on_key_pressed = Event()
+
+    def disable(self) -> None:
+        self._enabled = False
+
+    def enable(self) -> None:
+        self._enabled = True
 
     def AddOnKeyPressHandler(self, obj_method):
         self._on_key_pressed += obj_method
@@ -47,6 +55,8 @@ class LoggerMainWindowKeyboard():
 
     def keyPress(self, key_string : str):
         '''Handles the key by its name'''
+        if not self._enabled:
+            return
         self._on_key_pressed(key_string)
 
     def keyEnterPress(self) -> None:
@@ -117,13 +127,14 @@ class LoggerMainWindowKeyboard():
         keybinder.register_hotkey(self._win_id, kbk.KEY_F9, self.keyF9Press)
         keybinder.register_hotkey(self._win_id, kbk.KEY_F10, self.keyF10Press)
         keybinder.register_hotkey(self._win_id, kbk.KEY_F11, self.keyF11Press)
-        keybinder.register_hotkey(self._win_id, kbk.KEY_F12, self.keyF12Press)
+        #keybinder.register_hotkey(self._win_id, kbk.KEY_F12, self.keyF12Press)
 
         self._win_event_filter = WinEventFilter(keybinder)
         self._event_dispatcher = QAbstractEventDispatcher.instance()
         self._event_dispatcher.installNativeEventFilter(self._win_event_filter)
 
         self._registered = True
+        print('Keys registered')
 
     def unregisterKeys(self) -> None:
         '''
@@ -146,5 +157,7 @@ class LoggerMainWindowKeyboard():
         keybinder.unregister_hotkey(self._win_id, kbk.KEY_F9)
         keybinder.unregister_hotkey(self._win_id, kbk.KEY_F10)
         keybinder.unregister_hotkey(self._win_id, kbk.KEY_F11)
-        keybinder.unregister_hotkey(self._win_id, kbk.KEY_F12)
+        #keybinder.unregister_hotkey(self._win_id, kbk.KEY_F12)
+
+        print('Keys unregistered')
 

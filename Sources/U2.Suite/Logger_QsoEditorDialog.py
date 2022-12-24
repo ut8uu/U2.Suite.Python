@@ -18,6 +18,8 @@
 import datetime
 from pathlib import Path
 import sys
+
+from matplotlib.backend_bases import CloseEvent
 from helpers.FileSystemHelper import FileSystemHelper
 from logger.log_database import LogDatabase
 from logger.logger_constants import *
@@ -32,6 +34,7 @@ class QSOEdit(QtCore.QObject):
     """
 
     lineChanged = QtCore.pyqtSignal()
+    dialogClosed = QtCore.pyqtSignal()
 
 class Logger_QsoEditorDialog(QDialog, Ui_QsoEditor):
 
@@ -59,6 +62,7 @@ class Logger_QsoEditorDialog(QDialog, Ui_QsoEditor):
         self._qso = qso
 
         self.buttonBox.accepted.connect(self.save_changes)
+        self.buttonBox.rejected.connect(self.close_dialog)
         self.deleteButton.clicked.connect(self.delete_contact)
 
         keys = qso.keys()
@@ -74,6 +78,10 @@ class Logger_QsoEditorDialog(QDialog, Ui_QsoEditor):
         if FIELD_RST_SENT in keys:
             self.editRstSent.setText(qso[FIELD_RST_SENT])
         self.editDateTime.setDateTime(qso[FIELD_TIMESTAMP])
+
+    def close_dialog(self) -> None:
+        '''Does nothing but closes the window.'''
+        self.close()
 
     def save_changes(self) -> None:
         '''Updates a content of the contact.'''
@@ -103,6 +111,10 @@ class Logger_QsoEditorDialog(QDialog, Ui_QsoEditor):
         self._db.delete_contact_by_id(self._qso[FIELD_ID])
         self.change.lineChanged.emit()
         self.close()
+
+    def closeEvent(self, a0: CloseEvent) -> None:
+        self.change.dialogClosed.emit()
+        return super().closeEvent(a0)
 
 if __name__ == '__main__':
     import os
