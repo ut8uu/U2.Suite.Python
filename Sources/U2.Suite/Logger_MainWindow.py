@@ -32,7 +32,7 @@ from logger.logger_main_window_ui import LoggerMainWindowUiHelper
 from logger.logger_options import LoggerOptions
 from logger.ui.Ui_LoggerMainWindow import Ui_LoggerMainWindow
 from PyQt5.QtCore import QAbstractEventDispatcher, pyqtSlot, QDateTime
-from PyQt5.QtCore import QDir, QTimer
+from PyQt5.QtCore import QDir, QTimer, Qt, QEvent
 from PyQt5.QtGui import QFontDatabase
 from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, qApp
 from pyqtkeybind import keybinder
@@ -79,6 +79,10 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         self.listLog.itemDoubleClicked.connect(self.qso_double_clicked)
         self.cbRealtime.stateChanged.connect(self.real_time_changed)
         self.btnNow.clicked.connect(self.set_current_date_time)
+        # install event handler for main input controls
+        self.tbCallsign.installEventFilter(self)
+        self.tbName.installEventFilter(self)
+        self.tbComment.installEventFilter(self)
 
         self.actionStation_info.triggered.connect(self.display_station_info_dialog)
 
@@ -92,8 +96,8 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
             ]
 
         self._keyboard_handler = LoggerMainWindowKeyboard(self, self.winId())
-        self._keyboard_handler.registerKeys()
-        self._keyboard_handler.AddOnKeyPressHandler(self.on_keyPressed)
+        #self._keyboard_handler.registerKeys()
+        #self._keyboard_handler.AddOnKeyPressHandler(self.on_keyPressed)
         self.tbCallsign.setFocus()
 
         self.cbMode.clear()
@@ -114,8 +118,20 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
     def __del__(self):
         '''A class' destructor'''
         self._running = False
-        self._keyboard_handler.unregisterKeys()
-        self._keyboard_handler.RemoveOnKeyPressHandler(self.on_keyPressed)
+        #self._keyboard_handler.unregisterKeys()
+        #self._keyboard_handler.RemoveOnKeyPressHandler(self.on_keyPressed)
+
+    '''==========================================================================='''
+    def eventFilter(self, source, event):
+        if (event.type() == QEvent.KeyPress):
+            if source in [self.tbCallsign, self.tbName, self.tbComment]:
+                print('key press:', (event.key(), event.text()))
+                key = event.key()
+                if key in [Qt.Key.Key_Space, Qt.Key.Key_Tab]:
+                    if self.MoveFocus(key):
+                        '''A focus has been moved. Drop the input.'''
+                        return True
+        return super(Logger_MainWindow, self).eventFilter(source, event)
 
     '''==========================================================================='''
     def destroy(self) -> None:
@@ -167,31 +183,43 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
             self.listLog.addItem(logline)
 
     '''==========================================================================='''
-    def MoveFocus(self) -> None:
+    def MoveFocus(self, key: Qt.Key = Qt.Key.Key_Space) -> bool:
         '''
         Circularly moves focus among Callsign, Name, and Comment.
         Does nothing if none of the controls mentioned above is selected.
         '''
         try:
+            selected_control = self.getSelectedControl()
             # Callsign
-            if self.tbCallsign.hasFocus():
+            if selected_control is self.tbCallsign:
                 self.tbName.setFocus()
+                return True
             # Name
-            elif self.tbName.hasFocus():
-                if len(self.tbName.text()) > 0:
-                    self.tbName.setText(self.tbName.text() + ' ')
-                else:
+            elif selected_control is self.tbName:
+                if key == Qt.Key.Key_Space:
+                    if len(self.tbName.text()) > 0:
+                        self.tbName.setText(self.tbName.text() + ' ')
+                    else:
+                        self.tbComment.setFocus()
+                elif key == Qt.Key.Key_Tab:
                     self.tbComment.setFocus()
+                return True
             # Comment
-            elif self.tbComment.hasFocus():
-                if len(self.tbComment.text()) > 0:
-                    self.tbComment.setText(self.tbComment.text() + ' ')
-                else:
+            elif selected_control is self.tbComment:
+                if key == Qt.Key.Key_Space:
+                    if len(self.tbComment.text()) > 0:
+                        self.tbComment.setText(self.tbComment.text() + ' ')
+                    else:
+                        self.tbCallsign.setFocus()
+                elif key == Qt.Key.Key_Tab:
                     self.tbCallsign.setFocus()
+                return True
             else:
-                print(f'Focus remains on the "{self.getSelectedControl().objectName()}" control.')
+                print(f'Focus remains on the "{selected_control.objectName()}" control.')
         except Exception as ex:
             print(ex.args[0])
+
+        return False
 
     '''==========================================================================='''
     def GetPathToDatabase(self) -> Path:
@@ -354,6 +382,37 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         '''Handles closing of the Station Info dialog'''
         self._keyboard_handler.enable()
         self._is_active = True
+
+    '''=========================================================================='''
+    def keyPressEvent(self, event):
+        """This overrides Qt key event."""
+        modifier = event.modifiers()
+        is_ctrl = modifier == Qt.ControlModifier
+        key = event.key()
+        if key == Qt.Key.Key_Escape:
+            self.clear_fields()
+            self.tbCallsign.setFocus()
+        elif key in [Qt.Key.Key_Enter, Qt.Key.Key_Return]:
+            self.save_qso()
+            self.clear_fields()
+            self.tbCallsign.setFocus()
+            self.display_log()
+        elif key == Qt.Key.Key_Delete:
+            self.delete_qso()
+        elif key == Qt.Key.Key_Space:
+            if self.MoveFocus():
+                event.accept()
+
+    '''=========================================================================='''
+    def delete_qso(self) -> None:
+        '''Deletes a selected QSO, if any.'''
+        item = self.listLog.currentItem()
+        contactnumber = int(item.text().split()[0])
+        result = self._db.get_contact_by_id(contactnumber)
+        if result != None:
+            self._db.delete_contact_by_id(result['id'])
+            self.display_log()
+
 
 '''==========================================================================='''
 if __name__ == '__main__':
