@@ -28,13 +28,11 @@ class ApplicationPreferences(object):
 
     _file : str
     _preferences : dict
-    _reference_preference : dict
     _default_values : dict
 
     def __init__(self, file : str) -> None:
         self._file = file
         self._preferences = self._default_values.copy()
-        self._reference_preference = self._preferences.copy()
         self.read_preferences()
         pass
 
@@ -72,7 +70,6 @@ class ApplicationPreferences(object):
         Existing file is being overwritten, not existing is being created.
         '''
         with open(f'./{self._file}', "wt", encoding="utf-8") as file_descriptor:
-            self._preferences = self._reference_preference.copy()
             file_descriptor.write(dumps(self._preferences, indent=4))
             logging.info("%s", self._preferences)
 

@@ -66,5 +66,8 @@ class  LoggerApplicationPreferencesTests(unittest.TestCase):
         self.assertEqual(pref1.DefaultMode, pref2.DefaultMode)
         self.assertEqual(pref1.DefaultBand, pref2.DefaultBand)
 
+        self.assertEqual('17m', pref2.DefaultBand)
+        self.assertEqual('THROB', pref2.DefaultMode)
+
         # cleanup
         path.unlink()

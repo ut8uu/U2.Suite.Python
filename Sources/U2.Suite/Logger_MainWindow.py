@@ -27,9 +27,9 @@ import helpers.KeyBinderKeys as kbk
 from helpers.WinEventFilter import WinEventFilter
 from logger.log_database import LogDatabase
 from logger.logger_constants import *
-from logger.logger_main_window_keyboard import LoggerMainWindowKeyboard
 from logger.logger_main_window_ui import LoggerMainWindowUiHelper
 from logger.logger_options import LoggerOptions
+from logger.logger_preferences import LoggerApplicationPreferences
 from logger.ui.Ui_LoggerMainWindow import Ui_LoggerMainWindow
 from PyQt5.QtCore import QAbstractEventDispatcher, pyqtSlot, QDateTime
 from PyQt5.QtCore import QDir, QTimer, Qt, QEvent
@@ -49,7 +49,6 @@ def load_fonts_from_dir(directory: str) -> set:
     return font_families
 
 class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
-    _keyboard_handler : LoggerMainWindowKeyboard
     _lastSelectedControl: QWidget
     _allControls : List[QWidget]
     _registered = False
@@ -57,6 +56,7 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
     _event_dispatcher : QAbstractEventDispatcher
     _db : LogDatabase
     _is_active : bool
+    _preferences : LoggerApplicationPreferences
 
     _running : bool
 
@@ -67,7 +67,9 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
 
         self._running = True
         self._is_active = True
-        
+
+        self._preferences = LoggerApplicationPreferences()
+
         path = self.GetPathToDatabase()
         print(f'Path to db: {path}')
         self._db = LogDatabase(path, DATABASE_DEFAULT)
@@ -75,7 +77,6 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         self.setupUi(self)
         LoggerMainWindowUiHelper.update_ui(self)
 
-        qApp.focusChanged.connect(self.on_focusChanged)
         self.listLog.itemDoubleClicked.connect(self.qso_double_clicked)
         self.cbRealtime.stateChanged.connect(self.real_time_changed)
         self.btnNow.clicked.connect(self.set_current_date_time)
@@ -95,9 +96,6 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
             self.tdDateTime,
             ]
 
-        self._keyboard_handler = LoggerMainWindowKeyboard(self, self.winId())
-        #self._keyboard_handler.registerKeys()
-        #self._keyboard_handler.AddOnKeyPressHandler(self.on_keyPressed)
         self.tbCallsign.setFocus()
 
         self.cbMode.clear()
@@ -112,14 +110,17 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
 
         self.display_log()
 
+        self.cbRealtime.setChecked(self._preferences.Realtime)
+        self.cbUtc.setChecked(self._preferences.Utc)
+        self.cbMode.setCurrentText(self._preferences.DefaultMode)
+        self.cbBand.setCurrentText(self._preferences.DefaultBand)
+
         if len(self._db.LoggerOptions.StationCallsign) == 0:
             self.display_station_info_dialog()
     
     def __del__(self):
         '''A class' destructor'''
         self._running = False
-        #self._keyboard_handler.unregisterKeys()
-        #self._keyboard_handler.RemoveOnKeyPressHandler(self.on_keyPressed)
 
     '''==========================================================================='''
     def eventFilter(self, source, event):
@@ -253,6 +254,16 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
             FIELD_RST_RCVD : self.tbRcv.text().lstrip().rstrip()
         }
         self._db.log_contact(contact)
+        self.save_current_qso_state()
+
+    '''==========================================================================='''
+    def save_current_qso_state(self) -> None:
+        '''Stores current state of controls to the preferences.'''
+        self._preferences.DefaultMode = self.cbMode.currentText()
+        self._preferences.DefaultBand = self.cbBand.currentText()
+        self._preferences.Utc = self.cbUtc.isChecked()
+        self._preferences.Realtime = self.cbRealtime.isChecked()
+        self._preferences.write_preferences()
 
     '''==========================================================================='''
     def clear_fields(self) -> None:
@@ -260,19 +271,6 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         self.tbCallsign.setText('')
         self.tbName.setText('')
         self.tbComment.setText('')
-
-    '''==========================================================================='''
-    @pyqtSlot("QWidget*", "QWidget*")
-    def on_focusChanged(self, old, new) -> None:
-        '''Handles obtaining the focus'''
-
-        if new == None:
-            try:
-                self._keyboard_handler.disable()
-            except Exception as ex:
-                print(ex)
-        else:
-            self._keyboard_handler.enable()
 
     '''==========================================================================='''
     def focusOut(self) -> None:
@@ -309,6 +307,7 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
     @pyqtSlot()
     def bandChanged(self):
         '''Handles changing of the band'''
+
 
     '''==========================================================================='''
     @pyqtSlot()

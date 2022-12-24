@@ -20,7 +20,12 @@ from logger.logger_constants import KEY_DEFAULT_BAND, KEY_DEFAULT_MODE, KEY_REAL
 
 
 class LoggerApplicationPreferences(ApplicationPreferences):
-    '''Represents logger application preferences.'''
+    '''
+    Represents logger application preferences.
+    Be aware, although preferences are autometically loaded upon object creation,
+    it is required to save them explicitly. This is required to prevent breaking
+    the file during two or more simultaneous implicit commits.
+    '''
     
     def __init__(self) -> None:
         self._default_values = {
@@ -47,14 +52,14 @@ class LoggerApplicationPreferences(ApplicationPreferences):
         
     @property
     def DefaultMode(self) -> str:
-        return self.get_bool_value(KEY_DEFAULT_MODE, 'AM')
+        return self.get_string_value(KEY_DEFAULT_MODE, 'AM')
     @DefaultMode.setter
     def DefaultMode(self, value : str) -> None:
         self.Preferences[KEY_DEFAULT_MODE] = value
         
     @property
     def DefaultBand(self) -> str:
-        return self.get_bool_value(KEY_DEFAULT_BAND, '160m')
+        return self.get_string_value(KEY_DEFAULT_BAND, '160m')
     @DefaultBand.setter
     def DefaultBand(self, value : str) -> None:
         self.Preferences[KEY_DEFAULT_BAND] = value
