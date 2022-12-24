@@ -133,3 +133,4 @@ dmypy.json
 .vscode
 .test_data
 test.sqlite
+/Sources/U2.Suite/test.preferences
