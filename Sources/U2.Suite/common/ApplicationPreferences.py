@@ -18,8 +18,6 @@
 from json import dumps, loads
 import logging
 import os
-from pathlib import Path
-
 
 class ApplicationPreferences(object):
     '''
@@ -31,18 +29,24 @@ class ApplicationPreferences(object):
     _file : str
     _preferences : dict
     _reference_preference : dict
+    _default_values : dict
 
-    def __init__(self, file : str, initial_data : dict) -> None:
+    def __init__(self, file : str) -> None:
         self._file = file
-        self._preferences = initial_data
+        self._preferences = self._default_values.copy()
         self._reference_preference = self._preferences.copy()
         self.read_preferences()
         pass
 
     @property
+    def DefaultValues(self) -> dict:
+        return self._default_values
+
+    @property
     def Preferences(self) -> dict:
         return self._preferences
 
+    '''====================================================================='''
     def read_preferences(self):
         '''Reads preferences from the given file.'''
         try:
@@ -61,6 +65,7 @@ class ApplicationPreferences(object):
         except IOError as exception:
             logging.critical("Error: %s", exception)
 
+    '''====================================================================='''
     def write_preferences(self):
         '''
         Writes the preferences to file. 
@@ -71,4 +76,24 @@ class ApplicationPreferences(object):
             file_descriptor.write(dumps(self._preferences, indent=4))
             logging.info("%s", self._preferences)
 
+    '''====================================================================='''
+    def get_string_value(self, key : str, default_value : str = '') -> str:
+        '''
+        Performs an attempt to get the preference by the given name.
+        If preference not found, a default value will be returned.
+        '''
+        try:
+            return self._preferences.get(key)
+        except KeyError:
+            return default_value
+
+    '''====================================================================='''
+    def get_bool_value(self, key : str, default_value : bool) -> bool:
+        value = self.get_string_value(key, default_value)
+        if value == str(True):
+            return True
+        elif value == str(False):
+            return False
+        else:
+            return default_value
 

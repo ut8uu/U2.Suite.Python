@@ -181,7 +181,7 @@ class FastSatEntry(QMainWindow, Ui_FastSatEntry):
 
     def write_preferences(self):
         '''Writes the preferences file'''
-        with open(f'./{PREFERENCES_FILE}', "wt", encoding="utf-8") as file_descriptor:
+        with open(f'./{PREFERENCES_FILE_FSE}', "wt", encoding="utf-8") as file_descriptor:
             self.preferences = self.reference_preference.copy()
             file_descriptor.write(dumps(self.preferences, indent=4))
             logging.info("%s", self.preferences)
@@ -189,7 +189,7 @@ class FastSatEntry(QMainWindow, Ui_FastSatEntry):
     def read_preferences(self):
         '''Reads preferences from existing file or creates a new one'''
         try:
-            preferences_file_name = f'./{PREFERENCES_FILE}'
+            preferences_file_name = f'./{PREFERENCES_FILE_FSE}'
             if os.path.exists(preferences_file_name):
                 with open(preferences_file_name, "rt", encoding="utf-8") as file_descriptor:
                     content = file_descriptor.read()

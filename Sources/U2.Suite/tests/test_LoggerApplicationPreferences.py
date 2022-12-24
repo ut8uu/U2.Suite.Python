@@ -19,25 +19,52 @@ from pathlib import Path
 import unittest
 
 from common.ApplicationPreferences import ApplicationPreferences
+from logger.logger_constants import KEY_REALTIME, PREFERENCES_FILE_LOGGER
+from logger.logger_preferences import LoggerApplicationPreferences
 
-class  LoggerApplicationPreferences(unittest.TestCase):
+class  LoggerApplicationPreferencesTests(unittest.TestCase):
     '''Represents a set of application preferences tests'''
 
     def test_CanWorkWithPreferences(self):
-        '''Tests possibility to reaed and write application preferences'''
+        '''Tests possibility to read and write application preferences'''
 
         file = 'test.preferences'
         path = Path(f'./{file}')
         if path.exists():
             path.unlink()
-        initial_data = {'k1' : 'v1', 'k2' : 'v2'}
-        pref1 = ApplicationPreferences(file, initial_data)
+        pref1 = ApplicationPreferences(file)
+        pref1['k1'] = 'v1'
+        pref1['k2'] = 'v2'
 
         self.assertTrue(path.exists())
 
-        pref2 = ApplicationPreferences(file, initial_data)
+        pref2 = ApplicationPreferences(file)
         self.assertTrue('k1' in pref2.Preferences.keys())
         self.assertTrue('k2' in pref2.Preferences.keys())
         self.assertEqual(pref1.Preferences['k1'], pref2.Preferences['k1'])
         self.assertEqual(pref1.Preferences['k2'], pref2.Preferences['k2'])
         
+    def test_CanWorkWithLoggerPreferences(self) -> None:
+        '''Tests how logger preferences can be read from and written to file.'''
+
+        # preferences should be created from scratch
+        path = Path(f'./{PREFERENCES_FILE_LOGGER}')
+        if path.exists():
+            path.unlink()
+        
+        pref1 = LoggerApplicationPreferences()
+        pref1.Utc = False
+        pref1.Realtime = False
+        pref1.DefaultMode = 'THROB'
+        pref1.DefaultBand = '17m'
+
+        pref1.write_preferences()
+
+        pref2 = LoggerApplicationPreferences()
+        self.assertEqual(pref1.Utc, pref2.Utc)
+        self.assertEqual(pref1.Realtime, pref2.Realtime)
+        self.assertEqual(pref1.DefaultMode, pref2.DefaultMode)
+        self.assertEqual(pref1.DefaultBand, pref2.DefaultBand)
+
+        # cleanup
+        path.unlink()
