@@ -19,6 +19,8 @@ from datetime import datetime
 import os
 from pathlib import Path
 import sys
+
+from matplotlib.backend_bases import CloseEvent
 from Logger_QsoEditorDialog import Logger_QsoEditorDialog
 from Logger_StationInfoDialog import Logger_StationInfoDialog
 from helpers.FileSystemHelper import FileSystemHelper
@@ -121,6 +123,11 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
     def __del__(self):
         '''A class' destructor'''
         self._running = False
+
+    '''==========================================================================='''
+    def closeEvent(self, a0: CloseEvent) -> None:
+        self.save_current_qso_state()
+        return super().closeEvent(a0)
 
     '''==========================================================================='''
     def eventFilter(self, source, event):

@@ -87,9 +87,11 @@ class ApplicationPreferences(object):
     '''====================================================================='''
     def get_bool_value(self, key : str, default_value : bool) -> bool:
         value = self.get_string_value(key, default_value)
-        if value == str(True):
+        if type(value) is bool:
+            return value
+        if value.lower() == str(True).lower():
             return True
-        elif value == str(False):
+        elif value.lower() == str(False).lower():
             return False
         else:
             return default_value
