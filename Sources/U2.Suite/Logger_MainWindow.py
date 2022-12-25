@@ -280,11 +280,6 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         self.tbComment.setText('')
 
     '''==========================================================================='''
-    def focusOut(self) -> None:
-        '''Handles losing the focus'''
-        self._keyboard_handler.disable()
-
-    '''==========================================================================='''
     def getSelectedControl(self) -> QWidget:
         '''Locates and returns the control that is focused.'''
         for control in self._allControls:
@@ -344,7 +339,6 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         dialog.setup(result, self._db)
         dialog.change.lineChanged.connect(self.qso_edited)
         dialog.change.dialogClosed.connect(self.edit_qso_dialog_closed)
-        self._keyboard_handler.disable()
         self._is_active = False
         dialog.open()
 
@@ -357,7 +351,6 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
     '''==========================================================================='''
     def edit_qso_dialog_closed(self) -> None:
         '''Handles closing of the EditQSO dialog'''
-        self._keyboard_handler.enable()
         self._is_active = True
 
     '''==========================================================================='''
@@ -376,7 +369,6 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
     '''==========================================================================='''
     def display_station_info_dialog(self) -> None:
         '''Handles clicking the `Show Station Info` menu'''
-        self._keyboard_handler.disable()
         dialog = Logger_StationInfoDialog(self)
         dialog.setup(self._db.LoggerOptions)
         dialog.change_event.dialogClosed.connect(self.station_info_dialog_closed)
@@ -386,7 +378,6 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
     '''==========================================================================='''
     def station_info_dialog_closed(self) -> None:
         '''Handles closing of the Station Info dialog'''
-        self._keyboard_handler.enable()
         self._is_active = True
 
     '''=========================================================================='''
