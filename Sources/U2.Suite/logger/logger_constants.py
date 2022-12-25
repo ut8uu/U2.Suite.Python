@@ -59,10 +59,14 @@ DATABASE_DEFAULT = 'default.sqlite'
 
 KEY_MYCALLSIGN = 'mycallsign'
 KEY_MYGRID = 'mygrid'
+KEY_DEFAULT_BAND = 'band'
 KEY_DEFAULT_MODE = 'mode'
 KEY_DEFAULT_SATELLITE = 'satellite'
+KEY_REALTIME = 'realtime'
+KEY_UTC = 'utc'
 
-PREFERENCES_FILE = 'FastSatEntry_preferences.json'
+PREFERENCES_FILE_FSE = 'FastSatEntry_preferences.json'
+PREFERENCES_FILE_LOGGER = 'logger_preferences.json'
 
 UNIQUE_ID_FAST_SAT_ENTRY = 'U2.Suite.FastSatEntry'
 
