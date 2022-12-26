@@ -847,6 +847,8 @@ ADIF_enumerations = {
                  'FAX': 'FAX',
                  'FM': 'FM',
                  'FSK441': 'FSK441',
+                 'FT4': 'FT4',
+                 'FT8': 'FT8',
                  'HELL': 'FMHELL, FSKHELL, HELL80, HFSK, PSKHELL',
                  'ISCAT': 'ISCAT-A, ISCAT-B',
                  'JT4': 'JT4A, JT4B, JT4C, JT4D, JT4E, JT4F, JT4G',
@@ -1470,7 +1472,7 @@ class ADIF_log(list):
             if isinstance(x, ADIF_logentry):
                 ret += repr(x)
         return ret
-    def newEntry(self):
+    def newEntry(self) -> ADIF_logentry:
         self.append(ADIF_logentry(self))
         return self[-1]
     def getType(self, name):

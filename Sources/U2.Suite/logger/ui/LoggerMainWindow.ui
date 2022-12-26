@@ -744,11 +744,19 @@
      </property>
      <addaction name="actionImportFrom_ADIF_file"/>
     </widget>
+    <widget class="QMenu" name="menuExport">
+     <property name="title">
+      <string>Export</string>
+     </property>
+     <addaction name="actionExportToADIFfile"/>
+     <addaction name="actionExportToADXfile"/>
+    </widget>
     <addaction name="actionStation_info"/>
     <addaction name="actionNewLog"/>
     <addaction name="actionOpenLog"/>
     <addaction name="separator"/>
     <addaction name="menuImport"/>
+    <addaction name="menuExport"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
@@ -784,6 +792,16 @@
   <action name="actionImportFrom_ADIF_file">
    <property name="text">
     <string>From ADIF file</string>
+   </property>
+  </action>
+  <action name="actionExportToADIFfile">
+   <property name="text">
+    <string>To ADIF file</string>
+   </property>
+  </action>
+  <action name="actionExportToADXfile">
+   <property name="text">
+    <string>To ADX file</string>
    </property>
   </action>
  </widget>

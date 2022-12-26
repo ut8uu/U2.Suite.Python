@@ -24,7 +24,7 @@ import sys
 from matplotlib.backend_bases import CloseEvent
 from Logger_QsoEditorDialog import Logger_QsoEditorDialog
 from Logger_StationInfoDialog import Logger_StationInfoDialog
-from helpers.AdifHelper import AdifHelper
+from helpers.AdifHelper import ADIF_log, AdifHelper
 from helpers.FileSystemHelper import FileSystemHelper
 
 import helpers.KeyBinderKeys as kbk
@@ -86,6 +86,8 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         self.btnNow.clicked.connect(self.set_current_date_time)
 
         self.actionImportFrom_ADIF_file.triggered.connect(self.import_from_adif)
+        self.actionExportToADIFfile.triggered.connect(self.export_to_adif)
+        self.actionExportToADXfile.triggered.connect(self.export_to_adx)
 
         # install event handler for main input controls
         self.tbCallsign.installEventFilter(self)
@@ -438,6 +440,56 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
             self._db.log_contact(data)
         
         self.display_log()
+
+    '''==========================================================================='''
+    def export_to_adx(self) -> None:
+        '''Handles clicking the `Export to ADX file` menu item.'''
+        filename, filetype = QFileDialog.getSaveFileName(self, 'Select ADX file', '.',
+                filter="ADX files (*.adx)")
+        self.export_to_adif_file(filename, filetype)
+
+    '''==========================================================================='''
+    def export_to_adif(self) -> None:
+        '''Handles clicking the `Export to ADIF file` menu item.'''
+        filename, filetype = QFileDialog.getSaveFileName(self, 'Select ADIF file', '.',
+                filter="ADIF files (*.adi)")
+        self.export_to_adif_file(filename, filetype)
+
+    '''=========================================================================='''
+    def export_to_adif_file(self, filename : str, filetype : str) -> None:
+        if len(filename) == 0:
+            return
+
+        log = ADIF_log()
+        contacts = self._db.load_all_contacts()
+        
+        fields = contacts[0]
+        data = contacts[1]
+        callsign_index = fields.index(FIELD_CALLSIGN)
+        timestamp_index = fields.index(FIELD_TIMESTAMP)
+        mode_index = fields.index(FIELD_MODE)
+        band_index = fields.index(FIELD_BAND)
+
+        operator = self._db.LoggerOptions.StationCallsign
+        for qso in data:
+            qso_date = qso[timestamp_index].strftime('%Y%m%d')
+            time_on = qso[timestamp_index].strftime('%H%M')
+            callsign = qso[callsign_index].upper()
+            band = qso[band_index]
+            mode = qso[mode_index]
+
+            entry = log.newEntry()
+            entry[ADIF_BAND] = band
+            entry[ADIF_MODE] = mode
+            entry[ADIF_CALL] = callsign
+            entry[ADIF_QSO_DATE] = qso_date
+            entry[ADIF_TIME_ON] = time_on
+            entry[ADIF_OPERATOR] = operator
+
+        if filetype.find('adi') > -1:
+            AdifHelper.ExportAdif(filename, log)
+        elif filetype.find('adx') > -1:
+            AdifHelper.ExportAdx(filename, log)
 
 '''==========================================================================='''
 if __name__ == '__main__':
