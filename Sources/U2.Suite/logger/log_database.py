@@ -56,6 +56,7 @@ class LogDatabase(object):
                             FIELD_EMAIL, FIELD_ADDRESS, FIELD_SOURCE, FIELD_HAS_DATA)
         self._db._table_descriptions[TABLE_CONTACTS] = ( 
                             FIELD_ID, 
+                            FIELD_CHECKSUM,
                             FIELD_CALLSIGN, 
                             FIELD_TIMESTAMP, 
                             FIELD_FREQUENCY,
@@ -257,7 +258,7 @@ class LogDatabase(object):
     def calculate_checksum(self, data : dict) -> str:
         '''Calculates checksum based on the values from the given dictionary.'''
         content = f'{data[FIELD_CALLSIGN]}{data[FIELD_BAND]}{data[FIELD_MODE]}{data[FIELD_TIMESTAMP]}'
-        return hashlib.md5(content.encode('utf-8'))
+        return hashlib.md5(content.encode('utf-8')).hexdigest()
 
     def is_duplicate(self, data : dict) -> bool:
         '''
@@ -266,7 +267,7 @@ class LogDatabase(object):
         '''
         checksum = self.calculate_checksum(data)
         sql = f'SELECT count(id) FROM {TABLE_CONTACTS} WHERE {FIELD_CHECKSUM}=?'
-        count = self._db.execute_scalar(sql, (str(checksum),))
+        count = self._db.execute_scalar(sql, (checksum,))
         return count != 0
 
     def log_contact(self, input_data : dict) -> None:
@@ -295,7 +296,7 @@ class LogDatabase(object):
             return
 
         data = self._db.filter_dictionary(input_data, CONTACT_FIELDS)
-        data[FIELD_CHECKSUM] = str(self.calculate_checksum(data))
+        data[FIELD_CHECKSUM] = self.calculate_checksum(data)
         print(data)
 
         call_data = self.get_or_add_callsign(input_data)
