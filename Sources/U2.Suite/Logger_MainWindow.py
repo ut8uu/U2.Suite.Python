@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import adif_io
 from datetime import datetime
 import os
 from pathlib import Path
@@ -56,7 +55,6 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
     _lastSelectedControl: QWidget
     _allControls : List[QWidget]
     _registered = False
-    _win_event_filter : WinEventFilter
     _event_dispatcher : QAbstractEventDispatcher
     _db : LogDatabase
     _is_active : bool
