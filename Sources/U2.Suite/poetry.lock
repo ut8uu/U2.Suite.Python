@@ -1,4 +1,12 @@
 [[package]]
+name = "adif-io"
+version = "0.0.3"
+description = "Basic input of ADIF radio amateur log files."
+category = "main"
+optional = false
+python-versions = ">=3.5"
+
+[[package]]
 name = "attrs"
 version = "22.2.0"
 description = "Classes Without Boilerplate"
@@ -515,9 +523,13 @@ six = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "255473ee1c5a1a951f1f0c45e170bae90abf92877fb31412b0a4ad3aae785c5b"
+content-hash = "c119cd8afe39d28f3bc1eb71413717a2c9104d963f4e9dc4582ba52c7de9225a"
 
 [metadata.files]
+adif-io = [
+    {file = "adif_io-0.0.3-py3-none-any.whl", hash = "sha256:f137bcf396ec0740ac57f92c08fa2178619a22b7e570870eaa33a86745785126"},
+    {file = "adif_io-0.0.3.tar.gz", hash = "sha256:b069ab7d930ea017d44b55be7577e8cc4bd03fa7e8a286fd993178c09981150c"},
+]
 attrs = [
     {file = "attrs-22.2.0-py3-none-any.whl", hash = "sha256:29e95c7f6778868dbd49170f98f8818f78f3dc5e0e37c0b1f474e3561b240836"},
     {file = "attrs-22.2.0.tar.gz", hash = "sha256:c9227bfc2f01993c03f68db37d1d15c9690188323c067c641f1a35ca58185f99"},

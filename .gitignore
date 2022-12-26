@@ -135,3 +135,5 @@ dmypy.json
 test.sqlite
 /Sources/U2.Suite/test.preferences
 /Sources/U2.Suite/logger_preferences.json
+/Sources/U2.Suite/test_files/*
+/Sources/U2.Suite/test.db
