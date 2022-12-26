@@ -27,6 +27,7 @@ from logger.logger_constants import *
 from logger.logger_options import LoggerOptions
 from manyrig.rig.enums.CommandKind import CommandKind
 from logger.log_database import LogDatabase
+import shutil
 import unittest
 
 UT8UU = 'UT8UU'
@@ -45,8 +46,13 @@ class DatabaseTests(unittest.TestCase):
 
     def __init__(self, methodName: str = ...) -> None:
         super().__init__(methodName)
+
+    def setUp(self):
         self._db_name = 'test.db'
         self._path = self.GetPathToDatabase()
+        if self._path.exists():
+            shutil.rmtree(str(self._path))
+
         self._full_path = self._path / self._db_name
         if self._path.exists():
             try:
@@ -57,7 +63,7 @@ class DatabaseTests(unittest.TestCase):
 
     def GetPathToDatabase(self) -> Path:
         '''Calculates the full path to the database'''
-        return Path(os.path.abspath("."))
+        return Path(os.path.abspath("./test_data/database_tests"))
 
     def GetTestDatabase(self) -> LogDatabase:
         db = LogDatabase(self._path, self._db_name)

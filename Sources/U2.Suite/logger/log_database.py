@@ -43,6 +43,8 @@ class LogDatabase(object):
 
     def __init__(self, path : Path, db_name : str = DATABASE_DEFAULT) -> None:
         self._db_name = db_name
+        if not path.exists():
+            path.mkdir()
         self._db_full_path = path / db_name
         self._db = DatabaseCore(path, db_name)
         #options-related stuff must be created before using it

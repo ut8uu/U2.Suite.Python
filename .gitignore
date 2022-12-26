@@ -138,3 +138,4 @@ test.sqlite
 /Sources/U2.Suite/test_files/*
 /Sources/U2.Suite/test.db
 /Sources/U2.Suite/U2.Suite.pyproj.user
+/Sources/U2.Suite/test_data/*
