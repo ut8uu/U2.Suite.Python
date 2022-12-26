@@ -644,7 +644,7 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -738,9 +738,17 @@
     <property name="title">
      <string>File</string>
     </property>
+    <widget class="QMenu" name="menuImport">
+     <property name="title">
+      <string>Import</string>
+     </property>
+     <addaction name="actionImportFrom_ADIF_file"/>
+    </widget>
     <addaction name="actionStation_info"/>
     <addaction name="actionNewLog"/>
     <addaction name="actionOpenLog"/>
+    <addaction name="separator"/>
+    <addaction name="menuImport"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
@@ -771,6 +779,11 @@
   <action name="actionExit">
    <property name="text">
     <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionImportFrom_ADIF_file">
+   <property name="text">
+    <string>From ADIF file</string>
    </property>
   </action>
  </widget>

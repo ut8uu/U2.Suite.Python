@@ -103,8 +103,8 @@ class LogDatabase(object):
                 f"{FIELD_FREQUENCY} INTEGER DEFAULT 0, "
                 f"{FIELD_BAND} text NOT NULL, "
                 f"{FIELD_MODE} text NOT NULL, "
-                # this field can contain an overriden name of the operator
-                f"{FIELD_OPNAME} text NOT NULL," 
+                # this optional field can contain an overriden name of the operator
+                f"{FIELD_OPNAME} text DEFAULT ''," 
                 f"{FIELD_RST_SENT} text NULL, "
                 f"{FIELD_RST_RCVD} text NULL, "
                 f"{FIELD_IS_RUN_QSO} INTEGER DEFAULT 0, "
@@ -252,7 +252,6 @@ class LogDatabase(object):
             cursor.close()
             return result
 
-
     def log_contact(self, input_data : dict) -> None:
         """
         Inserts a contact into the db.
@@ -318,6 +317,10 @@ class LogDatabase(object):
                 self._db.execute_non_query(sql, (id,))
             except sqlite3.Error as exception:
                 logging.info("DataBase delete_contact: %s", exception)
+
+    def delete_all_contacts(self) -> None:
+        '''Deletes all contacts from the database.'''
+        self._db.execute_non_query(f'DELETE FROM {TABLE_CONTACTS}')
 
     def change_contact(self, id: int, input_data : dict) -> None:
         '''
