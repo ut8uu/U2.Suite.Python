@@ -13,7 +13,7 @@
     <RootNamespace>U2.Suite</RootNamespace>
     <TestFramework>unittest</TestFramework>
     <UnitTestPattern>test_*.py</UnitTestPattern>
-    <UnitTestRootDirectory>.</UnitTestRootDirectory>
+    <UnitTestRootDirectory>tests</UnitTestRootDirectory>
     <IsWindowsApplication>False</IsWindowsApplication>
     <InterpreterId>MSBuild|.venv|$(MSBuildProjectFullPath)</InterpreterId>
   </PropertyGroup>
