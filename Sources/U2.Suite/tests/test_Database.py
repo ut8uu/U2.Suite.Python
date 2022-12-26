@@ -207,3 +207,20 @@ class DatabaseTests(unittest.TestCase):
         self.assertEqual(UT8UU, options.StationCallsign)
         self.assertEqual('Sergey', options.OperatorName)
         
+    def test_DuplicatesAreIgnored(self) -> None:
+        db = self.GetTestDatabase()
+
+        data = {
+            FIELD_IS_RUN_QSO : 0,
+            FIELD_BAND : '20m',
+            FIELD_FREQUENCY : 14200123,
+            FIELD_MODE : MODE_SSB,
+            FIELD_TIMESTAMP : datetime.datetime.utcnow(),
+            FIELD_CALLSIGN : UT8UU.lower(),
+            FIELD_OPNAME : 'Sergey'
+        }
+        db.log_contact(data)
+        db.log_contact(data)
+
+        contacts = db.load_all_contacts()
+        self.assertEqual(1, len(contacts[1]))

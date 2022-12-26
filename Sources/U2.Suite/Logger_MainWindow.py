@@ -484,6 +484,7 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
             entry[ADIF_CALL] = callsign
             entry[ADIF_QSO_DATE] = qso_date
             entry[ADIF_TIME_ON] = time_on
+            entry[ADIF_TIME_OFF] = time_on
             entry[ADIF_OPERATOR] = operator
 
         if filetype.find('adi') > -1:

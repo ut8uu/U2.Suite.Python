@@ -22,6 +22,7 @@ if __name__ == '__main__':
 from common.exceptions.ArgumentException import ArgumentException
 from database.database_core import DatabaseCore
 from database.database_options import DatabaseOptions
+import hashlib
 from logger.logger_constants import *
 from logger.logger_options import LoggerOptions
 import logging
@@ -98,6 +99,7 @@ class LogDatabase(object):
             sql = (
                 f"CREATE TABLE IF NOT EXISTS {TABLE_CONTACTS} "
                 f"({FIELD_ID} INTEGER PRIMARY KEY, "
+                f"{FIELD_CHECKSUM} TEXT NOT NULL, "
                 f"{FIELD_CALLSIGN} TEXT NOT NULL, "
                 f"{FIELD_TIMESTAMP} TIMESTAMP NOT NULL, "
                 f"{FIELD_FREQUENCY} INTEGER DEFAULT 0, "
@@ -252,10 +254,27 @@ class LogDatabase(object):
             cursor.close()
             return result
 
+    def calculate_checksum(self, data : dict) -> str:
+        '''Calculates checksum based on the values from the given dictionary.'''
+        content = f'{data[FIELD_CALLSIGN]}{data[FIELD_BAND]}{data[FIELD_MODE]}{data[FIELD_TIMESTAMP]}'
+        return hashlib.md5(content.encode('utf-8'))
+
+    def is_duplicate(self, data : dict) -> bool:
+        '''
+        Checks whether the contact is a duplicate one.
+        
+        '''
+        checksum = self.calculate_checksum(data)
+        sql = f'SELECT count(id) FROM {TABLE_CONTACTS} WHERE {FIELD_CHECKSUM}=?'
+        count = self._db.execute_scalar(sql, (str(checksum),))
+        return count != 0
+
     def log_contact(self, input_data : dict) -> None:
         """
         Inserts a contact into the db.
         A provided callsign is looked up in the database and callsign_id is stored.
+
+        The contact will be ignored if it is considered a duplicate QSO.
 
         The following values can be present in the dictionary:
         - callsign (mandatory)
@@ -272,7 +291,11 @@ class LogDatabase(object):
         - dirty
         """
 
+        if self.is_duplicate(input_data):
+            return
+
         data = self._db.filter_dictionary(input_data, CONTACT_FIELDS)
+        data[FIELD_CHECKSUM] = str(self.calculate_checksum(data))
         print(data)
 
         call_data = self.get_or_add_callsign(input_data)
