@@ -151,18 +151,14 @@
   <ItemGroup>
     <Content Include="data\FastSatEntry_preferences.json" />
     <Content Include="emulator\ui\EmulatorMainWindow.ui" />
-    <Content Include="FastSatEntry-win.spec" />
-    <Content Include="FastSatEntry.spec" />
     <Content Include="font\JetBrainsMono-Regular.ttf" />
     <Content Include="icon\sat_dish-32.png" />
     <Content Include="icon\sat_dish-512.png" />
     <Content Include="icon\sat_dish-64.png" />
-    <Content Include="Logger-win.spec" />
     <Content Include="logger\ui\FastSatEntry.ui" />
     <Content Include="logger\ui\LoggerMainWindow.ui" />
     <Content Include="logger\ui\QsoEditorWindow.ui" />
     <Content Include="logger\ui\StationInfoDialog.ui" />
-    <Content Include="logger_preferences.json" />
     <Content Include="pyproject.toml" />
     <Content Include="README.md" />
     <Content Include="suite\ui\MainWindow.ui" />
