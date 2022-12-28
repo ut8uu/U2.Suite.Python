@@ -149,21 +149,6 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         self._running = False
 
     '''==========================================================================='''
-    def on_keyPressed(self, key: str) -> None:
-        '''Handles the key_pressed event'''
-        if not self._is_active:
-            return
-
-        if key == kbk.KEY_RETURN:
-            self.save_qso()
-            self.clear_fields()
-            self.display_log()
-        elif key == kbk.KEY_SPACE:
-            self.MoveFocus()
-        else:
-            print(f"Key '{key}' not supported.")
-
-    '''==========================================================================='''
     def display_log(self):
         '''Displays the entire log.'''
         contacts = self._db.load_all_contacts(FIELD_TIMESTAMP)

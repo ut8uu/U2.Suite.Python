@@ -20,7 +20,6 @@ from pathlib import Path
 from PyQt5 import QtCore
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QApplication, QDialog
-#from matplotlib.backend_bases import CloseEvent
 
 from logger.log_database import LogDatabase
 from logger.logger_options import LoggerOptions
