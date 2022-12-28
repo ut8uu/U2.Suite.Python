@@ -37,7 +37,6 @@ from PyQt5.QtCore import QAbstractEventDispatcher, pyqtSlot, QDateTime
 from PyQt5.QtCore import QDir, QTimer, Qt, QEvent
 from PyQt5.QtGui import QFontDatabase
 from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, qApp, QFileDialog
-from pyqtkeybind import keybinder
 from typing import List
 
 def load_fonts_from_dir(directory: str) -> set:

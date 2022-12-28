@@ -19,19 +19,11 @@ if __name__ == '__main__':
     print('This module cannot be executed directly')
     exit(0)
 
-import logging
-import semver
+from logger.logger_constants import *
 from typing import Any, List, Tuple
-import uuid
-from common.exceptions.ArgumentException import ArgumentException
 import os
 from pathlib import Path
 import sqlite3
-from common.exceptions.ArgumentMismatchException import ArgumentMismatchException
-from common.exceptions.logger.CallsignNotFoundException import CallsignNotFoundException
-
-from helpers.FileSystemHelper import FileSystemHelper
-from logger.logger_constants import *
 
 class DatabaseCore(object):
     '''Class handles all requests to the database'''
