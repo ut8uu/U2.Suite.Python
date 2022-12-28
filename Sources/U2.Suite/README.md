@@ -9,8 +9,8 @@ This is a Python implementation of the U2.Suite
 - Go to the 'U2.Suite' folder 
 - Execute the following commands:
     $> poetry config virtualenvs.in-project true
-    $> poetry install
     $> poetry shell
+    $> poetry install
 
 - IDE open project:
 	+ Visual Studio (vers 2019/2022): open project U2.Suite.pyproj
