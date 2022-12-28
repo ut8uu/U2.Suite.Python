@@ -16,7 +16,9 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from common.ApplicationPreferences import ApplicationPreferences
-from logger.logger_constants import KEY_DEFAULT_BAND, KEY_DEFAULT_MODE, KEY_REALTIME, KEY_UTC, PREFERENCES_FILE_LOGGER
+from logger.logger_constants import KEY_DEFAULT_BAND, KEY_DEFAULT_MODE 
+from logger.logger_constants import KEY_REALTIME, KEY_UTC, KEY_WSJT_ACCEPT_PACKETS
+from logger.logger_constants import PREFERENCES_FILE_LOGGER
 
 
 class LoggerApplicationPreferences(ApplicationPreferences):
@@ -32,7 +34,8 @@ class LoggerApplicationPreferences(ApplicationPreferences):
                 KEY_UTC : str(True),
                 KEY_REALTIME : str(True),
                 KEY_DEFAULT_BAND : '160m',
-                KEY_DEFAULT_MODE : 'SSB'
+                KEY_DEFAULT_MODE : 'SSB',
+                KEY_WSJT_ACCEPT_PACKETS : str(False)
             }
         super().__init__(PREFERENCES_FILE_LOGGER)
 
@@ -64,4 +67,12 @@ class LoggerApplicationPreferences(ApplicationPreferences):
     def DefaultBand(self, value : str) -> None:
         self.Preferences[KEY_DEFAULT_BAND] = value
         
+    @property
+    def AcceptWsjtPackets(self) -> bool:
+        return self.get_bool_value(KEY_WSJT_ACCEPT_PACKETS, False)
+    @AcceptWsjtPackets.setter
+    def AcceptWsjtPackets(self, value : bool) -> None:
+        self.Preferences[KEY_WSJT_ACCEPT_PACKETS] = value
+        
+    
     

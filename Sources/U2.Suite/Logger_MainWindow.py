@@ -20,17 +20,15 @@ import os
 from pathlib import Path
 import sys
 
-#from matplotlib.backend_bases import CloseEvent
 from Logger_QsoEditorDialog import Logger_QsoEditorDialog
 from Logger_StationInfoDialog import Logger_StationInfoDialog
 from helpers.AdifHelper import ADIF_log, AdifHelper
 from helpers.FileSystemHelper import FileSystemHelper
+from logger.Logger_PreferencesDialog import Logger_PreferencesDialog
 
-import helpers.KeyBinderKeys as kbk
 from logger.log_database import LogDatabase
 from logger.logger_constants import *
 from logger.logger_main_window_ui import LoggerMainWindowUiHelper
-from logger.logger_options import LoggerOptions
 from logger.logger_preferences import LoggerApplicationPreferences
 from logger.ui.Ui_LoggerMainWindow import Ui_LoggerMainWindow
 from PyQt5.QtCore import QAbstractEventDispatcher, pyqtSlot, QDateTime
@@ -55,7 +53,6 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
     _registered = False
     _event_dispatcher : QAbstractEventDispatcher
     _db : LogDatabase
-    _is_active : bool
     _preferences : LoggerApplicationPreferences
 
     _running : bool
@@ -66,7 +63,6 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         super().__init__(parent)
 
         self._running = True
-        self._is_active = True
 
         self._preferences = LoggerApplicationPreferences()
 
@@ -84,6 +80,7 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         self.actionImportFrom_ADIF_file.triggered.connect(self.import_from_adif)
         self.actionExportToADIFfile.triggered.connect(self.export_to_adif)
         self.actionExportToADXfile.triggered.connect(self.export_to_adx)
+        self.actionPreferences.triggered.connect(self.display_preferences_dialog)
 
         # install event handler for main input controls
         self.tbCallsign.installEventFilter(self)
@@ -327,19 +324,16 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         dialog.setup(result, self._db)
         dialog.change.lineChanged.connect(self.qso_edited)
         dialog.change.dialogClosed.connect(self.edit_qso_dialog_closed)
-        self._is_active = False
         dialog.open()
 
     '''==========================================================================='''
     def qso_edited(self) -> None:
         '''Handles post edit or delete event.'''
         self.display_log()
-        self._is_active = True
 
     '''==========================================================================='''
     def edit_qso_dialog_closed(self) -> None:
         '''Handles closing of the EditQSO dialog'''
-        self._is_active = True
 
     '''==========================================================================='''
     def update_time(self) -> None:
@@ -360,13 +354,11 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         dialog = Logger_StationInfoDialog(self)
         dialog.setup(self._db.LoggerOptions)
         dialog.change_event.dialogClosed.connect(self.station_info_dialog_closed)
-        self._is_active = False
         dialog.open()
 
     '''==========================================================================='''
     def station_info_dialog_closed(self) -> None:
         '''Handles closing of the Station Info dialog'''
-        self._is_active = True
 
     '''=========================================================================='''
     def keyPressEvent(self, event):
@@ -472,6 +464,15 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
             AdifHelper.ExportAdif(filename, log)
         elif filetype.find('adx') > -1:
             AdifHelper.ExportAdx(filename, log)
+
+    '''=========================================================================='''
+    def display_preferences_dialog(self) -> None:
+        '''Displays the application preferences dialog.'''
+        dialog = Logger_PreferencesDialog(self)
+        dialog.change.changed.connect(self.preferences_changed)
+        dialog.setup(self._preferences)
+        dialog.open()
+        
 
 '''==========================================================================='''
 if __name__ == '__main__':

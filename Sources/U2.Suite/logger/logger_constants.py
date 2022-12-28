@@ -64,6 +64,7 @@ KEY_DEFAULT_MODE = 'mode'
 KEY_DEFAULT_SATELLITE = 'satellite'
 KEY_REALTIME = 'realtime'
 KEY_UTC = 'utc'
+KEY_WSJT_ACCEPT_PACKETS = 'accept_wsjt_packets'
 
 PREFERENCES_FILE_FSE = 'FastSatEntry_preferences.json'
 PREFERENCES_FILE_LOGGER = 'logger_preferences.json'

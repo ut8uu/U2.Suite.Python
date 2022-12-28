@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>569</width>
-    <height>552</height>
+    <width>612</width>
+    <height>591</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -146,7 +146,7 @@
      <rect>
       <x>420</x>
       <y>10</y>
-      <width>47</width>
+      <width>80</width>
       <height>13</height>
      </rect>
     </property>
@@ -159,7 +159,7 @@
      <rect>
       <x>420</x>
       <y>30</y>
-      <width>141</width>
+      <width>180</width>
       <height>31</height>
      </rect>
     </property>
@@ -367,8 +367,8 @@
      <rect>
       <x>10</x>
       <y>200</y>
-      <width>551</width>
-      <height>54</height>
+      <width>595</width>
+      <height>65</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout">
@@ -565,8 +565,8 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>260</y>
-      <width>550</width>
+      <y>280</y>
+      <width>591</width>
       <height>240</height>
      </rect>
     </property>
@@ -589,7 +589,7 @@
       <rect>
        <x>5</x>
        <y>11</y>
-       <width>540</width>
+       <width>581</width>
        <height>220</height>
       </rect>
      </property>
@@ -649,8 +649,8 @@
      <rect>
       <x>10</x>
       <y>90</y>
-      <width>496</width>
-      <height>31</height>
+      <width>652</width>
+      <height>39</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout">
@@ -730,8 +730,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>569</width>
-     <height>21</height>
+     <width>612</width>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -757,6 +757,8 @@
     <addaction name="separator"/>
     <addaction name="menuImport"/>
     <addaction name="menuExport"/>
+    <addaction name="separator"/>
+    <addaction name="actionPreferences"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
@@ -802,6 +804,11 @@
   <action name="actionExportToADXfile">
    <property name="text">
     <string>To ADX file</string>
+   </property>
+  </action>
+  <action name="actionPreferences">
+   <property name="text">
+    <string>Preferences</string>
    </property>
   </action>
  </widget>

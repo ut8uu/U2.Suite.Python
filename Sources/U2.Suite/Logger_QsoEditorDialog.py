@@ -19,7 +19,6 @@ import datetime
 from pathlib import Path
 import sys
 
-#from matplotlib.backend_bases import CloseEvent
 from helpers.FileSystemHelper import FileSystemHelper
 from logger.log_database import LogDatabase
 from logger.logger_constants import *
