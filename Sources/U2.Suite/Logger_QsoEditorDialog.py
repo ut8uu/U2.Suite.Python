@@ -19,7 +19,7 @@ import datetime
 from pathlib import Path
 import sys
 
-from matplotlib.backend_bases import CloseEvent
+#from matplotlib.backend_bases import CloseEvent
 from helpers.FileSystemHelper import FileSystemHelper
 from logger.log_database import LogDatabase
 from logger.logger_constants import *
@@ -112,9 +112,9 @@ class Logger_QsoEditorDialog(QDialog, Ui_QsoEditor):
         self.change.lineChanged.emit()
         self.close()
 
-    def closeEvent(self, a0: CloseEvent) -> None:
+    def closeEvent(self, event) -> None:
         self.change.dialogClosed.emit()
-        return super().closeEvent(a0)
+        return super().closeEvent(event)
 
 if __name__ == '__main__':
     import os

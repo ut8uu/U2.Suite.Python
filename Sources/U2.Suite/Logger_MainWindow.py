@@ -20,14 +20,13 @@ import os
 from pathlib import Path
 import sys
 
-from matplotlib.backend_bases import CloseEvent
+#from matplotlib.backend_bases import CloseEvent
 from Logger_QsoEditorDialog import Logger_QsoEditorDialog
 from Logger_StationInfoDialog import Logger_StationInfoDialog
 from helpers.AdifHelper import ADIF_log, AdifHelper
 from helpers.FileSystemHelper import FileSystemHelper
 
 import helpers.KeyBinderKeys as kbk
-from helpers.WinEventFilter import WinEventFilter
 from logger.log_database import LogDatabase
 from logger.logger_constants import *
 from logger.logger_main_window_ui import LoggerMainWindowUiHelper
@@ -130,7 +129,7 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         self._running = False
 
     '''==========================================================================='''
-    def closeEvent(self, a0: CloseEvent) -> None:
+    def closeEvent(self, a0) -> None:
         self.save_current_qso_state()
         return super().closeEvent(a0)
 

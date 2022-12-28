@@ -20,7 +20,7 @@ from pathlib import Path
 from PyQt5 import QtCore
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QApplication, QDialog
-from matplotlib.backend_bases import CloseEvent
+#from matplotlib.backend_bases import CloseEvent
 
 from logger.log_database import LogDatabase
 from logger.logger_options import LoggerOptions
@@ -70,9 +70,9 @@ class Logger_StationInfoDialog(QDialog, Ui_StationInfoDialog):
         self.change_event.changed.emit()
         self.close()
 
-    def closeEvent(self, a0: CloseEvent) -> None:
+    def closeEvent(self, event) -> None:
         self.change_event.dialogClosed.emit()
-        return super().closeEvent(a0)
+        return super().closeEvent(event)
 
 if __name__ == '__main__':
     import os

@@ -27,10 +27,10 @@ from logger.logger_constants import *
 from logger.logger_options import LoggerOptions
 import logging
 from pathlib import Path
-#import semver
 import sqlite3
 from typing import Any, List, Tuple
 import uuid
+import semver
 
 class LogDatabase(object):
     '''Class handles all requests to the database'''
@@ -81,9 +81,9 @@ class LogDatabase(object):
 
     def __check_db(self) -> None:
         try:
-            #self._options.create_table()
-            #version = semver.VersionInfo.parse(self._db_version)
-            #self._options.get_or_insert_version(version)
+            self._options.create_table()
+            version = semver.VersionInfo.parse(self._db_version)
+            self._options.get_or_insert_version(version)
 
             # create a table for calls
             sql = (
