@@ -37,6 +37,7 @@ class Logger_PreferencesDialog(QDialog, Ui_LoggerPreferencesDialog):
     '''Represents Preferences dialog.'''
     
     _preferences : LoggerApplicationPreferences
+    change_event : PreferencesDialogEvent
     
     def __init__(self, parent = None) -> None:
         super().__init__(parent)
@@ -63,6 +64,8 @@ class Logger_PreferencesDialog(QDialog, Ui_LoggerPreferencesDialog):
         self._preferences.AcceptWsjtPackets = self.cbAcceptWsjtPackets.isChecked()
                 
         self._preferences.write_preferences()
+        self.change_event.changed.emit()
+        self.close()
         
 if __name__ == '__main__':
     '''Launched directly. Consider a test run.'''

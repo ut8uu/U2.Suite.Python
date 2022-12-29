@@ -25,6 +25,7 @@ from Logger_StationInfoDialog import Logger_StationInfoDialog
 from helpers.AdifHelper import ADIF_log, AdifHelper
 from helpers.FileSystemHelper import FileSystemHelper
 from logger.Logger_PreferencesDialog import Logger_PreferencesDialog
+from logger.listeners.wsjt_listener import WsjtListener
 
 from logger.log_database import LogDatabase
 from logger.logger_constants import *
@@ -54,6 +55,8 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
     _event_dispatcher : QAbstractEventDispatcher
     _db : LogDatabase
     _preferences : LoggerApplicationPreferences
+    
+    _wsjt_listener : WsjtListener
 
     _running : bool
 
@@ -119,6 +122,12 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
 
         if len(self._db.LoggerOptions.StationCallsign) == 0:
             self.display_station_info_dialog()
+            
+        self._wsjt_listener = WsjtListener()
+        self._wsjt_listener.setup('127.0.0.1')
+        if self._preferences.AcceptWsjtPackets:
+            self._wsjt_listener.start()
+
     
     def __del__(self):
         '''A class' destructor'''
@@ -469,9 +478,17 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
     def display_preferences_dialog(self) -> None:
         '''Displays the application preferences dialog.'''
         dialog = Logger_PreferencesDialog(self)
-        dialog.change.changed.connect(self.preferences_changed)
+        dialog.change_event.changed.connect(self.preferences_changed)
         dialog.setup(self._preferences)
         dialog.open()
+        
+    '''=========================================================================='''
+    def preferences_changed(self) -> None:
+        '''Handles changing the application preferences.'''
+        if self._preferences.AcceptWsjtPackets:
+            self._wsjt_listener.start()
+        else:
+            self._wsjt_listener.stop()
         
 
 '''==========================================================================='''
