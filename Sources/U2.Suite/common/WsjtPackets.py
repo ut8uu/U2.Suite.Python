@@ -360,6 +360,10 @@ class LoggedADIFPacket(GenericWSJTXPacket):
         assert ptype == self.TYPE_VALUE
         self._app_id = rdr.QString() # app id
         self._adif = rdr.QString() # actual adif
+        
+    @property
+    def ADIF(self) -> str:
+        return self._adif
 
     @classmethod
     def Builder(cls, to_wsjtx_id='WSJT-X', adif_text=""):
@@ -436,9 +440,6 @@ class WSJTXPacketClassFactory(GenericWSJTXPacket):
             return InvalidPacket( addr_port, udp_packet, "Unsupported schema value {}".format(schema))
         klass = WSJTXPacketClassFactory.PACKET_TYPE_TO_OBJ_MAP.get(pkt_type)
 
-        print('=========================================================')
-        print(pkt_type)
-        print(str(udp_packet))
         if klass is None:
             return InvalidPacket( addr_port, udp_packet, "Unknown packet type {}".format(pkt_type))
 
