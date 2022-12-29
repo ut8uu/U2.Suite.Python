@@ -19,26 +19,41 @@ import os, sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from common.WsjtPackets import LoggedADIFPacket, WSJTXPacketClassFactory
+from helpers.AdifHelper import ADIF_log, AdifHelper
 from logger.listeners.udp_listener_base import UdpListenerBase
+from PyQt5 import QtCore
 
 WSJT_UDP_PORT = 2237
 
+class WsjtListenerEvent(QtCore.QObject):
+    adif_received = QtCore.pyqtSignal(ADIF_log)
+
 class WsjtListener(UdpListenerBase):
     '''Represents a listener aimed at WSJT-X UDP packets.'''
+    _listener_event : WsjtListenerEvent
+    
     def __init__(self) -> None:
         super().__init__()
         
+        self._listener_event = WsjtListenerEvent()
+        
     def setup(self, address):
         super().setup(address, WSJT_UDP_PORT)
+        
+    @property
+    def ListenerEvent(self) -> WsjtListenerEvent:
+        return self._listener_event
     
     def packet_received(self, pkt, addr_port) -> None:
         if (pkt != None):
             the_packet = WSJTXPacketClassFactory.from_udp_packet(addr_port, pkt)
             if type(the_packet) == LoggedADIFPacket:
-                print(the_packet)
+                #print(the_packet.ADIF)
+                log = AdifHelper.ImportFromString(the_packet.ADIF)
+                self._listener_event.adif_received.emit(log)
         
 if __name__ == '__main__':
-    '''DIrect call for demo purposes.'''
+    '''Direct run for demo purposes.'''
     
     from wsjt_listener import WsjtListener
     

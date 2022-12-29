@@ -57,12 +57,12 @@ class AdifTests(unittest.TestCase):
         AdifHelper.ExportAdx(example_adx_file, log)
 
         # Read example.adif back...
-        adif_log = AdifHelper.Import(example_adif_file)
+        adif_log = AdifHelper.ImportFromFile(example_adif_file)
         print(adif_log[0]['CALL'])
         print(adif_log[0]['BAND'])
 
         # Read example.adx back...
-        adx_log = AdifHelper.Import(example_adx_file)
+        adx_log = AdifHelper.ImportFromFile(example_adx_file)
         print(adx_log[0]['call'],' band: ',adx_log[0]['band'])
 
         self.assertEqual(str(adif_log[0]['CALL']), str(adx_log[0]['CALL']))

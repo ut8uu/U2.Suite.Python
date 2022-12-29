@@ -80,7 +80,7 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         self.cbRealtime.stateChanged.connect(self.real_time_changed)
         self.btnNow.clicked.connect(self.set_current_date_time)
 
-        self.actionImportFrom_ADIF_file.triggered.connect(self.import_from_adif)
+        self.actionImportFrom_ADIF_file.triggered.connect(self.import_from_file)
         self.actionExportToADIFfile.triggered.connect(self.export_to_adif)
         self.actionExportToADXfile.triggered.connect(self.export_to_adx)
         self.actionPreferences.triggered.connect(self.display_preferences_dialog)
@@ -125,6 +125,7 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
             
         self._wsjt_listener = WsjtListener()
         self._wsjt_listener.setup('127.0.0.1')
+        self._wsjt_listener.ListenerEvent.adif_received.connect(self.adif_received)
         if self._preferences.AcceptWsjtPackets:
             self._wsjt_listener.start()
 
@@ -136,6 +137,7 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
     '''==========================================================================='''
     def closeEvent(self, a0) -> None:
         self.save_current_qso_state()
+        self._wsjt_listener.stop()
         return super().closeEvent(a0)
 
     '''==========================================================================='''
@@ -400,19 +402,22 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
             self.display_log()
 
     '''=========================================================================='''
-    def import_from_adif(self) -> None:
+    def import_from_file(self) -> None:
         '''Handles click on the `Import from ADIF file` action'''
         filename, filetype = QFileDialog.getOpenFileName(self, 'Select ADIF file', '.',
                 filter="ADIF files (*.adi;*.adx)")
 
         if len(filename) == 0:
             return
-        log = AdifHelper.Import(filename)
+        log = AdifHelper.ImportFromFile(filename)
         
         self._db.delete_all_contacts()
+        self.import_from_adif_log(log)
+        
+    def import_from_adif_log(self, log : ADIF_log):
         for entry in log:
             date = f'{entry[ADIF_QSO_DATE]}{entry[ADIF_TIME_ON]}'
-            timestamp = datetime.strptime(date, '%Y%m%d%H%M')
+            timestamp = datetime.strptime(date, '%Y%m%d%H%M%S')
             data = {
                 FIELD_CALLSIGN : str(entry[ADIF_CALL]),
                 FIELD_BAND : str(entry[ADIF_BAND]),
@@ -490,6 +495,11 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         else:
             self._wsjt_listener.stop()
         
+    '''=========================================================================='''
+    def adif_received(self, log : ADIF_log) -> None:
+        '''Handles receiving of the ADIF log.'''
+        self.import_from_adif_log(log)
+        self.display_log()
 
 '''==========================================================================='''
 if __name__ == '__main__':
