@@ -20,25 +20,22 @@ import os
 from pathlib import Path
 import sys
 
-from matplotlib.backend_bases import CloseEvent
 from Logger_QsoEditorDialog import Logger_QsoEditorDialog
 from Logger_StationInfoDialog import Logger_StationInfoDialog
 from helpers.AdifHelper import ADIF_log, AdifHelper
 from helpers.FileSystemHelper import FileSystemHelper
+from logger.Logger_PreferencesDialog import Logger_PreferencesDialog
+from logger.listeners.wsjt_listener import WsjtListener
 
-import helpers.KeyBinderKeys as kbk
-from helpers.WinEventFilter import WinEventFilter
 from logger.log_database import LogDatabase
 from logger.logger_constants import *
 from logger.logger_main_window_ui import LoggerMainWindowUiHelper
-from logger.logger_options import LoggerOptions
 from logger.logger_preferences import LoggerApplicationPreferences
 from logger.ui.Ui_LoggerMainWindow import Ui_LoggerMainWindow
 from PyQt5.QtCore import QAbstractEventDispatcher, pyqtSlot, QDateTime
 from PyQt5.QtCore import QDir, QTimer, Qt, QEvent
 from PyQt5.QtGui import QFontDatabase
 from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, qApp, QFileDialog
-from pyqtkeybind import keybinder
 from typing import List
 
 def load_fonts_from_dir(directory: str) -> set:
@@ -57,8 +54,9 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
     _registered = False
     _event_dispatcher : QAbstractEventDispatcher
     _db : LogDatabase
-    _is_active : bool
     _preferences : LoggerApplicationPreferences
+    
+    _wsjt_listener : WsjtListener
 
     _running : bool
 
@@ -68,7 +66,6 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         super().__init__(parent)
 
         self._running = True
-        self._is_active = True
 
         self._preferences = LoggerApplicationPreferences()
 
@@ -83,9 +80,10 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         self.cbRealtime.stateChanged.connect(self.real_time_changed)
         self.btnNow.clicked.connect(self.set_current_date_time)
 
-        self.actionImportFrom_ADIF_file.triggered.connect(self.import_from_adif)
+        self.actionImportFrom_ADIF_file.triggered.connect(self.import_from_file)
         self.actionExportToADIFfile.triggered.connect(self.export_to_adif)
         self.actionExportToADXfile.triggered.connect(self.export_to_adx)
+        self.actionPreferences.triggered.connect(self.display_preferences_dialog)
 
         # install event handler for main input controls
         self.tbCallsign.installEventFilter(self)
@@ -124,14 +122,22 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
 
         if len(self._db.LoggerOptions.StationCallsign) == 0:
             self.display_station_info_dialog()
+            
+        self._wsjt_listener = WsjtListener()
+        self._wsjt_listener.setup('127.0.0.1')
+        self._wsjt_listener.ListenerEvent.adif_received.connect(self.adif_received)
+        if self._preferences.AcceptWsjtPackets:
+            self._wsjt_listener.start()
+
     
     def __del__(self):
         '''A class' destructor'''
         self._running = False
 
     '''==========================================================================='''
-    def closeEvent(self, a0: CloseEvent) -> None:
+    def closeEvent(self, a0) -> None:
         self.save_current_qso_state()
+        self._wsjt_listener.stop()
         return super().closeEvent(a0)
 
     '''==========================================================================='''
@@ -149,21 +155,6 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
     '''==========================================================================='''
     def destroy(self) -> None:
         self._running = False
-
-    '''==========================================================================='''
-    def on_keyPressed(self, key: str) -> None:
-        '''Handles the key_pressed event'''
-        if not self._is_active:
-            return
-
-        if key == kbk.KEY_RETURN:
-            self.save_qso()
-            self.clear_fields()
-            self.display_log()
-        elif key == kbk.KEY_SPACE:
-            self.MoveFocus()
-        else:
-            print(f"Key '{key}' not supported.")
 
     '''==========================================================================='''
     def display_log(self):
@@ -344,19 +335,16 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         dialog.setup(result, self._db)
         dialog.change.lineChanged.connect(self.qso_edited)
         dialog.change.dialogClosed.connect(self.edit_qso_dialog_closed)
-        self._is_active = False
         dialog.open()
 
     '''==========================================================================='''
     def qso_edited(self) -> None:
         '''Handles post edit or delete event.'''
         self.display_log()
-        self._is_active = True
 
     '''==========================================================================='''
     def edit_qso_dialog_closed(self) -> None:
         '''Handles closing of the EditQSO dialog'''
-        self._is_active = True
 
     '''==========================================================================='''
     def update_time(self) -> None:
@@ -377,13 +365,11 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         dialog = Logger_StationInfoDialog(self)
         dialog.setup(self._db.LoggerOptions)
         dialog.change_event.dialogClosed.connect(self.station_info_dialog_closed)
-        self._is_active = False
         dialog.open()
 
     '''==========================================================================='''
     def station_info_dialog_closed(self) -> None:
         '''Handles closing of the Station Info dialog'''
-        self._is_active = True
 
     '''=========================================================================='''
     def keyPressEvent(self, event):
@@ -416,19 +402,22 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
             self.display_log()
 
     '''=========================================================================='''
-    def import_from_adif(self) -> None:
+    def import_from_file(self) -> None:
         '''Handles click on the `Import from ADIF file` action'''
         filename, filetype = QFileDialog.getOpenFileName(self, 'Select ADIF file', '.',
                 filter="ADIF files (*.adi;*.adx)")
 
         if len(filename) == 0:
             return
-        log = AdifHelper.Import(filename)
+        log = AdifHelper.ImportFromFile(filename)
         
         self._db.delete_all_contacts()
+        self.import_from_adif_log(log)
+        
+    def import_from_adif_log(self, log : ADIF_log):
         for entry in log:
             date = f'{entry[ADIF_QSO_DATE]}{entry[ADIF_TIME_ON]}'
-            timestamp = datetime.strptime(date, '%Y%m%d%H%M')
+            timestamp = datetime.strptime(date, '%Y%m%d%H%M%S')
             data = {
                 FIELD_CALLSIGN : str(entry[ADIF_CALL]),
                 FIELD_BAND : str(entry[ADIF_BAND]),
@@ -489,6 +478,28 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
             AdifHelper.ExportAdif(filename, log)
         elif filetype.find('adx') > -1:
             AdifHelper.ExportAdx(filename, log)
+
+    '''=========================================================================='''
+    def display_preferences_dialog(self) -> None:
+        '''Displays the application preferences dialog.'''
+        dialog = Logger_PreferencesDialog(self)
+        dialog.change_event.changed.connect(self.preferences_changed)
+        dialog.setup(self._preferences)
+        dialog.open()
+        
+    '''=========================================================================='''
+    def preferences_changed(self) -> None:
+        '''Handles changing the application preferences.'''
+        if self._preferences.AcceptWsjtPackets:
+            self._wsjt_listener.start()
+        else:
+            self._wsjt_listener.stop()
+        
+    '''=========================================================================='''
+    def adif_received(self, log : ADIF_log) -> None:
+        '''Handles receiving of the ADIF log.'''
+        self.import_from_adif_log(log)
+        self.display_log()
 
 '''==========================================================================='''
 if __name__ == '__main__':

@@ -1337,15 +1337,12 @@ class ADIF_log(list):
         return ADIF_fieldTypes[name]['enumeration'] or None
     def getDesc(self, name):
         return ADIF_fieldTypes[name]['desc'] or None
-    def fimport(self, file):
-        f = open(file, 'r')
-        data = f.read()#.decode('utf-8')
-        f.close()
+    def from_string(self, data):
         if data[0:5] == '<?xml':
             parser = make_parser()
             handler = ADXHandler(self)
             parser.setContentHandler(handler)
-            parser.parse(file)
+            parser.parse(data)
         else:
             tagre = re.compile(r'^<([^:>]+)(?::([0-9]+)(?::([^:>]*))?)?>')
             def skip_to_start(data):
@@ -1494,13 +1491,20 @@ class ADIF_log(list):
                     del e[x]
     def load_from_file(self, path_to_file: str) -> list[dict]:
         '''Loads ADIF from given file.'''
-        self.fimport(path_to_file)
+        f = open(path_to_file, 'r')
+        data = f.read()#.decode('utf-8')
+        f.close()
+        return self.from_string(data)
+        
+    def load_from_string(self, data) -> list[dict]:
+        '''Loads ADID from the given string.'''
+        return self.from_string(data)
 
 class AdifHelper(object):
     '''Represents helper methods for working with ADIF files.'''
 
     @staticmethod
-    def Import(path_to_file: str) -> ADIF_log:
+    def ImportFromFile(path_to_file: str) -> ADIF_log:
         '''
         Loads records from given file.
         Raises FileNotFoundError if file cannot be found.
@@ -1510,6 +1514,12 @@ class AdifHelper(object):
 
         log = ADIF_log()
         log.load_from_file(path_to_file)
+        return log
+    
+    @staticmethod
+    def ImportFromString(data : str) -> ADIF_log:
+        log = ADIF_log()
+        log.load_from_string(data)
         return log
 
     @staticmethod
@@ -1559,12 +1569,12 @@ if __name__ == '__main__':
     AdifHelper.ExportAdx(example_adx_file, log)
 
     # Read example.adif back...
-    newlog = AdifHelper.Import(example_adif_file)
+    newlog = AdifHelper.ImportFromFile(example_adif_file)
     print(newlog[0]['CALL'])
     print(newlog[0]['BAND'])
 
     # Read example.adx back...
-    newlog = AdifHelper.Import(example_adx_file)
+    newlog = AdifHelper.ImportFromFile(example_adx_file)
     print(newlog[0]['call'],' band: ',newlog[0]['band'])
 
     # Clean up... nothing interesting here...
