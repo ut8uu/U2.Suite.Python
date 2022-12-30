@@ -366,6 +366,11 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
     def display_station_info_dialog(self) -> None:
         '''Handles clicking the `Show Station Info` menu'''
         dialog = Logger_StationInfoDialog(self)
+        # get values from application preferences, if any
+        if len(self._db.LoggerOptions.StationCallsign) == 0:
+            self._db.LoggerOptions.StationCallsign = self._preferences.Callsign
+        if len(self._db.LoggerOptions.OperatorName) == 0:
+            self._db.LoggerOptions.OperatorName = self._preferences.OperatorName
         dialog.setup(self._db.LoggerOptions)
         dialog.change_event.dialogClosed.connect(self.station_info_dialog_closed)
         dialog.open()
