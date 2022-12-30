@@ -17,14 +17,15 @@
 
 import datetime
 from pathlib import Path
-import sys
+import sys, os
 
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from helpers.FileSystemHelper import FileSystemHelper
 from logger.log_database import LogDatabase
 from logger.logger_constants import *
 from logger.ui.Ui_QsoEditorWindow import Ui_QsoEditor
 from PyQt5 import QtCore
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import QApplication, QDialog
 
 class QSOEdit(QtCore.QObject):
@@ -51,8 +52,11 @@ class Logger_QsoEditorDialog(QDialog, Ui_QsoEditor):
         font = self.editCallsign.font()
         font.setCapitalization(QFont.AllUppercase)
         font.setPointSizeF(16)
-
         self.editCallsign.setFont(font)
+        
+        self.setFixedSize(self.width(), self.height())
+        self.setWindowIcon(QIcon(FileSystemHelper.relpath('icon/edit_file-32.png')))
+        
         self.change = QSOEdit()
 
     def setup(self, qso : dict, db : LogDatabase) -> None:

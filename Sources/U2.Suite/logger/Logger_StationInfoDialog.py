@@ -15,11 +15,13 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import sys
+import sys, os
 from pathlib import Path
 from PyQt5 import QtCore
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QApplication, QDialog
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from logger.log_database import LogDatabase
 from logger.logger_options import LoggerOptions
@@ -48,6 +50,7 @@ class Logger_StationInfoDialog(QDialog, Ui_StationInfoDialog):
         font.setCapitalization(QFont.AllUppercase)
         font.setPointSizeF(16)
         self.tbCallsign.setFont(font)
+        self.setFixedSize(self.width(), self.height())
 
     '''---------------------------------------------------------------------------'''
     def setup(self, options: LoggerOptions) -> None:

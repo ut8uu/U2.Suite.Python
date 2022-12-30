@@ -16,7 +16,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from common.ApplicationPreferences import ApplicationPreferences
-from logger.logger_constants import KEY_DEFAULT_BAND, KEY_DEFAULT_MODE 
+from logger.logger_constants import KEY_DEFAULT_BAND, KEY_DEFAULT_MODE, KEY_MYCALLSIGN, KEY_MYGRID, KEY_OPERATOR_NAME 
 from logger.logger_constants import KEY_REALTIME, KEY_UTC, KEY_WSJT_ACCEPT_PACKETS
 from logger.logger_constants import PREFERENCES_FILE_LOGGER
 
@@ -35,7 +35,11 @@ class LoggerApplicationPreferences(ApplicationPreferences):
                 KEY_REALTIME : str(True),
                 KEY_DEFAULT_BAND : '160m',
                 KEY_DEFAULT_MODE : 'SSB',
-                KEY_WSJT_ACCEPT_PACKETS : str(False)
+                KEY_WSJT_ACCEPT_PACKETS : str(False),
+                # station info tab
+                KEY_OPERATOR_NAME : '',
+                KEY_MYCALLSIGN : '',
+                KEY_MYGRID : ''
             }
         super().__init__(PREFERENCES_FILE_LOGGER, self._default_values)
 
@@ -73,6 +77,27 @@ class LoggerApplicationPreferences(ApplicationPreferences):
     @AcceptWsjtPackets.setter
     def AcceptWsjtPackets(self, value : bool) -> None:
         self.Preferences[KEY_WSJT_ACCEPT_PACKETS] = value
+        
+    @property
+    def Callsign(self) -> str:
+        return self.get_string_value(KEY_MYCALLSIGN, '')
+    @Callsign.setter
+    def Callsign(self, value : str) -> None:
+        self.Preferences[KEY_MYCALLSIGN] = value
+        
+    @property
+    def GridSquare(self) -> str:
+        return self.get_string_value(KEY_MYGRID, '')
+    @GridSquare.setter
+    def GridSquare(self, value : str) -> None:
+        self.Preferences[KEY_MYGRID] = value
+        
+    @property
+    def OperatorName(self) -> str:
+        return self.get_string_value(KEY_OPERATOR_NAME, '')
+    @OperatorName.setter
+    def OperatorName(self, value : str) -> None:
+        self.Preferences[KEY_OPERATOR_NAME] = value
         
     
     
