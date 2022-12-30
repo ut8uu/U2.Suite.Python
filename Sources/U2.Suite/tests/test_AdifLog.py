@@ -20,14 +20,14 @@ import datetime
 import os
 import unittest
 
-from helpers.AdifHelper import ADIF_log, AdifHelper
+from helpers.AdifHelper import ADIF_CALL, ADIF_OPERATOR, ADIF_log, ADIF_logentry, AdifHelper
 
 class AdifTests(unittest.TestCase):
     '''Represents tests of ADIF helper'''
 
     TEST_DIR = './test_files'
 
-    def test_CanWriteAdifFile(self)-> None:
+    def test_CanWorkWithAdifFiles(self)-> None:
         '''This is to test how to work with adif files'''
         TEST_DIR = './test_files'
         if not os.path.exists(TEST_DIR):
@@ -50,24 +50,39 @@ class AdifTests(unittest.TestCase):
         entry['TIME_ON']=datetime.datetime.now().strftime('%H%M')
         entry['comment_intl']=u'Testing...'
 
-        # Write to example.adif
-        AdifHelper.ExportAdif(example_adif_file, log)
+        try:
+            # Write to example.adif
+            AdifHelper.ExportAdif(example_adif_file, log)
 
-        # Write to example.adx
-        AdifHelper.ExportAdx(example_adx_file, log)
+            # Read example.adif back...
+            adif_log = AdifHelper.ImportFromFile(example_adif_file)
+            print(adif_log[0]['CALL'])
+            print(adif_log[0]['BAND'])
+            
+            record : ADIF_logentry
+            record = adif_log[0]
+            
+            self.assertEqual(str(record[ADIF_CALL]), 'WD1CKS')
+            self.assertEqual(str(record[ADIF_OPERATOR]), 'K6BSD')
+        finally:
+            if os.path.exists(example_adif_file):
+                os.remove(example_adif_file)
+            
+        try:
+            # Write to example.adx
+            AdifHelper.ExportAdx(example_adx_file, log)
 
-        # Read example.adif back...
-        adif_log = AdifHelper.ImportFromFile(example_adif_file)
-        print(adif_log[0]['CALL'])
-        print(adif_log[0]['BAND'])
+            # Read example.adx back...
+            adx_log = AdifHelper.ImportFromFile(example_adx_file)
+            print(adx_log[0]['call'],' band: ',adx_log[0]['band'])
 
-        # Read example.adx back...
-        adx_log = AdifHelper.ImportFromFile(example_adx_file)
-        print(adx_log[0]['call'],' band: ',adx_log[0]['band'])
+            self.assertEqual(str(record[ADIF_CALL]), 'WD1CKS')
+            self.assertEqual(str(record[ADIF_OPERATOR]), 'K6BSD')
 
-        self.assertEqual(str(adif_log[0]['CALL']), str(adx_log[0]['CALL']))
-        self.assertEqual(str(adif_log[0]['BAND']), str(adx_log[0]['BAND']))
+            self.assertEqual(str(adif_log[0]['CALL']), str(adx_log[0]['CALL']))
+            self.assertEqual(str(adif_log[0]['BAND']), str(adx_log[0]['BAND']))
+        finally:
+            # Clean up... nothing interesting here...
+            if os.path.exists(example_adx_file):
+                os.remove(example_adx_file)
 
-        # Clean up... nothing interesting here...
-        os.remove(example_adif_file)
-        os.remove(example_adx_file)

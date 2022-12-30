@@ -1,19 +1,32 @@
-# This file is part of the U2.Suite.Python distribution
-# (https://github.com/ut8uu/U2.Suite.Python).
-# 
-# Copyright (c) 2022 Sergey Usmanov, UT8UU.
-# 
-# This program is free software: you can redistribute it and/or modify  
-# it under the terms of the GNU General Public License as published by  
-# the Free Software Foundation, version 3.
+# This file is based on the ADIF_log.py by K6BSD
+# It can be found by the following link:
+# https://github.com/W8BSD/Py-ADIF/blob/master/ADIF_log.py
 #
-# This program is distributed in the hope that it will be useful, but 
-# WITHOUT ANY WARRANTY; without even the implied warranty of 
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
-# General Public License for more details.
+# The file was changed by Sergey Usmanov, UT8UU
 #
-# You should have received a copy of the GNU General Public License 
-# along with this program. If not, see <http://www.gnu.org/licenses/>.
+# Copyright (c) 2015, K6BSD
+# All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+# 
+# * Redistributions of source code must retain the above copyright notice, this
+#   list of conditions and the following disclaimer.
+# 
+# * Redistributions in binary form must reproduce the above copyright notice,
+#   this list of conditions and the following disclaimer in the documentation
+#   and/or other materials provided with the distribution.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import datetime
 import os
@@ -1138,6 +1151,17 @@ ADIF_fieldTypes = {
     'WEB':    {'type':'S', 'desc':"the contacted station's URL"},
 }
 
+ADIF_BAND = 'BAND'
+ADIF_CALL = 'CALL'
+ADIF_FREQUENCY = 'FREQUENCY'
+ADIF_MODE = 'MODE'
+ADIF_OPERATOR = 'OPERATOR'
+ADIF_QSO_DATE = 'QSO_DATE'
+ADIF_RST_RCVD = 'RST_RCVD'
+ADIF_RST_SENT = 'RST_SENT'
+ADIF_TIME_ON = 'TIME_ON'
+ADIF_TIME_OFF = 'TIME_OFF'
+
 # Validation functions
 def ADIF_validate(name, value, log):
     field = log.getType(name)
@@ -1337,12 +1361,22 @@ class ADIF_log(list):
         return ADIF_fieldTypes[name]['enumeration'] or None
     def getDesc(self, name):
         return ADIF_fieldTypes[name]['desc'] or None
-    def from_string(self, data):
+    def from_string(self, data : str) -> None:
         if data[0:5] == '<?xml':
+            # ADX should be written to the file
             parser = make_parser()
             handler = ADXHandler(self)
             parser.setContentHandler(handler)
-            parser.parse(data)
+            import tempfile
+            try:
+                with tempfile.NamedTemporaryFile() as tmp:
+                    with open(tmp.name, 'w') as f:
+                        f.write(data)
+                        parser.parse(tmp.name)
+            finally:
+                tmp.close()
+                os.unlink(tmp.name)
+                
         else:
             tagre = re.compile(r'^<([^:>]+)(?::([0-9]+)(?::([^:>]*))?)?>')
             def skip_to_start(data):
@@ -1412,7 +1446,7 @@ class ADIF_log(list):
                         else:
                             type = 'M'
                         self.setType(t['name'], type)
-                    r[t['name']]=t['data']
+                    r[t['name']] = t['data']
     def xml(self):
         ret = '<?xml version="1.0" encoding="UTF-8"?>\n'
         ret += '<ADX>\n'
@@ -1489,16 +1523,22 @@ class ADIF_log(list):
                 if x != x.upper():
                     e[x.upper()] = e[x]
                     del e[x]
-    def load_from_file(self, path_to_file: str) -> list[dict]:
+    def load_from_file(self, path_to_file: str):
         '''Loads ADIF from given file.'''
         f = open(path_to_file, 'r')
         data = f.read()#.decode('utf-8')
         f.close()
-        return self.from_string(data)
+        if data[0:5] == '<?xml':
+            parser = make_parser()
+            handler = ADXHandler(self)
+            parser.setContentHandler(handler)
+            parser.parse(path_to_file)
+        else:
+            self.from_string(data)
         
     def load_from_string(self, data) -> list[dict]:
         '''Loads ADID from the given string.'''
-        return self.from_string(data)
+        self.from_string(data)
 
 class AdifHelper(object):
     '''Represents helper methods for working with ADIF files.'''
@@ -1513,7 +1553,10 @@ class AdifHelper(object):
             raise FileNotFoundError(path_to_file)
 
         log = ADIF_log()
-        log.load_from_file(path_to_file)
+        try:
+            log.load_from_file(path_to_file)
+        except Exception as ex:
+            print(ex)
         return log
     
     @staticmethod
