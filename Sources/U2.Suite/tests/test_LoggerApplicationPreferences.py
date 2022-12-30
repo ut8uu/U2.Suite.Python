@@ -32,13 +32,21 @@ class  LoggerApplicationPreferencesTests(unittest.TestCase):
         path = Path(f'./{file}')
         if path.exists():
             path.unlink()
-        pref1 = ApplicationPreferences(file)
-        pref1['k1'] = 'v1'
-        pref1['k2'] = 'v2'
+        defaults = {'k1':'default_v1', 'k2':'default_v2'}
+        pref0 = ApplicationPreferences(file, defaults)
+        pref0.write_preferences() # default values should be written to disk
+        
+        pref1 = ApplicationPreferences(file, {})
+        # check if default values were written to preferences file
+        self.assertEqual(pref1.Preferences['k1'], 'default_v1')
+        
+        pref1.Preferences['k1'] = 'v1'
+        pref1.Preferences['k2'] = 'v2'
+        pref1.write_preferences()
 
         self.assertTrue(path.exists())
 
-        pref2 = ApplicationPreferences(file)
+        pref2 = ApplicationPreferences(file, defaults)
         self.assertTrue('k1' in pref2.Preferences.keys())
         self.assertTrue('k2' in pref2.Preferences.keys())
         self.assertEqual(pref1.Preferences['k1'], pref2.Preferences['k1'])

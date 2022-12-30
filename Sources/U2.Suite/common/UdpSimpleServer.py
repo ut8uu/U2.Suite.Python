@@ -5,11 +5,10 @@
 #
 # see dump_wsjtx_packets.py example for some simple usage
 #
+import ipaddress
+import logging
 import socket
 import struct
-#import common.WsjtPackets
-import logging
-import ipaddress
 
 from common.WsjtPackets import GenericWSJTXPacket
 

@@ -30,8 +30,9 @@ class ApplicationPreferences(object):
     _preferences : dict
     _default_values : dict
 
-    def __init__(self, file : str) -> None:
+    def __init__(self, file : str, default_values : dict) -> None:
         self._file = file
+        self._default_values = default_values
         self._preferences = self._default_values.copy()
         self.read_preferences()
         pass
