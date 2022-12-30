@@ -57,13 +57,13 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="tabStationData">
     <attribute name="title">
      <string>Station Info</string>
     </attribute>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>30</x>
@@ -194,14 +194,6 @@
         <string>Accept WSJT-X packets</string>
        </property>
       </widget>
-     </widget>
-     <widget class="QWidget" name="tab_3">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <attribute name="title">
-       <string>Tab 2</string>
-      </attribute>
      </widget>
     </widget>
    </widget>
