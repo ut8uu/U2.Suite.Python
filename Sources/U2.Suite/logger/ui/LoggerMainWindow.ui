@@ -751,12 +751,18 @@
      <addaction name="actionExportToADIFfile"/>
      <addaction name="actionExportToADXfile"/>
     </widget>
-    <addaction name="actionStation_info"/>
+    <widget class="QMenu" name="menuLog">
+     <property name="title">
+      <string>Log</string>
+     </property>
+     <addaction name="actionStation_info"/>
+     <addaction name="separator"/>
+     <addaction name="menuImport"/>
+     <addaction name="menuExport"/>
+    </widget>
+    <addaction name="menuLog"/>
     <addaction name="actionNewLog"/>
     <addaction name="actionOpenLog"/>
-    <addaction name="separator"/>
-    <addaction name="menuImport"/>
-    <addaction name="menuExport"/>
     <addaction name="separator"/>
     <addaction name="actionPreferences"/>
     <addaction name="separator"/>

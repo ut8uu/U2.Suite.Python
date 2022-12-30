@@ -7,8 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>97</height>
+    <height>107</height>
    </rect>
+  </property>
+  <property name="font">
+   <font>
+    <pointsize>12</pointsize>
+   </font>
   </property>
   <property name="windowTitle">
    <string>Station Info</string>
@@ -46,7 +51,7 @@
      <x>20</x>
      <y>20</y>
      <width>230</width>
-     <height>58</height>
+     <height>69</height>
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout">

@@ -19,10 +19,12 @@ import os
 from pathlib import Path
 import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from helpers.FileSystemHelper import FileSystemHelper
 from logger.logger_preferences import LoggerApplicationPreferences
 from logger.ui.Ui_LoggerPreferencesDialog import Ui_LoggerPreferencesDialog
 
 from PyQt5.QtCore import pyqtSignal, QObject
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QDialog
 
 class PreferencesDialogEvent(QObject):
@@ -48,6 +50,9 @@ class Logger_PreferencesDialog(QDialog, Ui_LoggerPreferencesDialog):
 
         self.buttonBox.accepted.connect(self.save_changes)
         self.buttonBox.rejected.connect(self.close_dialog)
+
+        self.setFixedSize(self.width(), self.height())
+        self.setWindowIcon(QIcon(FileSystemHelper.relpath('icon/edit_file-32.png')))
     
     '''---------------------------------------------------------------------------'''
     def setup(self, preferences : LoggerApplicationPreferences) -> None:
@@ -56,13 +61,22 @@ class Logger_PreferencesDialog(QDialog, Ui_LoggerPreferencesDialog):
         self._preferences = preferences
         self.cbAcceptWsjtPackets.setChecked(preferences.AcceptWsjtPackets)
         
+        # Station Info stuff
+        self.tbCall.setText(preferences.Callsign)
+        self.tbGridSquare.setText(preferences.GridSquare)
+        self.tbOperatorName.setText(preferences.OperatorName)
+        
     def close_dialog(self) -> None:
         self.close()
 
     def save_changes(self) -> None:
         '''Saves changes to preferences file.'''
         self._preferences.AcceptWsjtPackets = self.cbAcceptWsjtPackets.isChecked()
-                
+        #Station Info stuff
+        self._preferences.OperatorName = self.tbOperatorName.text()
+        self._preferences.Callsign = self.tbCall.text()
+        self._preferences.GridSquare = self.tbGridSquare.text()
+        
         self._preferences.write_preferences()
         self.change_event.changed.emit()
         self.close()
@@ -73,6 +87,9 @@ if __name__ == '__main__':
     from logger.ui.Ui_StationInfoDialog import Ui_StationInfoDialog
     app = QApplication(sys.argv)
     preferences = LoggerApplicationPreferences()
+    preferences.Callsign = 'UT8UU'
+    preferences.GridSquare = 'KO50'
+    preferences.OperatorName = 'Sergey'
     
     preferences.AcceptWsjtPackets = True
 

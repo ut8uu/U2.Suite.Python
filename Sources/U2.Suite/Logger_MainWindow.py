@@ -20,8 +20,8 @@ import os
 from pathlib import Path
 import sys
 
-from Logger_QsoEditorDialog import Logger_QsoEditorDialog
-from Logger_StationInfoDialog import Logger_StationInfoDialog
+from logger.Logger_QsoEditorDialog import Logger_QsoEditorDialog
+from logger.Logger_StationInfoDialog import Logger_StationInfoDialog
 from helpers.AdifHelper import ADIF_log, AdifHelper
 from helpers.FileSystemHelper import FileSystemHelper
 from logger.Logger_PreferencesDialog import Logger_PreferencesDialog
@@ -34,7 +34,7 @@ from logger.logger_preferences import LoggerApplicationPreferences
 from logger.ui.Ui_LoggerMainWindow import Ui_LoggerMainWindow
 from PyQt5.QtCore import QAbstractEventDispatcher, pyqtSlot, QDateTime
 from PyQt5.QtCore import QDir, QTimer, Qt, QEvent
-from PyQt5.QtGui import QFontDatabase
+from PyQt5.QtGui import QFontDatabase, QIcon
 from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, qApp, QFileDialog
 from typing import List
 
@@ -75,6 +75,8 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
 
         self.setupUi(self)
         LoggerMainWindowUiHelper.update_ui(self)
+        self.setFixedSize(self.width(), self.height())
+        self.setWindowIcon(QIcon(FileSystemHelper.relpath('icon/edit_file-32.png')))
 
         self.listLog.itemDoubleClicked.connect(self.qso_double_clicked)
         self.cbRealtime.stateChanged.connect(self.real_time_changed)
@@ -123,6 +125,7 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         if len(self._db.LoggerOptions.StationCallsign) == 0:
             self.display_station_info_dialog()
             
+        # WSHT-X related stuff
         self._wsjt_listener = WsjtListener()
         self._wsjt_listener.setup('127.0.0.1')
         self._wsjt_listener.ListenerEvent.adif_received.connect(self.adif_received)
