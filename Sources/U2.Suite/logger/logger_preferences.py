@@ -37,7 +37,7 @@ class LoggerApplicationPreferences(ApplicationPreferences):
                 KEY_DEFAULT_MODE : 'SSB',
                 KEY_WSJT_ACCEPT_PACKETS : str(False)
             }
-        super().__init__(PREFERENCES_FILE_LOGGER)
+        super().__init__(PREFERENCES_FILE_LOGGER, self._default_values)
 
     @property
     def Realtime(self) -> bool:
