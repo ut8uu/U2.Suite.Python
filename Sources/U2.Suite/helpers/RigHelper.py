@@ -18,8 +18,6 @@
 import configparser
 import logging
 
-from pyparsing import empty
-
 from common.contracts.BitMask import BitMask
 from common.contracts.ParameterValue import ParameterValue
 from common.contracts.RigCommand import RigCommand
