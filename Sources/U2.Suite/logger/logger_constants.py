@@ -57,18 +57,23 @@ DISPLAY_FORMAT_DDMMYY_HHMMSS = 'dd.MM.yyyy HH:mm:ss'
 
 DATABASE_DEFAULT = 'default.sqlite'
 
+KEY_CALLSIGNS = 'callsigns'
 KEY_MYCALLSIGN = 'mycallsign'
 KEY_MYGRID = 'mygrid'
 KEY_DEFAULT_BAND = 'band'
 KEY_DEFAULT_MODE = 'mode'
 KEY_DEFAULT_SATELLITE = 'satellite'
+KEY_MIN_DURATION = 'min_duration'
 KEY_OPERATOR_NAME = 'operator_name'
 KEY_REALTIME = 'realtime'
+KEY_TALK_GROUPS = 'talk_groups'
 KEY_UTC = 'utc'
+KEY_VERBOSE = 'verbose'
 KEY_WSJT_ACCEPT_PACKETS = 'accept_wsjt_packets'
 
 PREFERENCES_FILE_FSE = 'FastSatEntry_preferences.json'
 PREFERENCES_FILE_LOGGER = 'logger_preferences.json'
+PREFERENCES_FILE_BM_MONITOR = 'bm_monitor_preferences.json'
 
 UNIQUE_ID_FAST_SAT_ENTRY = 'U2.Suite.FastSatEntry'
 
