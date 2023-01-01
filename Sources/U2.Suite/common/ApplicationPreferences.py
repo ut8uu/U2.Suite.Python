@@ -18,6 +18,7 @@
 from json import dumps, loads
 import logging
 import os
+from pathlib import Path
 
 class ApplicationPreferences(object):
     '''
@@ -26,16 +27,35 @@ class ApplicationPreferences(object):
     and is a simple key-value storage.
     '''
 
+    _preferences_loaded : bool
+    _directory : str = './'
     _file : str
     _preferences : dict
     _default_values : dict
 
     def __init__(self, file : str, default_values : dict) -> None:
+        self._preferences_loaded = False
         self._file = file
         self._default_values = default_values
         self._preferences = self._default_values.copy()
-        self.read_preferences()
         pass
+    
+    @property
+    def Directory(self) -> str:
+        '''
+        A directory for BmMonitor preferences.
+        By default it's a current directory (./).
+        No trailing slashes, please.
+        '''
+        return self._directory
+    @Directory.setter
+    def Directory(self, path : str) -> None:
+        '''
+        A directory for BmMonitor preferences.
+        By default it's a current directory (./).
+        No trailing slashes, please.
+        '''
+        self._directory = path
 
     @property
     def DefaultValues(self) -> dict:
@@ -43,13 +63,16 @@ class ApplicationPreferences(object):
 
     @property
     def Preferences(self) -> dict:
+        if not self._preferences_loaded:
+            self.read_preferences()
         return self._preferences
 
     '''====================================================================='''
     def read_preferences(self):
         '''Reads preferences from the given file.'''
         try:
-            preferences_file_name = f'./{self._file}'
+            path = Path(self._directory) / self._file
+            preferences_file_name = str(path)
             if os.path.exists(preferences_file_name):
                 with open(preferences_file_name, "rt", encoding="utf-8") as file_descriptor:
                     content = file_descriptor.read()
@@ -61,6 +84,7 @@ class ApplicationPreferences(object):
             else:
                 logging.info("No preference file. Writing preference.")
                 self.write_preferences()
+            self._preferences_loaded = True
         except IOError as exception:
             logging.critical("Error: %s", exception)
 
@@ -70,7 +94,9 @@ class ApplicationPreferences(object):
         Writes the preferences to file. 
         Existing file is being overwritten, not existing is being created.
         '''
-        with open(f'./{self._file}', "wt", encoding="utf-8") as file_descriptor:
+        path = Path(self._directory) / self._file
+        preferences_file_name = str(path)
+        with open(preferences_file_name, "wt", encoding="utf-8") as file_descriptor:
             file_descriptor.write(dumps(self._preferences, indent=4))
             logging.info("%s", self._preferences)
 
@@ -81,7 +107,29 @@ class ApplicationPreferences(object):
         If preference not found, a default value will be returned.
         '''
         try:
-            return self._preferences.get(key)
+            return self.Preferences.get(key)
+        except KeyError:
+            return default_value
+
+    '''====================================================================='''
+    def get_int_value(self, key : str, default_value : int = 0) -> int:
+        '''
+        Performs an attempt to get the preference by the given name.
+        If preference not found, a default value will be returned.
+        '''
+        try:
+            return int(self.Preferences.get(key))
+        except KeyError:
+            return default_value
+
+    '''====================================================================='''
+    def get_list_value(self, key : str, default_value : list = []) -> list:
+        '''
+        Performs an attempt to get the preference by the given name.
+        If preference not found, a default value will be returned.
+        '''
+        try:
+            return list(self.Preferences.get(key))
         except KeyError:
             return default_value
 
