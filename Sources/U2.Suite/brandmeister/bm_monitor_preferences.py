@@ -16,10 +16,10 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from common.ApplicationPreferences import ApplicationPreferences
-from logger.logger_constants import KEY_CALLSIGNS, KEY_MIN_DURATION, KEY_TALK_GROUPS, KEY_VERBOSE, PREFERENCES_FILE_BM_MONITOR
+from logger.logger_constants import KEY_CALLSIGNS, KEY_MIN_DURATION, KEY_MIN_SILENCE, KEY_NOISE_CALLS, KEY_NOTIFY_DAPNET, KEY_NOTIFY_DISCORD, KEY_NOTIFY_DISCORD_WH_URL, KEY_NOTIFY_PUSHOVER, KEY_NOTIFY_TELEGRAM, KEY_TALK_GROUPS, KEY_VERBOSE, PREFERENCES_FILE_BM_MONITOR
 
 
-class LoggerApplicationPreferences(ApplicationPreferences):
+class BrandmeisterMonitorApplicationPreferences(ApplicationPreferences):
     '''
     Represents logger application preferences.
     Be aware, although preferences are autometically loaded upon object creation,
@@ -27,28 +27,46 @@ class LoggerApplicationPreferences(ApplicationPreferences):
     the file during two or more simultaneous implicit commits.
     '''
     
-    def __init__(self) -> None:
+    def __init__(self, file : str = PREFERENCES_FILE_BM_MONITOR) -> None:
         self._default_values = {
+            KEY_NOTIFY_DISCORD : False,
+            KEY_NOTIFY_DISCORD_WH_URL : '',
+            KEY_NOTIFY_DAPNET : False,
+            KEY_NOTIFY_PUSHOVER : False,
+            KEY_NOTIFY_TELEGRAM : False,
+            KEY_VERBOSE : True,
+            KEY_CALLSIGNS : [],
+            KEY_NOISE_CALLS : [],
+            KEY_TALK_GROUPS : [91],
+            KEY_MIN_SILENCE : 300,
+            KEY_MIN_DURATION : 5
             }
-        super().__init__(PREFERENCES_FILE_BM_MONITOR, self._default_values)
+        super().__init__(file, self._default_values)
 
     @property
     def TalkGroups(self) -> list[str]:
-        return self.get_bool_value(KEY_TALK_GROUPS, False)
+        return self.get_list_value(KEY_TALK_GROUPS, False)
     @TalkGroups.setter
     def TalkGroups(self, value : list[str]) -> None:
         self.Preferences[KEY_TALK_GROUPS] = value
         
     @property
+    def NoisyCalls(self) -> list[str]:
+        return self.get_list_value(KEY_NOISE_CALLS, False)
+    @NoisyCalls.setter
+    def NoisyCalls(self, value : list[str]) -> None:
+        self.Preferences[KEY_NOISE_CALLS] = value
+        
+    @property
     def Callsigns(self) -> list[str]:
-        return self.get_bool_value(KEY_CALLSIGNS, False)
+        return self.get_list_value(KEY_CALLSIGNS, False)
     @Callsigns.setter
     def Callsigns(self, value : list[str]) -> None:
         self.Preferences[KEY_CALLSIGNS] = value
         
     @property
     def MinDurationSec(self) -> int:
-        return self.get_bool_value(KEY_MIN_DURATION, False)
+        return self.get_int_value(KEY_MIN_DURATION, False)
     @MinDurationSec.setter
     def MinDurationSec(self, value : int) -> None:
         self.Preferences[KEY_MIN_DURATION] = value
@@ -59,4 +77,46 @@ class LoggerApplicationPreferences(ApplicationPreferences):
     @Verbose.setter
     def Verbose(self, value : bool) -> None:
         self.Preferences[KEY_VERBOSE] = value
+        
+    @property
+    def MinSilenceSec(self) -> int:
+        return self.get_int_value(KEY_MIN_SILENCE, False)
+    @MinSilenceSec.setter
+    def MinSilenceSec(self, value : int) -> None:
+        self.Preferences[KEY_MIN_SILENCE] = value
+        
+    @property
+    def NotifyDapnet(self) -> bool:
+        return self.get_bool_value(KEY_NOTIFY_DAPNET, False)
+    @NotifyDapnet.setter
+    def NotifyDapnet(self, value : bool) -> None:
+        self.Preferences[KEY_NOTIFY_DAPNET] = value
+        
+    @property
+    def NotifyDiscord(self) -> bool:
+        return self.get_bool_value(KEY_NOTIFY_DISCORD, False)
+    @NotifyDiscord.setter
+    def NotifyDiscord(self, value : bool) -> None:
+        self.Preferences[KEY_NOTIFY_DISCORD] = value
+        
+    @property
+    def NotifyDiscordWhUrl(self) -> str:
+        return self.get_string_value(KEY_NOTIFY_DISCORD_WH_URL, False)
+    @NotifyDiscordWhUrl.setter
+    def NotifyDiscordWhUrl(self, value : str) -> None:
+        self.Preferences[KEY_NOTIFY_DISCORD_WH_URL] = value
+        
+    @property
+    def NotifyPushover(self) -> bool:
+        return self.get_bool_value(KEY_NOTIFY_PUSHOVER, False)
+    @NotifyPushover.setter
+    def NotifyPushover(self, value : bool) -> None:
+        self.Preferences[KEY_NOTIFY_PUSHOVER] = value
+        
+    @property
+    def NotifyTelegram(self) -> bool:
+        return self.get_bool_value(KEY_NOTIFY_TELEGRAM, False)
+    @NotifyTelegram.setter
+    def NotifyTelegram(self, value : bool) -> None:
+        self.Preferences[KEY_NOTIFY_TELEGRAM] = value
         
