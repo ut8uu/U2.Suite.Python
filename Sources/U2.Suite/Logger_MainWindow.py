@@ -22,7 +22,7 @@ import sys
 
 from logger.Logger_QsoEditorDialog import Logger_QsoEditorDialog
 from logger.Logger_StationInfoDialog import Logger_StationInfoDialog
-from helpers.AdifHelper import ADIF_log, AdifHelper
+from helpers.AdifHelper import ADIF_BAND, ADIF_CALL, ADIF_MODE, ADIF_OPERATOR, ADIF_QSO_DATE, ADIF_TIME_OFF, ADIF_TIME_ON, ADIF_log, AdifHelper
 from helpers.FileSystemHelper import FileSystemHelper
 from logger.Logger_PreferencesDialog import Logger_PreferencesDialog
 from logger.listeners.wsjt_listener import WsjtListener
@@ -86,6 +86,7 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         self.actionExportToADIFfile.triggered.connect(self.export_to_adif)
         self.actionExportToADXfile.triggered.connect(self.export_to_adx)
         self.actionPreferences.triggered.connect(self.display_preferences_dialog)
+        self.actionExit.triggered.connect(self.close_window)
 
         # install event handler for main input controls
         self.tbCallsign.installEventFilter(self)
@@ -131,11 +132,19 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         self._wsjt_listener.ListenerEvent.adif_received.connect(self.adif_received)
         if self._preferences.AcceptWsjtPackets:
             self._wsjt_listener.start()
+            
+        self._preferences.PreferencesChanged.changed.connect(self.preferences_changed)
 
     
     def __del__(self):
         '''A class' destructor'''
         self._running = False
+        
+    '''==========================================================================='''
+    def close_window(self):
+        ''''''
+        
+        self.close()
 
     '''==========================================================================='''
     def closeEvent(self, a0) -> None:
@@ -491,7 +500,7 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
     def display_preferences_dialog(self) -> None:
         '''Displays the application preferences dialog.'''
         dialog = Logger_PreferencesDialog(self)
-        dialog.change_event.changed.connect(self.preferences_changed)
+        #dialog.change_event.changed.connect(self.preferences_changed)
         dialog.setup(self._preferences)
         dialog.open()
         

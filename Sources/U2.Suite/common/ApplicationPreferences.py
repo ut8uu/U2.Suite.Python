@@ -20,6 +20,11 @@ import logging
 import os
 from pathlib import Path
 
+from PyQt5.QtCore import pyqtSignal, QObject
+
+class PreferencesChangedEvent(QObject):
+    changed = pyqtSignal()
+
 class ApplicationPreferences(object):
     '''
     Represents base class for application preferences.
@@ -27,6 +32,7 @@ class ApplicationPreferences(object):
     and is a simple key-value storage.
     '''
 
+    _preferences_changed : PreferencesChangedEvent
     _preferences_loaded : bool
     _directory : str = './'
     _file : str
@@ -34,11 +40,16 @@ class ApplicationPreferences(object):
     _default_values : dict
 
     def __init__(self, file : str, default_values : dict) -> None:
+        self._preferences_changed = PreferencesChangedEvent()
         self._preferences_loaded = False
         self._file = file
         self._default_values = default_values
         self._preferences = self._default_values.copy()
         pass
+    
+    @property
+    def PreferencesChanged(self) -> PreferencesChangedEvent:
+        return self._preferences_changed
     
     @property
     def Directory(self) -> str:
@@ -99,6 +110,8 @@ class ApplicationPreferences(object):
         with open(preferences_file_name, "wt", encoding="utf-8") as file_descriptor:
             file_descriptor.write(dumps(self._preferences, indent=4))
             logging.info("%s", self._preferences)
+            
+        self._preferences_changed.changed.emit()
 
     '''====================================================================='''
     def get_string_value(self, key : str, default_value : str = '') -> str:
