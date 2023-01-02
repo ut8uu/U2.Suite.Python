@@ -22,10 +22,14 @@ import sys
 import socketio
 from threading import Thread
 import time
+from PyQt5.QtCore import QObject, pyqtSignal
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from brandmeister.bm_monitor_preferences import BrandmeisterMonitorApplicationPreferences
+
+class MonitorReportEvent(QObject):
+    report = pyqtSignal(tuple)
     
 class BmMonitorClientNamespace(socketio.ClientNamespace):
     
@@ -47,7 +51,6 @@ class BmMonitorClientNamespace(socketio.ClientNamespace):
     def on_mqtt(self, data):
         self._monitor.ProcessMqtt(data)
 
-
 class BrandmeisterMonitorCore(object):
     '''Represents a monitor for BM network activities.'''
     
@@ -56,6 +59,7 @@ class BrandmeisterMonitorCore(object):
 
     _preferences : BrandmeisterMonitorApplicationPreferences
 
+    _monitor_report_event : MonitorReportEvent
     _sio : socketio.Client
     _last_TG_activity : dict
     _last_OM_activity : dict
@@ -84,7 +88,24 @@ class BrandmeisterMonitorCore(object):
         self._last_TG_activity = {}
         self._last_OM_activity = {}
         
+        self._preferences.PreferencesChanged.changed.connect(self.preferences_changed)
+        
+        self._monitor_report_event = MonitorReportEvent()
         pass
+
+    @property
+    def Preferences(self) -> BrandmeisterMonitorApplicationPreferences:
+        return self._preferences
+    
+    '''==================================================================='''
+    @property
+    def MonitorReport(self) -> MonitorReportEvent:
+        return self._monitor_report_event
+    
+    '''==================================================================='''
+    def preferences_changed(self) -> None:
+        '''Handles changing of the application preferences.'''
+        
 
     def Start(self) -> None:
         if self._started:
@@ -137,7 +158,7 @@ class BrandmeisterMonitorCore(object):
 
     def ProcessMqtt(self, data):
         call = json.loads(data['payload'])
-        tg = call["DestinationID"]
+        tg = str(call["DestinationID"])
         callsign = call["SourceCall"]
         start_time = call["Start"]
         stop_time = call["Stop"]
@@ -150,20 +171,20 @@ class BrandmeisterMonitorCore(object):
         else:
             # check if callsign is monitored, the transmis_sion has already been finished
             # and the person was inactive for n seconds
-            if callsign in self._preferences.Callsigns:
+            if self._preferences.UseCallsigns and callsign in self._preferences.Callsigns:
                 if callsign not in self._last_OM_activity:
                     self._last_OM_activity[callsign] = 9999999
                 inactivity = now - self._last_OM_activity[callsign]
-                if callsign not in self._last_OM_activity or inactivity >= self._preferences.MinSilenceSec:
+                if inactivity >= self._preferences.MinSilenceSec or callsign not in self._last_OM_activity:
                     # If the activity has happened in a monitored TG, remember the transmis_sion start time stamp
-                    if tg in self._preferences.TalkGroups and stop_time > 0:
+                    if stop_time > 0 and tg in self._preferences.TalkGroups:
                         self._last_TG_activity[tg] = now
                     # remember the transmis_sion time stamp of this particular DMR user
                     self._last_OM_activity[callsign] = now
                     notify = True
-            # Continue if the talkgroup is monitored, the transmis_sion has been
+            # Continue if the talkgroup is monitored, the transmission has been
             # finished and there was no activity during the last n seconds in this talkgroup
-            elif tg in self._preferences.TalkGroups and stop_time > 0:# and callsign not in cfg.noisy_calls:
+            if stop_time > 0 and self._preferences.UseTalkGroups and tg in self._preferences.TalkGroups:# and callsign not in cfg.noisy_calls:
                 if tg not in self._last_TG_activity:
                     self._last_TG_activity[tg] = 9999999
                 inactivity = now - self._last_TG_activity[tg]
@@ -171,14 +192,14 @@ class BrandmeisterMonitorCore(object):
                 duration = stop_time - start_time
                 if duration > self._preferences.MinDurationSec:
                     print(f'[{tg}] {callsign} for {duration} seconds.')
+                    self._monitor_report_event.report.emit((tg, callsign, duration))
                 # only proceed if the key down has been long enough
                 if duration >= self._preferences.MinDurationSec:
                     if tg not in self._last_TG_activity or inactivity >= self._preferences.MinSilenceSec:
                         notify = True
                     elif self._preferences.Verbose:
-                        print("ignored activity in TG " + str(tg) + " from " + callsign + ": last action " + str(inactivity) + " seconds ago.")
+                        print("ignored activity in TG " + tg + " from " + callsign + ": last action " + str(inactivity) + " seconds ago.")
                     self._last_TG_activity[tg] = now
-
 
             if notify:
                 if self._preferences.NotifyPushover:

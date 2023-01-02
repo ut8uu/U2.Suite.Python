@@ -16,7 +16,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from common.ApplicationPreferences import ApplicationPreferences
-from logger.logger_constants import KEY_CALLSIGNS, KEY_MIN_DURATION, KEY_MIN_SILENCE, KEY_NOISE_CALLS, KEY_NOTIFY_DAPNET, KEY_NOTIFY_DISCORD, KEY_NOTIFY_DISCORD_WH_URL, KEY_NOTIFY_PUSHOVER, KEY_NOTIFY_TELEGRAM, KEY_TALK_GROUPS, KEY_VERBOSE, PREFERENCES_FILE_BM_MONITOR
+from logger.logger_constants import KEY_CALLSIGNS, KEY_MIN_DURATION, KEY_MIN_SILENCE, KEY_NOISY_CALLS, KEY_NOTIFY_DAPNET, KEY_NOTIFY_DISCORD, KEY_NOTIFY_DISCORD_WH_URL, KEY_NOTIFY_PUSHOVER, KEY_NOTIFY_TELEGRAM, KEY_TALK_GROUPS, KEY_USE_CALLSIGNS, KEY_USE_TALK_GROUPS, KEY_VERBOSE, PREFERENCES_FILE_BM_MONITOR
 
 
 class BrandmeisterMonitorApplicationPreferences(ApplicationPreferences):
@@ -35,13 +35,22 @@ class BrandmeisterMonitorApplicationPreferences(ApplicationPreferences):
             KEY_NOTIFY_PUSHOVER : False,
             KEY_NOTIFY_TELEGRAM : False,
             KEY_VERBOSE : True,
-            KEY_CALLSIGNS : [],
-            KEY_NOISE_CALLS : [],
-            KEY_TALK_GROUPS : [91],
+            KEY_USE_CALLSIGNS : False,
+            KEY_CALLSIGNS : '',
+            KEY_NOISY_CALLS : '',
+            KEY_USE_TALK_GROUPS : False,
+            KEY_TALK_GROUPS : '91',
             KEY_MIN_SILENCE : 300,
             KEY_MIN_DURATION : 5
             }
         super().__init__(file, self._default_values)
+
+    @property
+    def UseTalkGroups(self) -> bool:
+        return self.get_bool_value(KEY_USE_TALK_GROUPS, False)
+    @UseTalkGroups.setter
+    def UseTalkGroups(self, value : bool) -> None:
+        self.Preferences[KEY_USE_TALK_GROUPS] = value
 
     @property
     def TalkGroups(self) -> list[str]:
@@ -52,11 +61,18 @@ class BrandmeisterMonitorApplicationPreferences(ApplicationPreferences):
         
     @property
     def NoisyCalls(self) -> list[str]:
-        return self.get_list_value(KEY_NOISE_CALLS, False)
+        return self.get_list_value(KEY_NOISY_CALLS, False)
     @NoisyCalls.setter
     def NoisyCalls(self, value : list[str]) -> None:
-        self.Preferences[KEY_NOISE_CALLS] = value
+        self.Preferences[KEY_NOISY_CALLS] = value
         
+    @property
+    def UseCallsigns(self) -> bool:
+        return self.get_bool_value(KEY_USE_CALLSIGNS, False)
+    @UseCallsigns.setter
+    def UseCallsigns(self, value : bool) -> None:
+        self.Preferences[KEY_USE_CALLSIGNS] = value
+
     @property
     def Callsigns(self) -> list[str]:
         return self.get_list_value(KEY_CALLSIGNS, False)

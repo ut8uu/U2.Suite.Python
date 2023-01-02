@@ -38,15 +38,50 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         self.actionExit.triggered.connect(self.close_window)
         self.actionStart.triggered.connect(self.start_monitor)
         self.actionStop.triggered.connect(self.stop_monitor)
-        
+
         self._monitor_core = BrandmeisterMonitorCore()
+        self._monitor_core.MonitorReport.report.connect(self.monitor_reported)
         self.start_monitor()
+
+        p = self._monitor_core.Preferences
+        self.cbCallsigns.setChecked(p.UseCallsigns)
+        self.tbCallsigns.setText(','.join(p.Callsigns))
+        self.tbCallsigns.setEnabled(p.UseCallsigns)
+
+        self.cbTalkGroups.setChecked(p.UseTalkGroups)
+        self.tbTalkGroups.setText(','.join(p.TalkGroups))
+        self.tbTalkGroups.setEnabled(p.UseTalkGroups)
+        
+        self.cbTalkGroups.stateChanged.connect(self.update_preferences)
+        self.tbTalkGroups.textChanged.connect(self.update_preferences)
+        self.cbCallsigns.stateChanged.connect(self.update_preferences)
+        self.tbCallsigns.textChanged.connect(self.update_preferences)        
         
     '''==============================================================='''    
     def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
         self._monitor_core.Stop()
         return super().closeEvent(a0)
 
+    '''==============================================================='''
+    def monitor_reported(self, data : tuple) -> None:
+        '''Handles reporting of data from the monitor.'''
+        s = data
+
+    '''==============================================================='''
+    def update_preferences(self) -> None:
+        '''Updates preferences according to the current window state.'''
+        self._monitor_core.Preferences.UseCallsigns = self.cbCallsigns.isChecked()
+        self.tbCallsigns.setEnabled(self.cbCallsigns.isChecked())
+        callsigns = self.tbCallsigns.toPlainText().split(',')
+        self._monitor_core.Preferences.Callsigns = callsigns
+
+        self._monitor_core.Preferences.UseTalkGroups = self.cbTalkGroups.isChecked()
+        self.tbTalkGroups.setEnabled(self.cbTalkGroups.isChecked())
+        talkgroups = self.tbTalkGroups.toPlainText().split(',')
+        self._monitor_core.Preferences.TalkGroups = talkgroups
+        
+        self._monitor_core.Preferences.write_preferences()
+        
     '''==============================================================='''    
     def start_monitor(self):
         if not self.actionStart.isEnabled():

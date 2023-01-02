@@ -151,6 +151,8 @@ class ApplicationPreferences(object):
         value = self.get_string_value(key, default_value)
         if type(value) is bool:
             return value
+        if value is None:
+            return default_value
         if value.lower() == str(True).lower():
             return True
         elif value.lower() == str(False).lower():
