@@ -92,5 +92,16 @@ class FileSystemHelper():
             base_path = os.path.abspath(".")
         return os.path.join(base_path, filename)
 
+    @staticmethod
+    def load_fonts_from_dir(directory: str) -> set:
+        """
+        Loads fonts from given directory.
+        """
+        from PyQt5.QtCore import QDir
+        from PyQt5.QtGui import QFontDatabase
+        font_families = set()
+        for _fi in QDir(directory).entryInfoList(["*.ttf", "*.woff", "*.woff2"]):
+            _id = QFontDatabase.addApplicationFont(_fi.absoluteFilePath())
+            font_families |= set(QFontDatabase.applicationFontFamilies(_id))
+        return font_families
 
-    

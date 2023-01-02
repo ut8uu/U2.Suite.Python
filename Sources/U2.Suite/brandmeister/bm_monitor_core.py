@@ -48,7 +48,7 @@ class BmMonitorClientNamespace(socketio.ClientNamespace):
         self._monitor.ProcessMqtt(data)
 
 
-class BrandmeisterMonitor(object):
+class BrandmeisterMonitorCore(object):
     '''Represents a monitor for BM network activities.'''
     
     #############################
@@ -84,13 +84,12 @@ class BrandmeisterMonitor(object):
         self._last_TG_activity = {}
         self._last_OM_activity = {}
         
-        self._thread = Thread(target=self.monitor_worker, args = ())
-
         pass
 
     def Start(self) -> None:
         if self._started:
             return
+        self._thread = Thread(target=self.monitor_worker, args = ())
         self._thread.start() 
         self._started = True
         
@@ -110,8 +109,14 @@ class BrandmeisterMonitor(object):
     def monitor_worker(self) -> None:
         self.Say(f'Starting monitoring of TG {self._preferences.TalkGroups}')        
         
-        self._sio.connect(url='https://api.brandmeister.network', socketio_path="/lh/socket.io", transports="websocket")
-        self._sio.wait()
+        while self._started:
+            try:
+                self._sio.connect(url='https://api.brandmeister.network', socketio_path="/lh/socket.io", transports="websocket")
+                self._sio.wait()
+            except Exception as ex:
+                print(ex)
+                time.sleep(1)
+
         print('Thread exit...')
 
     #############################
@@ -198,7 +203,7 @@ class BrandmeisterMonitor(object):
                     push_discord(self._preferences.NotifyDiscordWhUrl, self.construct_message(call))
 
 if __name__ == '__main__':
-    monitor = BrandmeisterMonitor()
+    monitor = BrandmeisterMonitorCore()
     monitor.Start()
     input('Press Enter to finish.')
     monitor.Stop()

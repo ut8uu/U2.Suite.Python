@@ -38,16 +38,6 @@ from PyQt5.QtGui import QFontDatabase, QIcon
 from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, qApp, QFileDialog
 from typing import List
 
-def load_fonts_from_dir(directory: str) -> set:
-    """
-    Well it loads fonts from a directory...
-    """
-    font_families = set()
-    for _fi in QDir(directory).entryInfoList(["*.ttf", "*.woff", "*.woff2"]):
-        _id = QFontDatabase.addApplicationFont(_fi.absoluteFilePath())
-        font_families |= set(QFontDatabase.applicationFontFamilies(_id))
-    return font_families
-
 class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
     _lastSelectedControl: QWidget
     _allControls : List[QWidget]
@@ -524,7 +514,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     app.setStyle("Fusion")
     font_dir = FileSystemHelper.relpath("font")
-    families = load_fonts_from_dir(os.fspath(font_dir))
+    families = FileSystemHelper.load_fonts_from_dir(os.fspath(font_dir))
 
     window = Logger_MainWindow()
 
