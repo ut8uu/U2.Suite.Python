@@ -29,6 +29,7 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
     
     _monitor_core : BrandmeisterMonitorCore
     
+    '''==============================================================='''    
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
         
@@ -41,10 +42,12 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         self._monitor_core = BrandmeisterMonitorCore()
         self.start_monitor()
         
+    '''==============================================================='''    
     def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
         self._monitor_core.Stop()
         return super().closeEvent(a0)
-    
+
+    '''==============================================================='''    
     def start_monitor(self):
         if not self.actionStart.isEnabled():
             return
@@ -53,6 +56,7 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         self.actionStop.setEnabled(True)
         self._monitor_core.Start()
     
+    '''==============================================================='''    
     def stop_monitor(self):
         if not self.actionStop.isEnabled():
             return
@@ -61,9 +65,11 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         self.actionStop.setEnabled(False)
         self._monitor_core.Stop()
     
+    '''==============================================================='''    
     def close_window(self):
         self.close()
     
+'''==============================================================='''    
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     app.setStyle("Fusion")
