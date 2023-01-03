@@ -36,10 +36,10 @@ class BrandmeisterMonitorApplicationPreferences(ApplicationPreferences):
             KEY_NOTIFY_TELEGRAM : False,
             KEY_VERBOSE : True,
             KEY_USE_CALLSIGNS : False,
-            KEY_CALLSIGNS : '',
-            KEY_NOISY_CALLS : '',
+            KEY_CALLSIGNS : [],
+            KEY_NOISY_CALLS : [],
             KEY_USE_TALK_GROUPS : False,
-            KEY_TALK_GROUPS : '91',
+            KEY_TALK_GROUPS : ['91'],
             KEY_MIN_SILENCE : 300,
             KEY_MIN_DURATION : 5
             }

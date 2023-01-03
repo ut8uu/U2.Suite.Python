@@ -17,8 +17,10 @@
 
 from datetime import datetime
 import os
+from pathlib import Path
 import sys
 from brandmeister.bm_monitor_core import BrandmeisterMonitorCore, MonitorReportData
+from brandmeister.bm_monitor_database import BmMonitorDatabase
 from brandmeister.ui.Ui_BmMonitorMainWindow import Ui_BmMonitorMainWindow
 from PyQt5.QtWidgets import QMainWindow, QApplication
 from PyQt5 import QtGui
@@ -28,11 +30,16 @@ from helpers.FileSystemHelper import FileSystemHelper
 class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
     '''Represents a brandmeister monitor application.'''
     
+    _db : BmMonitorDatabase
     _monitor_core : BrandmeisterMonitorCore
     
     '''==============================================================='''    
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
+        
+        path = self.GetPathToDatabase()
+        print(f'Path to db: {path}')
+        self._db = BmMonitorDatabase(path)
         
         self.setupUi(self)
         self.setFixedSize(self.width(), self.height())
@@ -68,7 +75,7 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
     '''==============================================================='''
     def monitor_reported(self, data : MonitorReportData) -> None:
         '''Handles reporting of data from the monitor.'''
-        timestamp = datetime.now().strftime('%H:%M:%S %d.%m.%Y')
+        timestamp = datetime.now().strftime('%d.%m.%Y %H:%M:%S')
         line = (
             f'{timestamp.rjust(16)} '
             f'{data.TG.rjust(6)} '
@@ -76,6 +83,13 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
             f'{data.Duration}s'
             )
         self.monitoringList.addItem(line)
+        self._db.insert_report(data)
+        
+    '''==========================================================================='''
+    def GetPathToDatabase(self) -> Path:
+        '''Calculates the full path to the database'''
+        return FileSystemHelper.get_appdata_path(Path('U2.Suite') / 'BmMonitor' / 'Database', create_if_not_exists=True)
+
 
     '''==============================================================='''
     def update_preferences(self) -> None:

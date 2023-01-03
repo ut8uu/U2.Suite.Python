@@ -70,17 +70,18 @@ class DatabaseTests(unittest.TestCase):
         '''This is to test how reports can be inserted.'''
         db = BmMonitorDatabase(self.GetPathToDatabase())
         reports = db.get_reports()
-        self.assertEqual(0, len(reports))
+        self.assertEqual(0, len(reports[1]))
         
         report_data = {
             BM_KEY_CALLSIGN : 'UT8UU',
             BM_KEY_TALK_GROUP : '91',
             BM_KEY_DURATION : 20,
         }
-        db.insert_report(report_data)
+        report = MonitorReportData(report_data)
+        db.insert_report(report)
         
         reports = db.get_reports()
-        self.assertEqual(1, len(reports))
+        self.assertEqual(1, len(reports[1]))
         
     def insert_data(self, db: BmMonitorDatabase, callsign, tg, duration) -> None:
         report_data = {
@@ -88,7 +89,8 @@ class DatabaseTests(unittest.TestCase):
             BM_KEY_TALK_GROUP : tg,
             BM_KEY_DURATION : duration,
         }
-        db.insert_report(report_data)
+        report = MonitorReportData(report_data)
+        db.insert_report(report)
     
     def test_CanFilterAndSort(self) -> None:
         db = BmMonitorDatabase(self.GetPathToDatabase())

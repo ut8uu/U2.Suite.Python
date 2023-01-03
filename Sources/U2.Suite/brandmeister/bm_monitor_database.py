@@ -82,9 +82,9 @@ class BmMonitorDatabase:
         '''Inserts a report in the database.'''
         values = {
             FIELD_BM_MONITOR_TIMESTAMP : datetime.utcnow(),
-            FIELD_BM_MONITOR_CALLSIGN : data[BM_KEY_CALLSIGN],
-            FIELD_BM_MONITOR_DURATION : data[BM_KEY_DURATION],
-            FIELD_BM_MONITOR_TG : int(data[BM_KEY_TALK_GROUP]),
+            FIELD_BM_MONITOR_CALLSIGN : data.Callsign,
+            FIELD_BM_MONITOR_DURATION : data.Duration,
+            FIELD_BM_MONITOR_TG : int(data.TG),
         }
         self._db.insert_in_table(TABLE_BM_MONITOR_REPORTS, values)
     
