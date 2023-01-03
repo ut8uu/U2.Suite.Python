@@ -19,13 +19,28 @@ from datetime import datetime
 import os
 from pathlib import Path
 import sys
+import brandmeister.bm_groups as bm_groups
 from brandmeister.bm_monitor_core import BrandmeisterMonitorCore, MonitorReportData
 from brandmeister.bm_monitor_database import BmMonitorDatabase
 from brandmeister.ui.Ui_BmMonitorMainWindow import Ui_BmMonitorMainWindow
-from PyQt5.QtWidgets import QMainWindow, QApplication
-from PyQt5 import QtGui
+from PyQt5.QtWidgets import QMainWindow, QApplication, QStyledItemDelegate
+from PyQt5 import QtGui, QtCore
 
 from helpers.FileSystemHelper import FileSystemHelper
+
+class StyledItemDelegate(QStyledItemDelegate):
+    checked = QtCore.pyqtSignal(QtCore.QModelIndex, int)
+    def editorEvent(self, event, model, option, index):
+        if model.flags(index) & QtCore.Qt.ItemIsUserCheckable:
+            # before the change
+            last_value = index.data(QtCore.Qt.CheckStateRole)
+        value = QStyledItemDelegate.editorEvent(self, event, model, option, index)
+        if model.flags(index) & QtCore.Qt.ItemIsUserCheckable:
+            # after the change
+            new_value = index.data(QtCore.Qt.CheckStateRole)
+            if last_value != new_value:
+                self.checked.emit(index, new_value)
+        return value
 
 class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
     '''Represents a brandmeister monitor application.'''
@@ -51,7 +66,6 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
 
         self._monitor_core = BrandmeisterMonitorCore()
         self._monitor_core.MonitorReport.report.connect(self.monitor_reported)
-        self.start_monitor()
 
         p = self._monitor_core.Preferences
         self.cbCallsigns.setChecked(p.UseCallsigns)
@@ -59,13 +73,37 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         self.tbCallsigns.setEnabled(p.UseCallsigns)
 
         self.cbTalkGroups.setChecked(p.UseTalkGroups)
-        self.tbTalkGroups.setPlainText(','.join(p.TalkGroups))
-        self.tbTalkGroups.setEnabled(p.UseTalkGroups)
+        self.cbDisplayAllGroups.setChecked(p.DisplayAllTalkGroups)
+        
+        model = QtGui.QStandardItemModel()
+        for group_id in bm_groups.bm_groups:
+            group_title = bm_groups.bm_groups[group_id]
+            item = QtGui.QStandardItem(f'[{group_id}] {group_title}')
+            is_checked = int(group_id) in p.TalkGroups
+            check = QtCore.Qt.CheckState.Checked if is_checked else QtCore.Qt.CheckState.Unchecked
+            item.setCheckState(check)
+            item.setCheckable(True)
+            model.appendRow(item)
+        self.lbGroups.setModel(model)
+        
+        self.lbGroups.setEnabled(p.UseTalkGroups)
         
         self.cbTalkGroups.stateChanged.connect(self.update_preferences)
-        self.tbTalkGroups.textChanged.connect(self.update_preferences)
+        self.cbDisplayAllGroups.stateChanged.connect(self.update_preferences)
         self.cbCallsigns.stateChanged.connect(self.update_preferences)
         self.tbCallsigns.textChanged.connect(self.update_preferences)        
+        
+        delegate = StyledItemDelegate()
+        delegate.checked.connect(self.lbgroups_on_checked)
+        self.lbGroups.setItemDelegate(delegate)
+
+        self.start_monitor()
+            
+    '''================================================================'''
+    def lbgroups_on_checked(self, index, state):
+        '''Handles (un)checking of the item in the groups list view.'''
+        text = index.data()
+        self.update_preferences()
         
     '''==============================================================='''    
     def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
@@ -90,7 +128,6 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         '''Calculates the full path to the database'''
         return FileSystemHelper.get_appdata_path(Path('U2.Suite') / 'BmMonitor' / 'Database', create_if_not_exists=True)
 
-
     '''==============================================================='''
     def update_preferences(self) -> None:
         '''Updates preferences according to the current window state.'''
@@ -100,9 +137,17 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         self._monitor_core.Preferences.Callsigns = callsigns
 
         self._monitor_core.Preferences.UseTalkGroups = self.cbTalkGroups.isChecked()
-        self.tbTalkGroups.setEnabled(self.cbTalkGroups.isChecked())
-        talkgroups = self.tbTalkGroups.toPlainText().split(',')
-        self._monitor_core.Preferences.TalkGroups = talkgroups
+        self.cbTalkGroups.setEnabled(self.cbTalkGroups.isChecked())
+        groups = []
+        model = self.lbGroups.model()
+        item : QtGui.QStandardItem
+        for index in range(model.rowCount()):
+            item = model.item(index)
+            if item.isCheckable() and item.checkState() == QtCore.Qt.Checked:
+                text = item.text().split(' ')[0].lstrip('[').rstrip(']')
+                group_id = int(text)
+                groups.append(group_id)
+        self._monitor_core.Preferences.TalkGroups = groups
         
         self._monitor_core.Preferences.write_preferences()
         

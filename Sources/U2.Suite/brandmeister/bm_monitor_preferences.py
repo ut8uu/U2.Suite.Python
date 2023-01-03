@@ -16,7 +16,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from common.ApplicationPreferences import ApplicationPreferences
-from logger.logger_constants import KEY_CALLSIGNS, KEY_MIN_DURATION, KEY_MIN_SILENCE, KEY_NOISY_CALLS, KEY_NOTIFY_DAPNET, KEY_NOTIFY_DISCORD, KEY_NOTIFY_DISCORD_WH_URL, KEY_NOTIFY_PUSHOVER, KEY_NOTIFY_TELEGRAM, KEY_TALK_GROUPS, KEY_USE_CALLSIGNS, KEY_USE_TALK_GROUPS, KEY_VERBOSE, PREFERENCES_FILE_BM_MONITOR
+from logger.logger_constants import KEY_CALLSIGNS, KEY_DISPLAY_ALL_TALK_GROUPS, KEY_MIN_DURATION, KEY_MIN_SILENCE, KEY_NOISY_CALLS, KEY_NOTIFY_DAPNET, KEY_NOTIFY_DISCORD, KEY_NOTIFY_DISCORD_WH_URL, KEY_NOTIFY_PUSHOVER, KEY_NOTIFY_TELEGRAM, KEY_TALK_GROUPS, KEY_USE_CALLSIGNS, KEY_USE_TALK_GROUPS, KEY_VERBOSE, PREFERENCES_FILE_BM_MONITOR
 
 
 class BrandmeisterMonitorApplicationPreferences(ApplicationPreferences):
@@ -39,6 +39,7 @@ class BrandmeisterMonitorApplicationPreferences(ApplicationPreferences):
             KEY_CALLSIGNS : [],
             KEY_NOISY_CALLS : [],
             KEY_USE_TALK_GROUPS : False,
+            KEY_DISPLAY_ALL_TALK_GROUPS : True,
             KEY_TALK_GROUPS : ['91'],
             KEY_MIN_SILENCE : 300,
             KEY_MIN_DURATION : 5
@@ -51,6 +52,13 @@ class BrandmeisterMonitorApplicationPreferences(ApplicationPreferences):
     @UseTalkGroups.setter
     def UseTalkGroups(self, value : bool) -> None:
         self.Preferences[KEY_USE_TALK_GROUPS] = value
+
+    @property
+    def DisplayAllTalkGroups(self) -> bool:
+        return self.get_bool_value(KEY_DISPLAY_ALL_TALK_GROUPS, False)
+    @DisplayAllTalkGroups.setter
+    def DisplayAllTalkGroups(self, value : bool) -> None:
+        self.Preferences[KEY_DISPLAY_ALL_TALK_GROUPS] = value
 
     @property
     def TalkGroups(self) -> list[str]:
