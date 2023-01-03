@@ -28,8 +28,32 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 from brandmeister.bm_monitor_preferences import BrandmeisterMonitorApplicationPreferences
 
+BM_KEY_TALK_GROUP = 'talk_group'
+BM_KEY_CALLSIGN = 'callsign'
+BM_KEY_DURATION = 'duration'
+
+class MonitorReportData(object):
+    '''Represents a data to report outside of the monitor.'''
+    def __init__(self, data: dict) -> None:
+        self._tg = data[BM_KEY_TALK_GROUP]
+        self._callsign = data[BM_KEY_CALLSIGN]
+        self._duration = data[BM_KEY_DURATION]
+        pass
+    
+    @property
+    def TG(self) -> str:
+        return self._tg
+    
+    @property
+    def Callsign(self) -> str:
+        return self._callsign
+    
+    @property
+    def Duration(self) -> int:
+        return self._duration
+
 class MonitorReportEvent(QObject):
-    report = pyqtSignal(tuple)
+    report = pyqtSignal(MonitorReportData)
     
 class BmMonitorClientNamespace(socketio.ClientNamespace):
     
@@ -192,7 +216,13 @@ class BrandmeisterMonitorCore(object):
                 duration = stop_time - start_time
                 if duration > self._preferences.MinDurationSec:
                     print(f'[{tg}] {callsign} for {duration} seconds.')
-                    self._monitor_report_event.report.emit((tg, callsign, duration))
+                    report_data = {
+                        BM_KEY_CALLSIGN : callsign,
+                        BM_KEY_TALK_GROUP : tg,
+                        BM_KEY_DURATION : duration
+                    }
+                    report = MonitorReportData(report_data)
+                    self._monitor_report_event.report.emit(report)
                 # only proceed if the key down has been long enough
                 if duration >= self._preferences.MinDurationSec:
                     if tg not in self._last_TG_activity or inactivity >= self._preferences.MinSilenceSec:

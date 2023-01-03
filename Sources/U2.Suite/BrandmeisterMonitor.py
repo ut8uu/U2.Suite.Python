@@ -15,9 +15,10 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+from datetime import datetime
 import os
 import sys
-from brandmeister.bm_monitor_core import BrandmeisterMonitorCore
+from brandmeister.bm_monitor_core import BrandmeisterMonitorCore, MonitorReportData
 from brandmeister.ui.Ui_BmMonitorMainWindow import Ui_BmMonitorMainWindow
 from PyQt5.QtWidgets import QMainWindow, QApplication
 from PyQt5 import QtGui
@@ -34,6 +35,8 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         super().__init__(parent)
         
         self.setupUi(self)
+        self.setFixedSize(self.width(), self.height())
+        self.setWindowIcon(QtGui.QIcon(FileSystemHelper.relpath('icon/radio-48.png')))
         
         self.actionExit.triggered.connect(self.close_window)
         self.actionStart.triggered.connect(self.start_monitor)
@@ -45,11 +48,11 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
 
         p = self._monitor_core.Preferences
         self.cbCallsigns.setChecked(p.UseCallsigns)
-        self.tbCallsigns.setText(','.join(p.Callsigns))
+        self.tbCallsigns.setPlainText(','.join(p.Callsigns))
         self.tbCallsigns.setEnabled(p.UseCallsigns)
 
         self.cbTalkGroups.setChecked(p.UseTalkGroups)
-        self.tbTalkGroups.setText(','.join(p.TalkGroups))
+        self.tbTalkGroups.setPlainText(','.join(p.TalkGroups))
         self.tbTalkGroups.setEnabled(p.UseTalkGroups)
         
         self.cbTalkGroups.stateChanged.connect(self.update_preferences)
@@ -63,9 +66,16 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         return super().closeEvent(a0)
 
     '''==============================================================='''
-    def monitor_reported(self, data : tuple) -> None:
+    def monitor_reported(self, data : MonitorReportData) -> None:
         '''Handles reporting of data from the monitor.'''
-        s = data
+        timestamp = datetime.now().strftime('%H:%M:%S %d.%m.%Y')
+        line = (
+            f'{timestamp.rjust(16)} '
+            f'{data.TG.rjust(6)} '
+            f'{data.Callsign.ljust(12)} '
+            f'{data.Duration}s'
+            )
+        self.monitoringList.addItem(line)
 
     '''==============================================================='''
     def update_preferences(self) -> None:
