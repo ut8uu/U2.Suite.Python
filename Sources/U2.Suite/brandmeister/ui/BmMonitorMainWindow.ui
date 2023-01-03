@@ -30,8 +30,8 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>781</width>
-      <height>161</height>
+      <width>211</width>
+      <height>521</height>
      </rect>
     </property>
     <property name="currentIndex">
@@ -62,8 +62,8 @@
        <rect>
         <x>10</x>
         <y>30</y>
-        <width>751</width>
-        <height>87</height>
+        <width>181</width>
+        <height>441</height>
        </rect>
       </property>
       <property name="font">
@@ -101,8 +101,8 @@
        <rect>
         <x>10</x>
         <y>30</y>
-        <width>751</width>
-        <height>87</height>
+        <width>180</width>
+        <height>441</height>
        </rect>
       </property>
       <property name="font">
@@ -119,10 +119,10 @@
    <widget class="QListWidget" name="monitoringList">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>180</y>
-      <width>781</width>
-      <height>351</height>
+      <x>230</x>
+      <y>10</y>
+      <width>550</width>
+      <height>521</height>
      </rect>
     </property>
     <property name="font">
