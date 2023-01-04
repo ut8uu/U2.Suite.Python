@@ -19,7 +19,8 @@ import os
 from pathlib import Path
 import shutil
 import unittest
-from brandmeister.bm_monitor_core import BM_KEY_CALLSIGN, BM_KEY_DURATION, BM_KEY_TALK_GROUP, MonitorReportData
+from brandmeister.bm_monitor_constants import KEY_CALLSIGN, KEY_DURATION, KEY_TALK_GROUP
+from brandmeister.bm_monitor_core import MonitorReportData
 
 from brandmeister.bm_monitor_database import FIELD_BM_MONITOR_CALLSIGN, FIELD_BM_MONITOR_DURATION, FIELD_BM_MONITOR_TG, BmMonitorDatabase
 
@@ -73,9 +74,9 @@ class DatabaseTests(unittest.TestCase):
         self.assertEqual(0, len(reports[1]))
         
         report_data = {
-            BM_KEY_CALLSIGN : 'UT8UU',
-            BM_KEY_TALK_GROUP : '91',
-            BM_KEY_DURATION : 20,
+            KEY_CALLSIGN : 'UT8UU',
+            KEY_TALK_GROUP : '91',
+            KEY_DURATION : 20,
         }
         report = MonitorReportData(report_data)
         db.insert_report(report)
@@ -85,9 +86,9 @@ class DatabaseTests(unittest.TestCase):
         
     def insert_data(self, db: BmMonitorDatabase, callsign, tg, duration) -> None:
         report_data = {
-            BM_KEY_CALLSIGN : callsign,
-            BM_KEY_TALK_GROUP : tg,
-            BM_KEY_DURATION : duration,
+            KEY_CALLSIGN : callsign,
+            KEY_TALK_GROUP : tg,
+            KEY_DURATION : duration,
         }
         report = MonitorReportData(report_data)
         db.insert_report(report)
@@ -110,7 +111,7 @@ class DatabaseTests(unittest.TestCase):
         self.assertEqual(10, row0[duration_index])
         
         # 2. filtered by callsign
-        reports = db.get_reports({BM_KEY_CALLSIGN : 'UT1UU'})
+        reports = db.get_reports({KEY_CALLSIGN : 'UT1UU'})
         self.assertEqual(1, len(reports[1]))
         row0 = reports[1][0]
         self.assertEqual('UT1UU', row0[callsign_index])

@@ -140,3 +140,4 @@ test.sqlite
 /Sources/U2.Suite/U2.Suite.pyproj.user
 /Sources/U2.Suite/test_data/*
 /Sources/U2.Suite/*_preferences.json
+*.sqlite

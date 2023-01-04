@@ -5,7 +5,11 @@ block_cipher = None
 a = Analysis(
     ['BrandmeisterMonitor.py'],
     pathex=['.'],
-    binaries=[('icon\\*.png','icon'),('font\\*.ttf','font')],datas=[('data\\*','data')],
+    binaries=[
+        ('icon\\*.png','icon'),
+        ('font\\*.ttf','font')],
+        datas=[('data\\*','data')
+        ],
     hiddenimports=['semver','socketio'],
     hookspath=[],
     runtime_hooks=[],
@@ -15,7 +19,11 @@ a = Analysis(
     cipher=block_cipher,
     noarchive=False
     )
-pyz = PYZ(a.pure, a.zipped_data,cipher=block_cipher)
+pyz = PYZ(
+    a.pure, 
+    a.zipped_data,
+    cipher=block_cipher
+    )
 exe = EXE(
     pyz,
     a.scripts,
@@ -30,5 +38,5 @@ exe = EXE(
     upx=True,
     upx_exclude=[],
     runtime_tmpdir=None,
-    console=False 
+    console=False
     )

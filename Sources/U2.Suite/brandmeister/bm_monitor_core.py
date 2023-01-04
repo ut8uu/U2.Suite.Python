@@ -17,6 +17,7 @@
 
 import datetime as dt
 import json
+import logging
 import os
 import sys
 import socketio
@@ -27,18 +28,20 @@ from PyQt5.QtCore import QObject, pyqtSignal
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from brandmeister.bm_monitor_preferences import BrandmeisterMonitorApplicationPreferences
-
-BM_KEY_TALK_GROUP = 'talk_group'
-BM_KEY_CALLSIGN = 'callsign'
-BM_KEY_DURATION = 'duration'
+import brandmeister.bm_monitor_constants as const
 
 class MonitorReportData(object):
     '''Represents a data to report outside of the monitor.'''
     def __init__(self, data: dict) -> None:
-        self._tg = data[BM_KEY_TALK_GROUP]
-        self._callsign = data[BM_KEY_CALLSIGN]
-        self._duration = data[BM_KEY_DURATION]
+        self._timestamp = data.get(const.KEY_TIMESTAMP, dt.datetime.utcnow())    
+        self._tg = data[const.KEY_TALK_GROUP]
+        self._callsign = data[const.KEY_CALLSIGN]
+        self._duration = data[const.KEY_DURATION]
         pass
+    
+    @property
+    def Timestamp(self) -> dt.datetime:
+        return self._timestamp
     
     @property
     def TG(self) -> str:
@@ -65,11 +68,11 @@ class BmMonitorClientNamespace(socketio.ClientNamespace):
         self._monitor = monitor
         
     def on_connect(self):
-        print('connection established')
+        logging.info('connection established')
         pass
 
     def on_disconnect(self):
-        print('disconnected from server')
+        logging.info('disconnected from server')
         pass
 
     def on_mqtt(self, data):
@@ -129,7 +132,6 @@ class BrandmeisterMonitorCore(object):
     '''==================================================================='''
     def preferences_changed(self) -> None:
         '''Handles changing of the application preferences.'''
-        
 
     def Start(self) -> None:
         if self._started:
@@ -149,20 +151,20 @@ class BrandmeisterMonitorCore(object):
 
     def Say(self, msg : str) -> None:
         if self._preferences.Verbose:
-            print(msg)
+            logging.info(msg)
 
     def monitor_worker(self) -> None:
-        self.Say(f'Starting monitoring of TG {self._preferences.TalkGroups}')        
+        logging.info(f'Starting monitoring of TG {self._preferences.TalkGroups}')        
         
         while self._started:
             try:
                 self._sio.connect(url='https://api.brandmeister.network', socketio_path="/lh/socket.io", transports="websocket")
                 self._sio.wait()
             except Exception as ex:
-                print(ex)
+                logging.exception(ex)
                 time.sleep(1)
 
-        print('Thread exit...')
+        logging.debug('Thread exit...')
 
     #############################
     ##### Define Functions
@@ -184,13 +186,15 @@ class BrandmeisterMonitorCore(object):
         call = json.loads(data['payload'])
         tg = call["DestinationID"]
         callsign = call["SourceCall"]
+        if callsign == None or len(callsign) == 0:
+            return
         start_time = call["Start"]
         stop_time = call["Stop"]
         notify = False
         now = int(time.time())
 
         if self._preferences.Verbose and callsign in self._preferences.NoisyCalls:
-            print("ignored noisy ham " + callsign)
+            logging.info("Ignored noisy ham " + callsign)
         
         else:
             # check if callsign is monitored, the transmis_sion has already been finished
@@ -215,11 +219,12 @@ class BrandmeisterMonitorCore(object):
                 # calculate duration of key down
                 duration = stop_time - start_time
                 if duration > self._preferences.MinDurationSec:
-                    print(f'[{tg}] {callsign} for {duration} seconds.')
+                    logging.debug(f'[{tg}] {callsign} for {duration} seconds.')
                     report_data = {
-                        BM_KEY_CALLSIGN : callsign,
-                        BM_KEY_TALK_GROUP : tg,
-                        BM_KEY_DURATION : duration
+                        const.KEY_TIMESTAMP : dt.datetime.utcnow(),
+                        const.KEY_CALLSIGN : callsign,
+                        const.KEY_TALK_GROUP : tg,
+                        const.KEY_DURATION : duration
                     }
                     report = MonitorReportData(report_data)
                     self._monitor_report_event.report.emit(report)
@@ -228,7 +233,7 @@ class BrandmeisterMonitorCore(object):
                     if tg not in self._last_TG_activity or inactivity >= self._preferences.MinSilenceSec:
                         notify = True
                     elif self._preferences.Verbose:
-                        print("ignored activity in TG " + str(tg) + " from " + callsign + ": last action " + str(inactivity) + " seconds ago.")
+                        logging.info("ignored activity in TG " + str(tg) + " from " + callsign + ": last action " + str(inactivity) + " seconds ago.")
                     self._last_TG_activity[tg] = now
 
             if notify:
@@ -256,5 +261,5 @@ class BrandmeisterMonitorCore(object):
 if __name__ == '__main__':
     monitor = BrandmeisterMonitorCore()
     monitor.Start()
-    input('Press Enter to finish.')
+    input('Press Enter to finish...')
     monitor.Stop()

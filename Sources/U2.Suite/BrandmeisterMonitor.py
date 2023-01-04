@@ -16,6 +16,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from datetime import datetime
+import logging
 import os
 from pathlib import Path
 import sys
@@ -23,6 +24,7 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import brandmeister.bm_groups as bm_groups
+import brandmeister.bm_monitor_constants as const
 from brandmeister.bm_monitor_core import BrandmeisterMonitorCore, MonitorReportData
 from brandmeister.bm_monitor_database import BmMonitorDatabase
 from brandmeister.ui.Ui_BmMonitorMainWindow import Ui_BmMonitorMainWindow
@@ -45,18 +47,35 @@ class StyledItemDelegate(QStyledItemDelegate):
                 self.checked.emit(index, new_value)
         return value
 
+logging.basicConfig(filename='bm_monitor.log',
+                    level='DEBUG',
+                    filemode='a',
+                    format='%(name)s: %(levelname)s - %(message)s')
+logging.info('======================================================')
+logging.info('Application started')
+
 class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
     '''Represents a brandmeister monitor application.'''
     
     _db : BmMonitorDatabase
     _monitor_core : BrandmeisterMonitorCore
+    _logger : logging.Logger
     
     '''==============================================================='''    
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
         
-        path = self.GetPathToDatabase()
-        print(f'Path to db: {path}')
+        self._monitor_core = BrandmeisterMonitorCore()
+        self._monitor_core.MonitorReport.report.connect(self.monitor_reported)
+
+        log_level = logging.getLevelName(self._monitor_core.Preferences.LogLevel)
+        self._logger = logging.getLogger("bm")
+        console_handler = logging.StreamHandler()
+        self._logger.addHandler(console_handler)
+        self._logger.setLevel(log_level)
+
+        path = Path(self._monitor_core.Preferences.PathToDatabase)
+        self._logger.debug(f'Path to db: {path}')
         self._db = BmMonitorDatabase(path)
         
         self.setupUi(self)
@@ -67,29 +86,26 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         self.actionStart.triggered.connect(self.start_monitor)
         self.actionStop.triggered.connect(self.stop_monitor)
 
-        self._monitor_core = BrandmeisterMonitorCore()
-        self._monitor_core.MonitorReport.report.connect(self.monitor_reported)
+        pref = self._monitor_core.Preferences
+        self.cbCallsigns.setChecked(pref.UseCallsigns)
+        self.tbCallsigns.setPlainText(','.join(pref.Callsigns))
+        self.tbCallsigns.setEnabled(pref.UseCallsigns)
 
-        p = self._monitor_core.Preferences
-        self.cbCallsigns.setChecked(p.UseCallsigns)
-        self.tbCallsigns.setPlainText(','.join(p.Callsigns))
-        self.tbCallsigns.setEnabled(p.UseCallsigns)
-
-        self.cbTalkGroups.setChecked(p.UseTalkGroups)
-        self.cbDisplayAllGroups.setChecked(p.DisplayAllTalkGroups)
+        self.cbTalkGroups.setChecked(pref.UseTalkGroups)
+        self.cbDisplayAllGroups.setChecked(pref.DisplayAllTalkGroups)
         
         model = QtGui.QStandardItemModel()
         for group_id in bm_groups.bm_groups:
             group_title = bm_groups.bm_groups[group_id]
             item = QtGui.QStandardItem(f'[{group_id}] {group_title}')
-            is_checked = int(group_id) in p.TalkGroups
+            is_checked = int(group_id) in pref.TalkGroups
             check = QtCore.Qt.CheckState.Checked if is_checked else QtCore.Qt.CheckState.Unchecked
             item.setCheckState(check)
             item.setCheckable(True)
             model.appendRow(item)
         self.lbGroups.setModel(model)
         
-        self.lbGroups.setEnabled(p.UseTalkGroups)
+        self.lbGroups.setEnabled(pref.UseTalkGroups)
         
         self.cbTalkGroups.stateChanged.connect(self.update_preferences)
         self.cbDisplayAllGroups.stateChanged.connect(self.update_preferences)
@@ -110,7 +126,7 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         if state == QtCore.Qt.CheckState.Unchecked:
             text += 'un'
         text += 'checked.'
-        print(text)
+        self._logger.debug(text)
         self.update_preferences()
         
     '''==============================================================='''    
@@ -121,13 +137,14 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
     '''==============================================================='''
     def monitor_reported(self, data : MonitorReportData) -> None:
         '''Handles reporting of data from the monitor.'''
-        timestamp = datetime.now().strftime('%d.%m.%Y %H:%M:%S')
+        timestamp = data.Timestamp.strftime('%d.%m.%Y %H:%M:%S')
         line = (
             f'{timestamp.rjust(16)} '
             f'{str(data.TG).rjust(6)} '
             f'{data.Callsign.ljust(12)} '
             f'{data.Duration}s'
             )
+        self._logger.debug(f'Received report: {line}')
         self.monitoringList.addItem(line)
         self._db.insert_report(data)
         

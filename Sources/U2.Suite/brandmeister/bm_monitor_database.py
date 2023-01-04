@@ -16,10 +16,12 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from datetime import datetime
+import logging
 import sqlite3
 import semver
 
-from brandmeister.bm_monitor_core import BM_KEY_CALLSIGN, BM_KEY_DURATION, BM_KEY_TALK_GROUP, MonitorReportData
+import brandmeister.bm_monitor_constants as const
+from brandmeister.bm_monitor_core import MonitorReportData
 from database.database_core import DatabaseCore
 from database.database_options import DatabaseOptions
 from pathlib import Path
@@ -113,7 +115,7 @@ class BmMonitorDatabase:
                 result = (self._db._table_descriptions[TABLE_BM_MONITOR_REPORTS], cursor.fetchall())
                 cursor.close()
         except sqlite3.Error as ex:
-            print(f'SqLite error: {ex}')
+            logging.exception(f'SqLite error: {ex}')
 
         return result
     
