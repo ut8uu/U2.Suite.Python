@@ -58,6 +58,7 @@ class UdpListenerBase():
             return
         self._started = False
         self._thread.join()
+        print(f'Listening to {self._address} finished.')
         
     def listening_worker(self) -> None:
         print(f'Started listening to {self._address}:{self._port}')

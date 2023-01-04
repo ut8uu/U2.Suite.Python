@@ -65,6 +65,7 @@ KEY_DEFAULT_SATELLITE = 'satellite'
 KEY_OPERATOR_NAME = 'operator_name'
 KEY_REALTIME = 'realtime'
 KEY_UTC = 'utc'
+KEY_VERBOSE = 'verbose'
 KEY_WSJT_ACCEPT_PACKETS = 'accept_wsjt_packets'
 
 PREFERENCES_FILE_FSE = 'FastSatEntry_preferences.json'

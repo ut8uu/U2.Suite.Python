@@ -19,6 +19,7 @@ if __name__ == '__main__':
     print('This module cannot be executed directly')
     exit(0)
 
+import logging
 from logger.logger_constants import *
 from typing import Any, List, Tuple
 import os
@@ -96,8 +97,8 @@ class DatabaseCore(object):
                 conn.commit()
                 cursor.close()
         except sqlite3.Error as ex:
-            print(f'SqLite error: {ex}')
-        print(f'Query {sql} executed successfully.')
+            logging.exception(f'SqLite error: {ex}')
+        logging.debug(f'Query {sql} executed successfully.')
 
     def insert_in_table(self, table : str, data : dict) -> None:
         '''Inserts a record in the given table'''
