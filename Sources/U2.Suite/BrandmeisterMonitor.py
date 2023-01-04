@@ -50,16 +50,19 @@ class StyledItemDelegate(QStyledItemDelegate):
 logging.basicConfig(filename='bm_monitor.log',
                     level='DEBUG',
                     filemode='a',
-                    format='%(name)s: %(levelname)s - %(message)s')
+                    format='%(asctime)s:%(name)s: %(levelname)s - %(message)s')
 logging.info('======================================================')
 logging.info('Application started')
+# a global logger
+logger = logging.getLogger('bm')
+console_handler = logging.StreamHandler()
+logger.addHandler(console_handler)
 
 class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
     '''Represents a brandmeister monitor application.'''
     
     _db : BmMonitorDatabase
     _monitor_core : BrandmeisterMonitorCore
-    _logger : logging.Logger
     
     '''==============================================================='''    
     def __init__(self, parent=None) -> None:
@@ -69,10 +72,8 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         self._monitor_core.MonitorReport.report.connect(self.monitor_reported)
 
         log_level = logging.getLevelName(self._monitor_core.Preferences.LogLevel)
-        self._logger = logging.getLogger("bm")
-        console_handler = logging.StreamHandler()
-        self._logger.addHandler(console_handler)
-        self._logger.setLevel(log_level)
+        logger.setLevel(log_level)
+        self._logger = logger
 
         path = Path(self._monitor_core.Preferences.PathToDatabase)
         self._logger.debug(f'Path to db: {path}')
