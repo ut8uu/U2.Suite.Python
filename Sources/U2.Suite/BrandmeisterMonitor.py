@@ -19,6 +19,9 @@ from datetime import datetime
 import os
 from pathlib import Path
 import sys
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 import brandmeister.bm_groups as bm_groups
 from brandmeister.bm_monitor_core import BrandmeisterMonitorCore, MonitorReportData
 from brandmeister.bm_monitor_database import BmMonitorDatabase
@@ -101,8 +104,13 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
             
     '''================================================================'''
     def lbgroups_on_checked(self, index, state):
-        '''Handles (un)checking of the item in the groups list view.'''
-        text = index.data()
+        '''Handles checking/unchecking of the item in the groups list view.'''
+        text = f'Group {index.data()} is '
+        
+        if state == QtCore.Qt.CheckState.Unchecked:
+            text += 'un'
+        text += 'checked.'
+        print(text)
         self.update_preferences()
         
     '''==============================================================='''    
@@ -116,7 +124,7 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         timestamp = datetime.now().strftime('%d.%m.%Y %H:%M:%S')
         line = (
             f'{timestamp.rjust(16)} '
-            f'{data.TG.rjust(6)} '
+            f'{str(data.TG).rjust(6)} '
             f'{data.Callsign.ljust(12)} '
             f'{data.Duration}s'
             )
@@ -137,6 +145,7 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         self._monitor_core.Preferences.Callsigns = callsigns
 
         self._monitor_core.Preferences.UseTalkGroups = self.cbTalkGroups.isChecked()
+        self._monitor_core.Preferences.DisplayAllTalkGroups = self.cbDisplayAllGroups.isChecked()
         self.cbTalkGroups.setEnabled(self.cbTalkGroups.isChecked())
         groups = []
         model = self.lbGroups.model()

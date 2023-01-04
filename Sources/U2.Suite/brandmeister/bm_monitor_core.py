@@ -182,7 +182,7 @@ class BrandmeisterMonitorCore(object):
 
     def ProcessMqtt(self, data):
         call = json.loads(data['payload'])
-        tg = str(call["DestinationID"])
+        tg = call["DestinationID"]
         callsign = call["SourceCall"]
         start_time = call["Start"]
         stop_time = call["Stop"]
@@ -228,7 +228,7 @@ class BrandmeisterMonitorCore(object):
                     if tg not in self._last_TG_activity or inactivity >= self._preferences.MinSilenceSec:
                         notify = True
                     elif self._preferences.Verbose:
-                        print("ignored activity in TG " + tg + " from " + callsign + ": last action " + str(inactivity) + " seconds ago.")
+                        print("ignored activity in TG " + str(tg) + " from " + callsign + ": last action " + str(inactivity) + " seconds ago.")
                     self._last_TG_activity[tg] = now
 
             if notify:
