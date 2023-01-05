@@ -206,7 +206,7 @@
     <property name="font">
      <font>
       <family>JetBrains Mono</family>
-      <pointsize>10</pointsize>
+      <pointsize>13</pointsize>
       <weight>50</weight>
       <bold>false</bold>
      </font>

@@ -25,7 +25,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 import brandmeister.bm_groups as bm_groups
 import brandmeister.bm_monitor_constants as const
-from brandmeister.bm_monitor_core import BrandmeisterMonitorCore, MonitorReportData
+from brandmeister.bm_monitor_core import BrandmeisterMonitorCore, MonitorReportData, MonitoringStats
 from brandmeister.bm_monitor_database import BmMonitorDatabase
 from brandmeister.ui.Ui_BmMonitorMainWindow import Ui_BmMonitorMainWindow
 from PyQt5.QtWidgets import QMainWindow, QApplication, QStyledItemDelegate, QListView
@@ -63,13 +63,17 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
     
     _db : BmMonitorDatabase
     _monitor_core : BrandmeisterMonitorCore
+    _stored_count : int
     
     '''==============================================================='''    
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
         
+        self._stored_count = 0
+        
         self._monitor_core = BrandmeisterMonitorCore()
         self._monitor_core.MonitorReport.report.connect(self.monitor_reported)
+        self._monitor_core.MonitorReport.heartbeat.connect(self.monitor_heartbeat)
 
         log_level = logging.getLevelName(self._monitor_core.Preferences.LogLevel)
         logger.setLevel(log_level)
@@ -153,16 +157,28 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         return super().closeEvent(a0)
 
     '''==============================================================='''
-    def monitor_reported(self, data : MonitorReportData) -> None:
+    def monitor_heartbeat(self, stats : MonitoringStats) -> None:
+        '''
+        Handles reporting of the monitor's heartbeat.
+        '''
+        msg = f'Received: {stats.Total}, caught: {stats.Caught}, stored: {self._stored_count}'
+        self.statusbar.showMessage(msg)
+        
+    '''==============================================================='''
+    def monitor_reported(self, data : MonitorReportData, stats : MonitoringStats) -> None:
         '''Handles reporting of data from the monitor.'''
         id = self._db.insert_report(data)
         data.Id = id
+        self._stored_count += 1
 
         self.display_record(self.monitoringList, data)
 
         minutes = self.string_filter_to_minutes(self.cbTimestampFilter.currentText())
         timestamp = datetime.utcnow() - timedelta(minutes=minutes)
         self.cleanup_view(self.monitoringList, timestamp)
+        
+        msg = f'Received: {stats.Total}, caught: {stats.Caught}, stored: {self._stored_count}'
+        self.statusbar.showMessage(msg)
     
     '''==========================================================================='''
     def cleanup_view(self, list_view : QListView, min_timestamp : datetime) -> None:

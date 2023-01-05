@@ -21,7 +21,7 @@ import logging
 import os
 import sys
 import socketio
-from threading import Thread
+from threading import Thread, Timer
 import time
 from PyQt5.QtCore import QObject, pyqtSignal
 
@@ -29,6 +29,26 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 from brandmeister.bm_monitor_preferences import BrandmeisterMonitorApplicationPreferences
 import brandmeister.bm_monitor_constants as const
+
+class MonitoringStats(object):
+    def __init__(self, total : int = 0, caught : int = 0) -> None:
+        self._total = total
+        self._caught = caught
+        pass
+    
+    @property
+    def Total(self) -> int:
+        return self._total
+    @Total.setter
+    def Total(self, value : int) -> None:
+        self._total = value
+
+    @property
+    def Caught(self) -> int:
+        return self._caught
+    @Caught.setter
+    def Caught(self, value : int) -> None:
+        self._caught = value
 
 class MonitorReportData(object):
     '''Represents a data to report outside of the monitor.'''
@@ -64,7 +84,8 @@ class MonitorReportData(object):
         return self._duration
 
 class MonitorReportEvent(QObject):
-    report = pyqtSignal(MonitorReportData)
+    report = pyqtSignal(MonitorReportData, MonitoringStats)
+    heartbeat = pyqtSignal(MonitoringStats)
     
 class BmMonitorClientNamespace(socketio.ClientNamespace):
     
@@ -100,11 +121,14 @@ class BrandmeisterMonitorCore(object):
     _last_OM_activity : dict
     _started : bool
     _thread : Thread
+    _heartbeat_timer : Timer
     
     _dapnet_imported : bool
     _discord_imported : bool
     _pushover_imported : bool
     _telegram_imported : bool
+    
+    _monitoringStats : MonitoringStats
     
     def __init__(self) -> None:
         self._started = False
@@ -112,6 +136,8 @@ class BrandmeisterMonitorCore(object):
         self._discord_imported = False
         self._pushover_imported = False
         self._telegram_imported = False
+        
+        self._monitoringStats = MonitoringStats()
         
         self._preferences = BrandmeisterMonitorApplicationPreferences()
         
@@ -126,6 +152,8 @@ class BrandmeisterMonitorCore(object):
         self._preferences.PreferencesChanged.changed.connect(self.preferences_changed)
         
         self._monitor_report_event = MonitorReportEvent()
+        self._heartbeat_timer = Timer(1, self.heartbeat)
+        self._heartbeat_timer.start()
         pass
 
     @property
@@ -136,6 +164,13 @@ class BrandmeisterMonitorCore(object):
     @property
     def MonitorReport(self) -> MonitorReportEvent:
         return self._monitor_report_event
+    
+    '''==================================================================='''
+    def heartbeat(self):
+        self._monitor_report_event.heartbeat.emit(self._monitoringStats)
+        if self._started:
+            self._heartbeat_timer = Timer(1, self.heartbeat)
+            self._heartbeat_timer.start()
     
     '''==================================================================='''
     def preferences_changed(self) -> None:
@@ -205,6 +240,8 @@ class BrandmeisterMonitorCore(object):
             logging.info("Ignored noisy ham " + callsign)
         
         else:
+            self._monitoringStats.Total += 1
+
             # check if callsign is monitored, the transmis_sion has already been finished
             # and the person was inactive for n seconds
             if self._preferences.UseCallsigns and callsign in self._preferences.Callsigns:
@@ -235,7 +272,8 @@ class BrandmeisterMonitorCore(object):
                         const.KEY_DURATION : duration
                     }
                     report = MonitorReportData(report_data)
-                    self._monitor_report_event.report.emit(report)
+                    self._monitoringStats.Caught += 1
+                    self._monitor_report_event.report.emit(report, self._monitoringStats)
                 # only proceed if the key down has been long enough
                 if duration >= self._preferences.MinDurationSec:
                     if tg not in self._last_TG_activity or inactivity >= self._preferences.MinSilenceSec:

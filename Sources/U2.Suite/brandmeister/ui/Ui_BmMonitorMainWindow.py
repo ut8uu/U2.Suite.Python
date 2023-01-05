@@ -89,7 +89,7 @@ class Ui_BmMonitorMainWindow(object):
         self.monitoringList.setGeometry(QtCore.QRect(309, 50, 630, 480))
         font = QtGui.QFont()
         font.setFamily("JetBrains Mono")
-        font.setPointSize(10)
+        font.setPointSize(13)
         font.setBold(False)
         font.setWeight(50)
         self.monitoringList.setFont(font)
