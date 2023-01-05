@@ -51,7 +51,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Filter by groups</string>
+       <string>Use groups</string>
       </property>
      </widget>
      <widget class="QCheckBox" name="cbDisplayAllGroups">
@@ -98,12 +98,12 @@
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>311</width>
+        <width>250</width>
         <height>20</height>
        </rect>
       </property>
       <property name="text">
-       <string>Filter by callsigns</string>
+       <string>Use callsigns</string>
       </property>
      </widget>
      <widget class="QPlainTextEdit" name="tbCallsigns">
@@ -129,23 +129,145 @@
      </widget>
     </widget>
    </widget>
-   <widget class="QListWidget" name="monitoringList">
+   <widget class="QTabWidget" name="tabRecords">
     <property name="geometry">
      <rect>
-      <x>299</x>
+      <x>310</x>
       <y>10</y>
-      <width>640</width>
+      <width>621</width>
       <height>521</height>
      </rect>
     </property>
-    <property name="font">
-     <font>
-      <family>JetBrains Mono</family>
-      <pointsize>12</pointsize>
-      <weight>50</weight>
-      <bold>false</bold>
-     </font>
+    <property name="currentIndex">
+     <number>0</number>
     </property>
+    <widget class="QWidget" name="tabAllRecords">
+     <attribute name="title">
+      <string>All records</string>
+     </attribute>
+     <widget class="QListView" name="monitoringList">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>591</width>
+        <height>470</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>JetBrains Mono</family>
+        <pointsize>10</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tabFilteredRecords">
+     <attribute name="title">
+      <string>Filtered records</string>
+     </attribute>
+     <widget class="QComboBox" name="cbTimestampFilter">
+      <property name="geometry">
+       <rect>
+        <x>11</x>
+        <y>10</y>
+        <width>240</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <item>
+       <property name="text">
+        <string>Last hour</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Last 6 hours</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Last 12 hours</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Last 24 hours</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Last week</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>All</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QLabel" name="label">
+      <property name="geometry">
+       <rect>
+        <x>271</x>
+        <y>20</y>
+        <width>90</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Filter:</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="tbFilterCallsign">
+      <property name="geometry">
+       <rect>
+        <x>371</x>
+        <y>10</y>
+        <width>190</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+     </widget>
+     <widget class="QListView" name="monitoringFilteredList">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>50</y>
+        <width>591</width>
+        <height>431</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>JetBrains Mono</family>
+        <pointsize>10</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+     </widget>
+    </widget>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">

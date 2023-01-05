@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 import os
 from pathlib import Path
@@ -28,7 +28,7 @@ import brandmeister.bm_monitor_constants as const
 from brandmeister.bm_monitor_core import BrandmeisterMonitorCore, MonitorReportData
 from brandmeister.bm_monitor_database import BmMonitorDatabase
 from brandmeister.ui.Ui_BmMonitorMainWindow import Ui_BmMonitorMainWindow
-from PyQt5.QtWidgets import QMainWindow, QApplication, QStyledItemDelegate
+from PyQt5.QtWidgets import QMainWindow, QApplication, QStyledItemDelegate, QListView
 from PyQt5 import QtGui, QtCore
 
 from helpers.FileSystemHelper import FileSystemHelper
@@ -106,6 +106,25 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
             model.appendRow(item)
         self.lbGroups.setModel(model)
         
+        all_records_model = QtGui.QStandardItemModel()
+        self.monitoringList.setModel(all_records_model)
+        
+        # setup the filter combobox
+        self.cbTimestampFilter.clear()
+        self.cbTimestampFilter.addItems([
+            const.FILTER_LAST_5MINUTES,
+            const.FILTER_LAST_HOUR,
+            const.FILTER_LAST_6HOURS,
+            const.FILTER_LAST_12HOURS,
+            const.FILTER_LAST_DAY,
+            const.FILTER_LAST_WEEK,
+            const.FILTER_NO_FILTER,
+        ])
+        self.cbTimestampFilter.setCurrentIndex(0)
+        
+        filtered_records_model = QtGui.QStandardItemModel()
+        self.monitoringFilteredList.setModel(filtered_records_model)
+        
         self.lbGroups.setEnabled(pref.UseTalkGroups)
         
         self.cbTalkGroups.stateChanged.connect(self.update_preferences)
@@ -138,16 +157,80 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
     '''==============================================================='''
     def monitor_reported(self, data : MonitorReportData) -> None:
         '''Handles reporting of data from the monitor.'''
+        id = self._db.insert_report(data)
+        data.Id = id
+        # first we display the record in the recent records without filtering
+        self.display_record(self.monitoringList, data, id)
+        
+        # second, display in the filtered list
+        minutes = self.string_filter_to_minutes(self.cbTimestampFilter.currentText())
+        timestamp = datetime.utcnow() - timedelta(minutes=minutes)
+        self.display_record(self.monitoringFilteredList, data, id, 
+                            timestamp, self.tbFilterCallsign.text())
+        self.cleanup_view(self.monitoringFilteredList, timestamp)
+    
+    '''==========================================================================='''
+    def cleanup_view(self, list_view : QListView, min_timestamp : datetime) -> None:
+        '''
+        Removes items from the given list view older than the given timestamp.
+        '''
+        model = list_view.model()
+        for index in reversed(range(model.rowCount())):
+            item : QtGui.QStandardItem
+            item = model.item(index)
+            ts = item.data.Timestamp
+            if ts < min_timestamp:
+                model.removeRow(index)
+        
+    '''==========================================================================='''
+    def string_filter_to_minutes(self, filter : str) -> int:
+        '''
+        Converts given string to the number of minutes in it.
+        E.g. 'Last hour' should return 60.
+        
+        Returns a number of minutes for the given filter.
+        '''        
+        if filter == const.FILTER_LAST_5MINUTES:
+            return 5
+        if filter == const.FILTER_LAST_HOUR:
+            return 60
+        if filter == const.FILTER_LAST_6HOURS:
+            return 360
+        if filter == const.FILTER_LAST_12HOURS:
+            return 720
+        if filter == const.FILTER_LAST_DAY:
+            return 1440
+        if filter == const.FILTER_LAST_WEEK:
+            return 10080
+        return 999999999       
+        
+    '''==========================================================================='''
+    def display_record(self, list_view : QListView, data : MonitorReportData,
+                       id : int, min_timestamp : datetime = datetime.min, callsign_filter : str = '') -> None:
+        '''
+        Displays the report on the given list view.
+        The line is being displayed only when the timestamp is greater than the given one
+        and if callsign meets the filtered option.
+        '''
+        if min_timestamp > data.Timestamp:
+            return
+        if len(callsign_filter) > 0 \
+            and data.Callsign.lower().find(callsign_filter.lower()) < 0:
+                # text in filter is not found
+                return
+            
         timestamp = data.Timestamp.strftime('%d.%m.%Y %H:%M:%S')
         line = (
+            f'{str(id).rjust(7)} '
             f'{timestamp.rjust(16)} '
             f'{str(data.TG).rjust(6)} '
             f'{data.Callsign.ljust(12)} '
             f'{data.Duration}s'
             )
         self._logger.debug(f'Received report: {line}')
-        self.monitoringList.addItem(line)
-        self._db.insert_report(data)
+        item = QtGui.QStandardItem(line)
+        item.data = data
+        list_view.model().insertRow(0, item)   
         
     '''==========================================================================='''
     def GetPathToDatabase(self) -> Path:

@@ -33,11 +33,19 @@ import brandmeister.bm_monitor_constants as const
 class MonitorReportData(object):
     '''Represents a data to report outside of the monitor.'''
     def __init__(self, data: dict) -> None:
-        self._timestamp = data.get(const.KEY_TIMESTAMP, dt.datetime.utcnow())    
+        self._id = 0
+        self._timestamp = data.get(const.KEY_TIMESTAMP, dt.datetime.utcnow())
         self._tg = data[const.KEY_TALK_GROUP]
         self._callsign = data[const.KEY_CALLSIGN]
         self._duration = data[const.KEY_DURATION]
         pass
+    
+    @property
+    def Id(self) -> int:
+        return self._id
+    @Id.setter
+    def Id(self, value : int) -> None:
+        self._id = value
     
     @property
     def Timestamp(self) -> dt.datetime:

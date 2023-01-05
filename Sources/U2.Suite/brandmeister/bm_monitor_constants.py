@@ -37,3 +37,11 @@ KEY_USE_CALLSIGNS = 'use_callsigns'
 KEY_VERBOSE = 'verbose'
 
 PREFERENCES_FILE_BM_MONITOR = 'bm_monitor_preferences.json'
+
+FILTER_LAST_5MINUTES = 'Last 5 minutes'
+FILTER_LAST_HOUR = 'Last hour'
+FILTER_LAST_6HOURS = 'Last 6 hours'
+FILTER_LAST_12HOURS = 'Last 12 hours'
+FILTER_LAST_DAY = 'Last day'
+FILTER_LAST_WEEK = 'Last week'
+FILTER_NO_FILTER = 'No filter'
