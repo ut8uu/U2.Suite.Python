@@ -51,32 +51,52 @@
        </rect>
       </property>
       <property name="text">
-       <string>Use groups</string>
-      </property>
-     </widget>
-     <widget class="QCheckBox" name="cbDisplayAllGroups">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>40</y>
-        <width>190</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Display all groups</string>
-      </property>
-      <property name="checked">
-       <bool>true</bool>
+       <string>Filter by groups</string>
       </property>
      </widget>
      <widget class="QListView" name="lbGroups">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>70</y>
+        <y>40</y>
         <width>250</width>
-        <height>410</height>
+        <height>440</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>JetBrains Mono</family>
+        <pointsize>8</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_3">
+     <attribute name="title">
+      <string>DXCC</string>
+     </attribute>
+     <widget class="QCheckBox" name="cbFilterByDxcc">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>190</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Filter by DXCC</string>
+      </property>
+     </widget>
+     <widget class="QListView" name="lbFilterByDxcc">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>40</y>
+        <width>250</width>
+        <height>440</height>
        </rect>
       </property>
       <property name="font">
@@ -93,7 +113,7 @@
      <attribute name="title">
       <string>Callsigns</string>
      </attribute>
-     <widget class="QCheckBox" name="cbCallsigns">
+     <widget class="QCheckBox" name="cbFilterByCallsigns">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -103,7 +123,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Use callsigns</string>
+       <string>Filter by callsigns</string>
       </property>
      </widget>
      <widget class="QPlainTextEdit" name="tbCallsigns">
@@ -113,9 +133,9 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>30</y>
+        <y>40</y>
         <width>250</width>
-        <height>441</height>
+        <height>440</height>
        </rect>
       </property>
       <property name="font">
@@ -129,145 +149,89 @@
      </widget>
     </widget>
    </widget>
-   <widget class="QTabWidget" name="tabRecords">
+   <widget class="QComboBox" name="cbTimestampFilter">
+    <property name="geometry">
+     <rect>
+      <x>450</x>
+      <y>0</y>
+      <width>151</width>
+      <height>40</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <item>
+     <property name="text">
+      <string>Last hour</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Last 6 hours</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Last 12 hours</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Last 24 hours</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Last week</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>All</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QListView" name="monitoringList">
+    <property name="geometry">
+     <rect>
+      <x>309</x>
+      <y>50</y>
+      <width>630</width>
+      <height>480</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>JetBrains Mono</family>
+      <pointsize>10</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblDisplay">
     <property name="geometry">
      <rect>
       <x>310</x>
       <y>10</y>
-      <width>621</width>
-      <height>521</height>
+      <width>130</width>
+      <height>20</height>
      </rect>
     </property>
-    <property name="currentIndex">
-     <number>0</number>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
     </property>
-    <widget class="QWidget" name="tabAllRecords">
-     <attribute name="title">
-      <string>All records</string>
-     </attribute>
-     <widget class="QListView" name="monitoringList">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>10</y>
-        <width>591</width>
-        <height>470</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>JetBrains Mono</family>
-        <pointsize>10</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-     </widget>
-    </widget>
-    <widget class="QWidget" name="tabFilteredRecords">
-     <attribute name="title">
-      <string>Filtered records</string>
-     </attribute>
-     <widget class="QComboBox" name="cbTimestampFilter">
-      <property name="geometry">
-       <rect>
-        <x>11</x>
-        <y>10</y>
-        <width>240</width>
-        <height>30</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <item>
-       <property name="text">
-        <string>Last hour</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Last 6 hours</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Last 12 hours</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Last 24 hours</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Last week</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>All</string>
-       </property>
-      </item>
-     </widget>
-     <widget class="QLabel" name="label">
-      <property name="geometry">
-       <rect>
-        <x>271</x>
-        <y>20</y>
-        <width>90</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Filter:</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="tbFilterCallsign">
-      <property name="geometry">
-       <rect>
-        <x>371</x>
-        <y>10</y>
-        <width>190</width>
-        <height>30</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-     </widget>
-     <widget class="QListView" name="monitoringFilteredList">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>50</y>
-        <width>591</width>
-        <height>431</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>JetBrains Mono</family>
-        <pointsize>10</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-     </widget>
-    </widget>
+    <property name="text">
+     <string>Display period:</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">

@@ -88,12 +88,11 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         self.actionStop.triggered.connect(self.stop_monitor)
 
         pref = self._monitor_core.Preferences
-        self.cbCallsigns.setChecked(pref.UseCallsigns)
+        self.cbFilterByCallsigns.setChecked(pref.UseCallsigns)
         self.tbCallsigns.setPlainText(','.join(pref.Callsigns))
         self.tbCallsigns.setEnabled(pref.UseCallsigns)
 
         self.cbTalkGroups.setChecked(pref.UseTalkGroups)
-        self.cbDisplayAllGroups.setChecked(pref.DisplayAllTalkGroups)
         
         model = QtGui.QStandardItemModel()
         for group_id in bm_groups.bm_groups:
@@ -123,13 +122,12 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         self.cbTimestampFilter.setCurrentIndex(0)
         
         filtered_records_model = QtGui.QStandardItemModel()
-        self.monitoringFilteredList.setModel(filtered_records_model)
+        self.monitoringList.setModel(filtered_records_model)
         
         self.lbGroups.setEnabled(pref.UseTalkGroups)
         
         self.cbTalkGroups.stateChanged.connect(self.update_preferences)
-        self.cbDisplayAllGroups.stateChanged.connect(self.update_preferences)
-        self.cbCallsigns.stateChanged.connect(self.update_preferences)
+        self.cbFilterByCallsigns.stateChanged.connect(self.update_preferences)
         self.tbCallsigns.textChanged.connect(self.update_preferences)        
         
         delegate = StyledItemDelegate()
@@ -159,15 +157,12 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         '''Handles reporting of data from the monitor.'''
         id = self._db.insert_report(data)
         data.Id = id
-        # first we display the record in the recent records without filtering
-        self.display_record(self.monitoringList, data, id)
-        
-        # second, display in the filtered list
+
+        self.display_record(self.monitoringList, data)
+
         minutes = self.string_filter_to_minutes(self.cbTimestampFilter.currentText())
         timestamp = datetime.utcnow() - timedelta(minutes=minutes)
-        self.display_record(self.monitoringFilteredList, data, id, 
-                            timestamp, self.tbFilterCallsign.text())
-        self.cleanup_view(self.monitoringFilteredList, timestamp)
+        self.cleanup_view(self.monitoringList, timestamp)
     
     '''==========================================================================='''
     def cleanup_view(self, list_view : QListView, min_timestamp : datetime) -> None:
@@ -205,23 +200,12 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         return 999999999       
         
     '''==========================================================================='''
-    def display_record(self, list_view : QListView, data : MonitorReportData,
-                       id : int, min_timestamp : datetime = datetime.min, callsign_filter : str = '') -> None:
+    def display_record(self, list_view : QListView, data : MonitorReportData) -> None:
         '''
         Displays the report on the given list view.
-        The line is being displayed only when the timestamp is greater than the given one
-        and if callsign meets the filtered option.
         '''
-        if min_timestamp > data.Timestamp:
-            return
-        if len(callsign_filter) > 0 \
-            and data.Callsign.lower().find(callsign_filter.lower()) < 0:
-                # text in filter is not found
-                return
-            
         timestamp = data.Timestamp.strftime('%d.%m.%Y %H:%M:%S')
         line = (
-            f'{str(id).rjust(7)} '
             f'{timestamp.rjust(16)} '
             f'{str(data.TG).rjust(6)} '
             f'{data.Callsign.ljust(12)} '
@@ -240,13 +224,12 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
     '''==============================================================='''
     def update_preferences(self) -> None:
         '''Updates preferences according to the current window state.'''
-        self._monitor_core.Preferences.UseCallsigns = self.cbCallsigns.isChecked()
-        self.tbCallsigns.setEnabled(self.cbCallsigns.isChecked())
+        self._monitor_core.Preferences.UseCallsigns = self.cbFilterByCallsigns.isChecked()
+        self.tbCallsigns.setEnabled(self.cbFilterByCallsigns.isChecked())
         callsigns = self.tbCallsigns.toPlainText().split(',')
         self._monitor_core.Preferences.Callsigns = callsigns
 
         self._monitor_core.Preferences.UseTalkGroups = self.cbTalkGroups.isChecked()
-        self._monitor_core.Preferences.DisplayAllTalkGroups = self.cbDisplayAllGroups.isChecked()
         self.cbTalkGroups.setEnabled(self.cbTalkGroups.isChecked())
         groups = []
         model = self.lbGroups.model()
