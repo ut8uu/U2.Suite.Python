@@ -28,6 +28,7 @@ import brandmeister.bm_monitor_constants as const
 from brandmeister.bm_monitor_core import BrandmeisterMonitorCore, MonitorReportData, MonitoringStats
 from brandmeister.bm_monitor_database import BmMonitorDatabase
 from brandmeister.ui.Ui_BmMonitorMainWindow import Ui_BmMonitorMainWindow
+import common.data.dxcc as dxcc
 from PyQt5.QtWidgets import QMainWindow, QApplication, QStyledItemDelegate, QListView
 from PyQt5 import QtGui, QtCore
 
@@ -99,15 +100,33 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         self.cbTalkGroups.setChecked(pref.UseTalkGroups)
         
         model = QtGui.QStandardItemModel()
+        all_groups = pref.TalkGroups
         for group_id in bm_groups.bm_groups:
             group_title = bm_groups.bm_groups[group_id]
             item = QtGui.QStandardItem(f'[{group_id}] {group_title}')
-            is_checked = int(group_id) in pref.TalkGroups
+            is_checked = int(group_id) in all_groups
             check = QtCore.Qt.CheckState.Checked if is_checked else QtCore.Qt.CheckState.Unchecked
             item.setCheckState(check)
             item.setCheckable(True)
+            item.data = group_id
             model.appendRow(item)
         self.lbGroups.setModel(model)
+        
+        # DXCC-related stuff
+        self.cbFilterByDxcc.setChecked(pref.UseCallsigns)
+
+        all_countries = pref.Countries
+        dxcc_model = QtGui.QStandardItemModel()
+        for country_id in dxcc.Countries:
+            country_title = dxcc.Countries[country_id]
+            item = QtGui.QStandardItem(country_title)
+            is_checked = int(country_id) in all_countries
+            check = QtCore.Qt.CheckState.Checked if is_checked else QtCore.Qt.CheckState.Unchecked
+            item.setCheckState(check)
+            item.setCheckable(True)
+            item.data = country_id
+            dxcc_model.appendRow(item)
+        self.lbCountries.setModel(dxcc_model)
         
         all_records_model = QtGui.QStandardItemModel()
         self.monitoringList.setModel(all_records_model)
@@ -131,6 +150,7 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         self.lbGroups.setEnabled(pref.UseTalkGroups)
         
         self.cbTalkGroups.stateChanged.connect(self.update_preferences)
+        self.cbFilterByDxcc.stateChanged.connect(self.update_preferences)
         self.cbFilterByCallsigns.stateChanged.connect(self.update_preferences)
         self.tbCallsigns.textChanged.connect(self.update_preferences)        
         
@@ -138,12 +158,27 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         delegate.checked.connect(self.lbgroups_on_checked)
         self.lbGroups.setItemDelegate(delegate)
 
+        delegate = StyledItemDelegate()
+        delegate.checked.connect(self.lbcountries_on_checked)
+        self.lbCountries.setItemDelegate(delegate)
+
         self.start_monitor()
             
     '''================================================================'''
     def lbgroups_on_checked(self, index, state):
         '''Handles checking/unchecking of the item in the groups list view.'''
         text = f'Group {index.data()} is '
+        
+        if state == QtCore.Qt.CheckState.Unchecked:
+            text += 'un'
+        text += 'checked.'
+        self._logger.debug(text)
+        self.update_preferences()
+        
+    '''================================================================'''
+    def lbcountries_on_checked(self, index, state):
+        '''Handles checking/unchecking of the item in the countries list view.'''
+        text = f'Country {index.data()} is '
         
         if state == QtCore.Qt.CheckState.Unchecked:
             text += 'un'
@@ -257,6 +292,16 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
                 group_id = int(text)
                 groups.append(group_id)
         self._monitor_core.Preferences.TalkGroups = groups
+        
+        countries = []
+        model = self.lbCountries.model()
+        item : QtGui.QStandardItem
+        for index in range(model.rowCount()):
+            item = model.item(index)
+            if item.isCheckable() and item.checkState() == QtCore.Qt.Checked:
+                country_id = int(item.data)
+                countries.append(country_id)
+        self._monitor_core.Preferences.Countries = countries
         
         self._monitor_core.Preferences.write_preferences()
         

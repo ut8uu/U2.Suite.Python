@@ -145,7 +145,10 @@ class ApplicationPreferences(object):
         If preference not found, a default value will be returned.
         '''
         try:
-            return list(self.Preferences.get(key))
+            list_data = self.Preferences.get(key)
+            if list_data == None:
+                return default_value
+            return list(list_data)
         except KeyError:
             return default_value
 

@@ -90,7 +90,7 @@
        <string>Filter by DXCC</string>
       </property>
      </widget>
-     <widget class="QListView" name="lbFilterByDxcc">
+     <widget class="QListView" name="lbCountries">
       <property name="geometry">
        <rect>
         <x>10</x>

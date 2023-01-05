@@ -17,6 +17,7 @@
 
 KEY_CALLSIGN = 'callsign'
 KEY_CALLSIGNS = 'callsigns'
+KEY_COUNTRIES = 'countries'
 KEY_DISPLAY_ALL_TALK_GROUPS = 'display_all_tg'
 KEY_DURATION = 'duration'
 KEY_LOG_LEVEL = 'log_level'
@@ -32,8 +33,9 @@ KEY_PATH_TO_DATABASE = 'path_to_db'
 KEY_TALK_GROUP = 'talk_group'
 KEY_TALK_GROUPS = 'talk_groups'
 KEY_TIMESTAMP = 'timestamp'
-KEY_USE_TALK_GROUPS = 'use_talk_groups'
 KEY_USE_CALLSIGNS = 'use_callsigns'
+KEY_USE_COUNTRIES = 'use_countries'
+KEY_USE_TALK_GROUPS = 'use_talk_groups'
 KEY_VERBOSE = 'verbose'
 
 PREFERENCES_FILE_BM_MONITOR = 'bm_monitor_preferences.json'
