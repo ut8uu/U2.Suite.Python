@@ -1583,6 +1583,16 @@ class AdifHelper(object):
         f.write(log.xml())
         f.close()
 
+@staticmethod
+def callsign_to_dxcc(callsign : str) -> int:
+    '''
+    Tries to calculate the country by the given callsign.
+    
+    Returns an actual DXCC id if country was successfully calculated OR
+    -1 otherwise.
+    '''
+    return -1
+
 if __name__ == '__main__':
     TEST_DIR = './test_files'
     if not os.path.exists(TEST_DIR):
