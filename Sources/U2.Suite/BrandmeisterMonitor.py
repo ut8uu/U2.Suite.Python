@@ -113,11 +113,13 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         self.lbGroups.setModel(model)
         
         # DXCC-related stuff
-        self.cbFilterByDxcc.setChecked(pref.UseCallsigns)
+        self.cbFilterByDxcc.setChecked(pref.UseCountries)
 
         all_countries = pref.Countries
         dxcc_model = QtGui.QStandardItemModel()
-        for country_id in dxcc.Countries:
+        
+        entries = dict(sorted(dxcc.Countries.items(), key=lambda item: item[1]))
+        for country_id in entries:
             country_title = dxcc.Countries[country_id]
             item = QtGui.QStandardItem(country_title)
             is_checked = int(country_id) in all_countries
@@ -258,7 +260,7 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         timestamp = data.Timestamp.strftime('%d.%m.%Y %H:%M:%S')
         line = (
             f'{timestamp.rjust(16)} '
-            f'{str(data.TG).rjust(6)} '
+            f'{str(data.TG).rjust(8)} '
             f'{data.Callsign.ljust(12)} '
             f'{data.Duration}s'
             )
@@ -302,6 +304,7 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
                 country_id = int(item.data)
                 countries.append(country_id)
         self._monitor_core.Preferences.Countries = countries
+        self._monitor_core.Preferences.UseCountries = self.cbFilterByDxcc.isChecked()
         
         self._monitor_core.Preferences.write_preferences()
         

@@ -141,3 +141,7 @@ test.sqlite
 /Sources/U2.Suite/test_data/*
 /Sources/U2.Suite/*_preferences.json
 *.sqlite
+/Sources/U2.Suite/data/dxcc/*.tbl
+/Sources/U2.Suite/data/dxcc/*.tab
+/Sources/U2.Suite/data/dxcc/*.txt
+/Sources/U2.Suite/data/dxcc/*.SCP
