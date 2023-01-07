@@ -306,7 +306,7 @@ class BrandmeisterMonitorCore(object):
                         # calculate duration of key down
                         duration = stop_time - start_time
                         if duration > self._preferences.MinDurationSec:
-                            self.Say(f'DXCC [{country_id}] {callsign} for {duration} seconds.')
+                            #self.Say(f'DXCC [{country_id}] {callsign} for {duration} seconds.')
                             report_data = {
                                 const.KEY_TIMESTAMP : dt.datetime.utcnow(),
                                 const.KEY_CALLSIGN : callsign,

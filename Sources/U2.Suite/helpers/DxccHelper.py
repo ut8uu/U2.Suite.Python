@@ -35,11 +35,10 @@ class DxccHelper(object, metaclass=Singleton):
     def __init__(self) -> None:
         import os
 
-        CTYFILES_PATH = str(Path(FileSystemHelper.relpath('.')) / 'data' / 'dxcc') + os.path.sep
-        CTYFILES_URL = 'http://www.ok2cqr.com/linux/cqrlog/ctyfiles/cqrlog-cty.tar.gz'
-        AUTOFETCH_FILES = False
+        path = str(FileSystemHelper.get_appdata_path(Path('U2.Suite') / 'dxcc')) + os.path.sep
+        url = 'http://www.ok2cqr.com/linux/cqrlog/ctyfiles/cqrlog-cty.tar.gz'
 
-        self._dxcc_inst = dxcc(CTYFILES_PATH, CTYFILES_URL, AUTOFETCH_FILES, VERBOSE=0)
+        self._dxcc_inst = dxcc(path, url, AUTOFETCH_FILES=False, VERBOSE=0)
         
     def get_dxcc_inst(self) -> dxcc:
         return self._dxcc_inst
