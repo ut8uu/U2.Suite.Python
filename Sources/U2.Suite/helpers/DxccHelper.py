@@ -1,19 +1,23 @@
-'''
-This file is based on the work by DL8BH.
-You can find the original file in the corresponding Github repository
-vy the following URL: https://github.com/dl8bh/py-dxcc
+# This file is part of the U2.Suite.Python distribution
+# (https://github.com/ut8uu/U2.Suite.Python).
+# 
+# Copyright (c) 2022 Sergey Usmanov, UT8UU.
+# 
+# This program is free software: you can redistribute it and/or modify  
+# it under the terms of the GNU General Public License as published by  
+# the Free Software Foundation, version 3.
+#
+# This program is distributed in the hope that it will be useful, but 
+# WITHOUT ANY WARRANTY; without even the implied warranty of 
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License 
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-Adapted and modified by Sergey Usmanov, UT8UU
-'''
-
-"""simple dxcc-resolution program to be used with cqrlogs dxcc-tables"""
-import csv, dicttoxml, json, os, re, sys, tarfile
-import logging
+import os
 from pathlib import Path
-from collections import OrderedDict
-from datetime import datetime
-import urllib.request
-import fileinput
+import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from helpers.FileSystemHelper import FileSystemHelper
