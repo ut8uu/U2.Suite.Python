@@ -1,3 +1,11 @@
+'''
+This file is a part of the work of Bernhard Kneip, DL8BH.
+You can find the original file in the corresponding repository on github
+by the following address: https://github.com/dl8bh/py-dxcc
+
+Used with explicit permission of the author.
+'''
+
 #!/usr/bin/python3
 """simple dxcc-resolution program to be used with cqrlogs dxcc-tables"""
 import logging
