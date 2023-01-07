@@ -33,6 +33,7 @@ FIELD_BM_MONITOR_TIMESTAMP = 'timestamp'
 FIELD_BM_MONITOR_TG = 'tg'
 FIELD_BM_MONITOR_CALLSIGN = 'callsign'
 FIELD_BM_MONITOR_DURATION = 'duration'
+FIELD_BM_MONITOR_DXCC = 'dxcc'
 
 class BmMonitorDatabase:
     '''Represents a persistent storage for Brandmeister Monitor.'''
@@ -62,6 +63,7 @@ class BmMonitorDatabase:
             FIELD_BM_MONITOR_ID,
             FIELD_BM_MONITOR_TIMESTAMP,
             FIELD_BM_MONITOR_CALLSIGN,
+            FIELD_BM_MONITOR_DXCC,
             FIELD_BM_MONITOR_TG,
             FIELD_BM_MONITOR_DURATION
             )
@@ -72,6 +74,7 @@ class BmMonitorDatabase:
             f'"{FIELD_BM_MONITOR_ID}"	INTEGER PRIMARY KEY, '
             f'"{FIELD_BM_MONITOR_TIMESTAMP}"	TIMESTAMP, '
             f'"{FIELD_BM_MONITOR_CALLSIGN}"	TEXT, '
+            f'"{FIELD_BM_MONITOR_DXCC}"     INT, '
             f'"{FIELD_BM_MONITOR_TG}"     INT, '
             f'"{FIELD_BM_MONITOR_DURATION}"  INT'
             f');'
@@ -89,6 +92,7 @@ class BmMonitorDatabase:
         values = {
             FIELD_BM_MONITOR_TIMESTAMP : datetime.utcnow(),
             FIELD_BM_MONITOR_CALLSIGN : data.Callsign,
+            FIELD_BM_MONITOR_DXCC : data.Dxcc,
             FIELD_BM_MONITOR_DURATION : data.Duration,
             FIELD_BM_MONITOR_TG : int(data.TG),
         }
