@@ -59,6 +59,10 @@ class MonitorReportData(object):
         self._timestamp = data.get(const.KEY_TIMESTAMP, dt.datetime.utcnow())
         self._tg = data[const.KEY_TALK_GROUP]
         self._callsign = data[const.KEY_CALLSIGN]
+        dxcc_id = data.get(const.KEY_DXCC, 0)
+        if dxcc_id == None:
+            dxcc_id = 0
+        self._dxcc = dxcc_id
         self._duration = data[const.KEY_DURATION]
         pass
     
@@ -80,6 +84,10 @@ class MonitorReportData(object):
     @property
     def Callsign(self) -> str:
         return self._callsign
+    
+    @property
+    def Dxcc(self) -> int:
+        return self._dxcc
     
     @property
     def Duration(self) -> int:
@@ -253,6 +261,13 @@ class BrandmeisterMonitorCore(object):
         else:
             self._monitoringStats.Total += 1
 
+            dxcc_data = self._dxcc_inst.call2dxcc(callsign.upper())
+            adif = dxcc_data[1].get('adif', '0')
+            dxcc_id = 0
+            if adif != None:
+                dxcc_id = int(adif)
+            report : MonitorReportData = None
+            
             # check if callsign is monitored, the transmis_sion has already been finished
             # and the person was inactive for n seconds
             if self._preferences.UseCallsigns and callsign in self._preferences.Callsigns:
@@ -279,12 +294,11 @@ class BrandmeisterMonitorCore(object):
                     report_data = {
                         const.KEY_TIMESTAMP : dt.datetime.utcnow(),
                         const.KEY_CALLSIGN : callsign,
+                        const.KEY_DXCC : dxcc_id,
                         const.KEY_TALK_GROUP : tg,
                         const.KEY_DURATION : duration
                     }
                     report = MonitorReportData(report_data)
-                    self._monitoringStats.Caught += 1
-                    self._monitor_report_event.report.emit(report, self._monitoringStats)
                 # only proceed if the key down has been long enough
                 if duration >= self._preferences.MinDurationSec:
                     if tg not in self._last_TG_activity or inactivity >= self._preferences.MinSilenceSec:
@@ -313,12 +327,11 @@ class BrandmeisterMonitorCore(object):
                             report_data = {
                                 const.KEY_TIMESTAMP : dt.datetime.utcnow(),
                                 const.KEY_CALLSIGN : callsign,
+                                const.KEY_DXCC : dxcc_id,
                                 const.KEY_TALK_GROUP : tg,
                                 const.KEY_DURATION : duration
                             }
                             report = MonitorReportData(report_data)
-                            self._monitoringStats.Caught += 1
-                            self._monitor_report_event.report.emit(report, self._monitoringStats)
                         # only proceed if the key down has been long enough
                         if duration >= self._preferences.MinDurationSec:
                             if tg not in self._last_DXCC_activity \
@@ -329,6 +342,10 @@ class BrandmeisterMonitorCore(object):
                             self._last_TG_activity[tg] = now
                 else:
                     logging.error(f'DXCC helper cannot resolve the callsign {callsign}. TG [{tg}]')
+
+            if report != None:
+                self._monitoringStats.Caught += 1
+                self._monitor_report_event.report.emit(report, self._monitoringStats)
 
             if notify:
                 if self._preferences.NotifyPushover:
