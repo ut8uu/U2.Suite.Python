@@ -191,6 +191,9 @@ class BrandmeisterMonitorCore(object):
         self._thread.start() 
         self._started = True
         
+        # launch the heartbeat
+        self.heartbeat()
+        
     def Stop(self) -> None:
         if not self._started:
             return
