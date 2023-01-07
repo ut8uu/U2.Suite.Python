@@ -44,7 +44,9 @@ class BrandmeisterMonitorApplicationPreferences(ApplicationPreferences):
             const.KEY_TALK_GROUPS : [91],
             const.KEY_MIN_SILENCE : 300,
             const.KEY_MIN_DURATION : 5,
-            const.KEY_PATH_TO_DATABASE : os.path.abspath("./")
+            const.KEY_PATH_TO_DATABASE : os.path.abspath("./"),
+            const.KEY_USE_COUNTRIES : False,
+            const.KEY_COUNTRIES : []
             }
         super().__init__(file, self._default_values)
 
@@ -82,14 +84,21 @@ class BrandmeisterMonitorApplicationPreferences(ApplicationPreferences):
 
     @property
     def TalkGroups(self) -> list[str]:
-        return self.get_list_value(const.KEY_TALK_GROUPS, False)
+        return self.get_list_value(const.KEY_TALK_GROUPS, [])
     @TalkGroups.setter
     def TalkGroups(self, value : list[str]) -> None:
         self.Preferences[const.KEY_TALK_GROUPS] = value
         
     @property
+    def Countries(self) -> list[str]:
+        return self.get_list_value(const.KEY_COUNTRIES, [])
+    @Countries.setter
+    def Countries(self, value : list[str]) -> None:
+        self.Preferences[const.KEY_COUNTRIES] = value
+        
+    @property
     def NoisyCalls(self) -> list[str]:
-        return self.get_list_value(const.KEY_NOISY_CALLS, False)
+        return self.get_list_value(const.KEY_NOISY_CALLS, [])
     @NoisyCalls.setter
     def NoisyCalls(self, value : list[str]) -> None:
         self.Preferences[const.KEY_NOISY_CALLS] = value
@@ -100,6 +109,13 @@ class BrandmeisterMonitorApplicationPreferences(ApplicationPreferences):
     @UseCallsigns.setter
     def UseCallsigns(self, value : bool) -> None:
         self.Preferences[const.KEY_USE_CALLSIGNS] = value
+
+    @property
+    def UseCountries(self) -> bool:
+        return self.get_bool_value(const.KEY_USE_COUNTRIES, False)
+    @UseCountries.setter
+    def UseCountries(self, value : bool) -> None:
+        self.Preferences[const.KEY_USE_COUNTRIES] = value
 
     @property
     def Callsigns(self) -> list[str]:

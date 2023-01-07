@@ -7,10 +7,10 @@ a = Analysis(
     pathex=['.'],
     binaries=[
         ('icon\\*.png','icon'),
-        ('font\\*.ttf','font')],
-        datas=[('data\\*','data')
+        ('font\\*.ttf','font')
         ],
-    hiddenimports=['semver','socketio'],
+    datas=[('data\\*','data')],
+    hiddenimports=['semver','socketio','dicttoxml'],
     hookspath=[],
     runtime_hooks=[],
     excludes=[],

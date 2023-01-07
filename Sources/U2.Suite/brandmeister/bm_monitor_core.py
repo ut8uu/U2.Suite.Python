@@ -21,7 +21,7 @@ import logging
 import os
 import sys
 import socketio
-from threading import Thread
+from threading import Thread, Timer
 import time
 from PyQt5.QtCore import QObject, pyqtSignal
 
@@ -29,15 +29,45 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 from brandmeister.bm_monitor_preferences import BrandmeisterMonitorApplicationPreferences
 import brandmeister.bm_monitor_constants as const
+from helpers.DxccHelper import DxccHelper
+from helpers.dxcc import dxcc
+
+class MonitoringStats(object):
+    def __init__(self, total : int = 0, caught : int = 0) -> None:
+        self._total = total
+        self._caught = caught
+        pass
+    
+    @property
+    def Total(self) -> int:
+        return self._total
+    @Total.setter
+    def Total(self, value : int) -> None:
+        self._total = value
+
+    @property
+    def Caught(self) -> int:
+        return self._caught
+    @Caught.setter
+    def Caught(self, value : int) -> None:
+        self._caught = value
 
 class MonitorReportData(object):
     '''Represents a data to report outside of the monitor.'''
     def __init__(self, data: dict) -> None:
-        self._timestamp = data.get(const.KEY_TIMESTAMP, dt.datetime.utcnow())    
+        self._id = 0
+        self._timestamp = data.get(const.KEY_TIMESTAMP, dt.datetime.utcnow())
         self._tg = data[const.KEY_TALK_GROUP]
         self._callsign = data[const.KEY_CALLSIGN]
         self._duration = data[const.KEY_DURATION]
         pass
+    
+    @property
+    def Id(self) -> int:
+        return self._id
+    @Id.setter
+    def Id(self, value : int) -> None:
+        self._id = value
     
     @property
     def Timestamp(self) -> dt.datetime:
@@ -56,7 +86,8 @@ class MonitorReportData(object):
         return self._duration
 
 class MonitorReportEvent(QObject):
-    report = pyqtSignal(MonitorReportData)
+    report = pyqtSignal(MonitorReportData, MonitoringStats)
+    heartbeat = pyqtSignal(MonitoringStats)
     
 class BmMonitorClientNamespace(socketio.ClientNamespace):
     
@@ -88,15 +119,21 @@ class BrandmeisterMonitorCore(object):
 
     _monitor_report_event : MonitorReportEvent
     _sio : socketio.Client
+    _last_DXCC_activity : dict
     _last_TG_activity : dict
     _last_OM_activity : dict
     _started : bool
     _thread : Thread
+    _heartbeat_timer : Timer
     
     _dapnet_imported : bool
     _discord_imported : bool
     _pushover_imported : bool
     _telegram_imported : bool
+    
+    _monitoringStats : MonitoringStats
+    
+    _dxcc_inst : dxcc
     
     def __init__(self) -> None:
         self._started = False
@@ -105,7 +142,11 @@ class BrandmeisterMonitorCore(object):
         self._pushover_imported = False
         self._telegram_imported = False
         
+        self._monitoringStats = MonitoringStats()
+        
         self._preferences = BrandmeisterMonitorApplicationPreferences()
+        
+        self._dxcc_inst = DxccHelper().get_dxcc_inst()
         
         self._sio = socketio.Client()
         namespace = BmMonitorClientNamespace()
@@ -114,10 +155,13 @@ class BrandmeisterMonitorCore(object):
 
         self._last_TG_activity = {}
         self._last_OM_activity = {}
+        self._last_DXCC_activity = {}
         
         self._preferences.PreferencesChanged.changed.connect(self.preferences_changed)
         
         self._monitor_report_event = MonitorReportEvent()
+        self._heartbeat_timer = Timer(1, self.heartbeat)
+        self._heartbeat_timer.start()
         pass
 
     @property
@@ -130,6 +174,13 @@ class BrandmeisterMonitorCore(object):
         return self._monitor_report_event
     
     '''==================================================================='''
+    def heartbeat(self):
+        self._monitor_report_event.heartbeat.emit(self._monitoringStats)
+        if self._started:
+            self._heartbeat_timer = Timer(1, self.heartbeat)
+            self._heartbeat_timer.start()
+    
+    '''==================================================================='''
     def preferences_changed(self) -> None:
         '''Handles changing of the application preferences.'''
 
@@ -139,6 +190,9 @@ class BrandmeisterMonitorCore(object):
         self._thread = Thread(target=self.monitor_worker, args = ())
         self._thread.start() 
         self._started = True
+        
+        # launch the heartbeat
+        self.heartbeat()
         
     def Stop(self) -> None:
         if not self._started:
@@ -164,7 +218,7 @@ class BrandmeisterMonitorCore(object):
                 logging.exception(ex)
                 time.sleep(1)
 
-        logging.debug('Thread exit...')
+        self.Say('Thread exit...')
 
     #############################
     ##### Define Functions
@@ -197,6 +251,8 @@ class BrandmeisterMonitorCore(object):
             logging.info("Ignored noisy ham " + callsign)
         
         else:
+            self._monitoringStats.Total += 1
+
             # check if callsign is monitored, the transmis_sion has already been finished
             # and the person was inactive for n seconds
             if self._preferences.UseCallsigns and callsign in self._preferences.Callsigns:
@@ -219,7 +275,7 @@ class BrandmeisterMonitorCore(object):
                 # calculate duration of key down
                 duration = stop_time - start_time
                 if duration > self._preferences.MinDurationSec:
-                    logging.debug(f'[{tg}] {callsign} for {duration} seconds.')
+                    self.Say(f'[{tg}] {callsign} for {duration} seconds.')
                     report_data = {
                         const.KEY_TIMESTAMP : dt.datetime.utcnow(),
                         const.KEY_CALLSIGN : callsign,
@@ -227,14 +283,52 @@ class BrandmeisterMonitorCore(object):
                         const.KEY_DURATION : duration
                     }
                     report = MonitorReportData(report_data)
-                    self._monitor_report_event.report.emit(report)
+                    self._monitoringStats.Caught += 1
+                    self._monitor_report_event.report.emit(report, self._monitoringStats)
                 # only proceed if the key down has been long enough
                 if duration >= self._preferences.MinDurationSec:
                     if tg not in self._last_TG_activity or inactivity >= self._preferences.MinSilenceSec:
                         notify = True
-                    elif self._preferences.Verbose:
-                        logging.info("ignored activity in TG " + str(tg) + " from " + callsign + ": last action " + str(inactivity) + " seconds ago.")
+                    else:
+                        self.Say("ignored activity in TG " + str(tg) + " from " + callsign + ": last action " + str(inactivity) + " seconds ago.")
                     self._last_TG_activity[tg] = now
+
+            # Continue if the DXCC is monitored, the transmission has been
+            # finished and there was no activity during the last n seconds in this talkgroup
+            if self._preferences.UseCountries:
+                dxcc_data = self._dxcc_inst.call2dxcc(callsign.upper())
+                adif = dxcc_data[1].get('adif')
+                if adif != None:
+                    country_id = int(adif)
+                    #self.Say(f'{callsign} DXCC [{country_id}]')
+                    if country_id != None and stop_time > 0 \
+                        and country_id in self._preferences.Countries:
+                        if country_id not in self._last_DXCC_activity:
+                            self._last_DXCC_activity[country_id] = 9999999
+                        inactivity = now - self._last_DXCC_activity[country_id]
+                        # calculate duration of key down
+                        duration = stop_time - start_time
+                        if duration > self._preferences.MinDurationSec:
+                            #self.Say(f'DXCC [{country_id}] {callsign} for {duration} seconds.')
+                            report_data = {
+                                const.KEY_TIMESTAMP : dt.datetime.utcnow(),
+                                const.KEY_CALLSIGN : callsign,
+                                const.KEY_TALK_GROUP : tg,
+                                const.KEY_DURATION : duration
+                            }
+                            report = MonitorReportData(report_data)
+                            self._monitoringStats.Caught += 1
+                            self._monitor_report_event.report.emit(report, self._monitoringStats)
+                        # only proceed if the key down has been long enough
+                        if duration >= self._preferences.MinDurationSec:
+                            if tg not in self._last_DXCC_activity \
+                                or inactivity >= self._preferences.MinSilenceSec:
+                                notify = True
+                            elif self._preferences.Verbose:
+                                logging.info("ignored activity in DXCC " + str(country_id) + " from " + callsign + ": last action " + str(inactivity) + " seconds ago.")
+                            self._last_TG_activity[tg] = now
+                else:
+                    logging.error(f'DXCC helper cannot resolve the callsign {callsign}. TG [{tg}]')
 
             if notify:
                 if self._preferences.NotifyPushover:

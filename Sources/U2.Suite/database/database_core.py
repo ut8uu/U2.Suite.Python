@@ -98,7 +98,7 @@ class DatabaseCore(object):
                 cursor.close()
         except sqlite3.Error as ex:
             logging.exception(f'SqLite error: {ex}')
-        logging.debug(f'Query {sql} executed successfully.')
+        #logging.debug(f'Query {sql} executed successfully.')
 
     def insert_in_table(self, table : str, data : dict) -> None:
         '''Inserts a record in the given table'''

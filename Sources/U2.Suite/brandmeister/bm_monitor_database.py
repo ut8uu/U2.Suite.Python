@@ -80,8 +80,12 @@ class BmMonitorDatabase:
         pass
     
     '''======================================================================'''
-    def insert_report(self, data : MonitorReportData) -> None:
-        '''Inserts a report in the database.'''
+    def insert_report(self, data : MonitorReportData) -> int:
+        '''
+        Inserts a report in the database.
+        
+        Returns an identifier of the newly added record.
+        '''
         values = {
             FIELD_BM_MONITOR_TIMESTAMP : datetime.utcnow(),
             FIELD_BM_MONITOR_CALLSIGN : data.Callsign,
@@ -89,6 +93,7 @@ class BmMonitorDatabase:
             FIELD_BM_MONITOR_TG : int(data.TG),
         }
         self._db.insert_in_table(TABLE_BM_MONITOR_REPORTS, values)
+        return self._db.execute_scalar(f'SELECT max({FIELD_BM_MONITOR_ID}) FROM {TABLE_BM_MONITOR_REPORTS}')
     
     '''======================================================================'''
     def get_reports(self, filter : dict = {}, order_by : str = '') -> tuple[list, list]:
