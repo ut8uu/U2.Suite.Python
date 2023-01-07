@@ -5,8 +5,12 @@ block_cipher = None
 a = Analysis(
     ['Logger_MainWindow.py'],
     pathex=['.'],
-    binaries=[('icon\\*.png','icon'),('font\\*.ttf','font')],datas=[('data\\*','data')],
-    hiddenimports=[],
+    binaries=[
+        ('icon\\*.png','icon'),
+        ('font\\*.ttf','font')
+        ],
+    datas=[('data\\*','data')],
+    hiddenimports=['semver','socketio','dicttoxml'],
     hookspath=[],
     runtime_hooks=[],
     excludes=[],
@@ -15,20 +19,33 @@ a = Analysis(
     cipher=block_cipher,
     noarchive=False
     )
-pyz = PYZ(a.pure, a.zipped_data,cipher=block_cipher)
+pyz = PYZ(
+    a.pure, 
+    a.zipped_data,
+    cipher=block_cipher
+    )
 exe = EXE(
     pyz,
     a.scripts,
-    a.binaries,
-    a.zipfiles,
-    a.datas,
     [],
-    name='Logger.exe',
+    exclude_binaries=True,
+    name='Logger',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
     upx_exclude=[],
     runtime_tmpdir=None,
-    console=False 
+    console=False,
+    target_arch=None,
     )
+coll = COLLECT(
+    exe,
+    a.binaries,
+    a.zipfiles,
+    a.datas,
+    strip=False,
+    upx=True,
+    upx_exclude=[],
+    name='Logger',
+)
