@@ -145,3 +145,4 @@ test.sqlite
 /Sources/U2.Suite/data/dxcc/*.tab
 /Sources/U2.Suite/data/dxcc/*.txt
 /Sources/U2.Suite/data/dxcc/*.SCP
+/Sources/U2.Suite/output/*
