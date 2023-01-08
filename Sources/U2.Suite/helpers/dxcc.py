@@ -8,7 +8,6 @@ Used with explicit permission of the author.
 
 #!/usr/bin/python3
 """simple dxcc-resolution program to be used with cqrlogs dxcc-tables"""
-import logging
 import os
 import csv
 import re
@@ -48,9 +47,7 @@ class dxcc:
     def process_country_files(self):
         """concatenates the countryfiles in a cqrlog-compatible way"""
         ctyfiles = [self.CTYFILES_PATH + 'Country.tab', self.CTYFILES_PATH + 'CallResolution.tbl', self.CTYFILES_PATH + 'AreaOK1RR.tbl']
-        ctab = self.CTYFILES_PATH + 'Country.tab'
-        logging.info(f'Reading from {ctab}')
-        with open(ctab, 'w') as countrytab, fileinput.input(ctyfiles) as fin:
+        with open(self.CTYFILES_PATH + 'country.tab', 'w') as countrytab, fileinput.input(ctyfiles) as fin:
             for line in fin:
                 countrytab.write(line)
 
@@ -61,8 +58,9 @@ class dxcc:
         patternlist = patternlist.replace('  ', ' ')
         for pattern in patternlist.split(' '):
             if '%' in pattern or '#' in pattern or '=' in pattern:
+                if "%" in pattern:
+                    pattern += '$'
                 pattern = pattern.replace('%', '[A-Z]').replace('#', '[0-9]')
-                pattern += '$'
             pattern = '^' + pattern
             returnlist.append(pattern)
         return returnlist
@@ -357,21 +355,24 @@ class dxcc:
 
 if __name__ == '__main__':
     import os
-    #from pydxcc import dxcc
-    import configparser
 
-    CFG = configparser.ConfigParser()
-    CFG.read(os.path.expanduser(os.path.dirname(os.path.abspath(__file__)) + '/2.cfg'))
-    CTYFILES_PATH = os.path.expanduser(CFG.get('CTYFILES', 'path'))
-    CTYFILES_URL = CFG.get('CTYFILES', 'url')
-    AUTOFETCH_FILES = CFG.getboolean('CTYFILES', 'autofetch')
+    import sys
+    sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+    from helpers.FileSystemHelper import FileSystemHelper
+    from pathlib import Path
+    
+    path = str(FileSystemHelper.get_appdata_path(Path('U2.Suite') / 'dxcc')) + os.path.sep
+    url = 'http://www.ok2cqr.com/linux/cqrlog/ctyfiles/cqrlog-cty.tar.gz'
 
-    pydxcc_instance = dxcc(CTYFILES_PATH, CTYFILES_URL, AUTOFETCH_FILES)
+    pydxcc_instance = dxcc(path, url, False)
     for pattern in pydxcc_instance.GLOBAL_DXCC_LIST:
         print(pattern)
     from timeit import default_timer as timer
     start = timer()
-    print(pydxcc_instance.call2dxcc('AF4RU', None))
+    print(pydxcc_instance.call2dxcc('9A1AAA', None))
+    print(pydxcc_instance.call2dxcc('M0AAA', None))
+    print(pydxcc_instance.call2dxcc('M7AAA', None))
     
     end = timer()
     print(end - start)
+             

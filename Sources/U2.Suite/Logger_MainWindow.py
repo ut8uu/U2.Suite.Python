@@ -20,6 +20,8 @@ import os
 from pathlib import Path
 import sys
 
+from common.ui.DialogAbout import DialogAbout
+
 from logger.Logger_QsoEditorDialog import Logger_QsoEditorDialog
 from logger.Logger_StationInfoDialog import Logger_StationInfoDialog
 from helpers.AdifHelper import ADIF_BAND, ADIF_CALL, ADIF_MODE, ADIF_OPERATOR, ADIF_QSO_DATE, ADIF_TIME_OFF, ADIF_TIME_ON, ADIF_log, AdifHelper
@@ -39,6 +41,9 @@ from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, qApp, QFileDialo
 from typing import List
 
 class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
+    DESCRIPTION = 'A small logging application.'
+    VERSION = '1.0.0'
+    
     _lastSelectedControl: QWidget
     _allControls : List[QWidget]
     _registered = False
@@ -77,6 +82,7 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         self.actionExportToADXfile.triggered.connect(self.export_to_adx)
         self.actionPreferences.triggered.connect(self.display_preferences_dialog)
         self.actionExit.triggered.connect(self.close_window)
+        self.actionAbout.triggered.connect(self.display_about_dialog)
 
         # install event handler for main input controls
         self.tbCallsign.installEventFilter(self)
@@ -507,6 +513,18 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         '''Handles receiving of the ADIF log.'''
         self.import_from_adif_log(log)
         self.display_log()
+        
+    '''=========================================================================='''
+    def display_about_dialog(self) -> None:
+        dialog = DialogAbout()
+        dialog.Title = 'About Logger'
+        dialog.DisplayImage('logger.png')
+        dialog.AppName = 'Logger'
+        dialog.AppDescription = self.DESCRIPTION
+        dialog.Version = f'version {self.VERSION}'
+        year = datetime.utcnow().strftime('%Y')
+        dialog.Copyright = f'© {year} Sergey Usmanov, UT8UU'
+        dialog.exec()
 
 '''==========================================================================='''
 if __name__ == '__main__':
