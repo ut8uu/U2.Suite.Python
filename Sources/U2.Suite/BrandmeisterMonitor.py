@@ -29,6 +29,7 @@ from brandmeister.bm_monitor_core import BrandmeisterMonitorCore, MonitorReportD
 from brandmeister.bm_monitor_database import BmMonitorDatabase
 from brandmeister.ui.Ui_BmMonitorMainWindow import Ui_BmMonitorMainWindow
 import common.data.dxcc as dxcc
+from common.ui.DialogAbout import DialogAbout
 from PyQt5.QtWidgets import QMainWindow, QApplication, QStyledItemDelegate, QListView
 from PyQt5 import QtGui, QtCore
 
@@ -62,6 +63,7 @@ logger.addHandler(console_handler)
 class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
     '''Represents a brandmeister monitor application.'''
     
+    VERSION : str = '1.0.0'
     _db : BmMonitorDatabase
     _monitor_core : BrandmeisterMonitorCore
     _stored_count : int
@@ -91,6 +93,7 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         self.actionExit.triggered.connect(self.close_window)
         self.actionStart.triggered.connect(self.start_monitor)
         self.actionStop.triggered.connect(self.stop_monitor)
+        self.actionAbout.triggered.connect(self.display_about_dialog)
 
         pref = self._monitor_core.Preferences
         self.cbFilterByCallsigns.setChecked(pref.UseCallsigns)
@@ -329,6 +332,18 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
     '''==============================================================='''    
     def close_window(self):
         self.close()
+        
+    '''==============================================================='''
+    def display_about_dialog(self):
+        dialog = DialogAbout()
+        dialog.Title = 'About Brandmeister Monitor'
+        dialog.DisplayImage('brandmeistermonitor.png')
+        dialog.AppName = 'Brandmeister Monitor'
+        dialog.AppDescription = ''
+        dialog.Version = f'version {self.VERSION}'
+        year = datetime.utcnow().strftime('%Y')
+        dialog.Copyright = f'© {year} Sergey Usmanov, UT8UU'
+        dialog.exec()
     
 '''==============================================================='''    
 if __name__ == '__main__':

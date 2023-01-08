@@ -19,29 +19,31 @@ import logging
 import os
 from pathlib import Path
 import sys
+
 from PyQt5.QtGui import QImage, QPixmap, QPalette, QPainter
 from PyQt5.QtWidgets import QApplication, QDialog, QSizePolicy
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), f'..{os.path.sep}..')))
 
 from common.ui.Ui_AboutDialog import Ui_AboutDialog
 from helpers.FileSystemHelper import FileSystemHelper
 
-class AboutDialog(QDialog, Ui_AboutDialog):
-    '''Represents an About dialog.'''
+class DialogAbout(QDialog, Ui_AboutDialog):
+    '''
+    Represents an universal About Dialog.
+    '''
     
     _image_file : str
     
     def __init__(self, parent = None) -> None:
         super().__init__(parent)
         self.setupUi(self)
-        
         self._image_file = ''
         
         self.imageLabel.setBackgroundRole(QPalette.Base)
         self.imageLabel.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored)
         self.imageLabel.setScaledContents(True)
-        
+
     @property
     def Title(self) -> str:
         return self.windowTitle()
@@ -77,14 +79,6 @@ class AboutDialog(QDialog, Ui_AboutDialog):
     def Copyright(self, value : str) -> None:
         self.lblCopyright.setText(value)
 
-    @property
-    def ImageFile(self) -> str:
-        return self._image_file
-    @ImageFile.setter
-    def ImageFile(self, value : str) -> None:
-        self._image_file = value
-        self.DisplayImage(value)
-
     def DisplayImage(self, file : str) -> None:
         '''
         Displays given image on the dialog surface.
@@ -94,6 +88,7 @@ class AboutDialog(QDialog, Ui_AboutDialog):
         '''
         path = Path('.') / 'icon' / 'about' / file
         spath = FileSystemHelper.relpath(str(path))
+        assert os.path.exists(spath)
         if not os.path.exists(spath):
             logging.error(f'Image /icon/about/{file} not found.')
             return
@@ -105,15 +100,16 @@ class AboutDialog(QDialog, Ui_AboutDialog):
         self.imageLabel.setPixmap(QPixmap.fromImage(image))
         self.scaleFactor = 1.0
         
+
 if __name__ == '__main__':
-    from AboutDialog import Ui_AboutDialog
     app = QApplication(sys.argv)
-    dialog = AboutDialog()
+    dialog = DialogAbout()
     dialog.Title = 'About the Main'
-    dialog.ImageFile = 'demo.png'
+    dialog.DisplayImage('demo.png')
     dialog.AppName = 'A Demo About Dialog'
     dialog.AppDescription = 'A small dialog to show how the About dialog can be shown without launching the main application. This text is long and therefore should be displayed in multiple lines.'
     dialog.Version = 'version 2.3.5'
     dialog.Copyright = '(c) 2023 Sergey Usmanov, UT8UU'
     dialog.exec()
     sys.exit(0)
+    

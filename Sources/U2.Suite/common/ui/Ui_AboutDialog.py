@@ -17,7 +17,7 @@ class Ui_AboutDialog(object):
         AboutDialog.resize(612, 352)
         AboutDialog.setStyleSheet("background-color: rgb(46, 52, 54); color: rgb(211, 215, 207);")
         self.buttonBox = QtWidgets.QDialogButtonBox(AboutDialog)
-        self.buttonBox.setGeometry(QtCore.QRect(250, 300, 341, 32))
+        self.buttonBox.setGeometry(QtCore.QRect(470, 300, 121, 32))
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
         self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName("buttonBox")
