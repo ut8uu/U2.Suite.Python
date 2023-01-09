@@ -29,9 +29,9 @@ from common.ui.Ui_AboutDialog import Ui_AboutDialog
 from helpers.FileSystemHelper import FileSystemHelper
 
 class DialogAbout(QDialog, Ui_AboutDialog):
-    '''
+    """
     Represents an universal About Dialog.
-    '''
+    """
     
     _image_file : str
     
@@ -80,12 +80,12 @@ class DialogAbout(QDialog, Ui_AboutDialog):
         self.lblCopyright.setText(value)
 
     def DisplayImage(self, file : str) -> None:
-        '''
+        """
         Displays given image on the dialog surface.
         
         File - a name of the file inside of the /icon/about folder.
         A file itself must be 250x250 pixels.
-        '''
+        """
         path = Path('.') / 'icon' / 'about' / file
         spath = FileSystemHelper.relpath(str(path))
         assert os.path.exists(spath)

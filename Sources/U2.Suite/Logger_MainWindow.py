@@ -133,22 +133,22 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
 
     
     def __del__(self):
-        '''A class' destructor'''
+        """A class' destructor"""
         self._running = False
         
-    '''==========================================================================='''
+    """==========================================================================="""
     def close_window(self):
-        ''''''
+        """"""
         
         self.close()
 
-    '''==========================================================================='''
+    """==========================================================================="""
     def closeEvent(self, a0) -> None:
         self.save_current_qso_state()
         self._wsjt_listener.stop()
         return super().closeEvent(a0)
 
-    '''==========================================================================='''
+    """==========================================================================="""
     def eventFilter(self, source, event):
         if (event.type() == QEvent.KeyPress):
             if source in [self.tbCallsign, self.tbName, self.tbComment]:
@@ -156,17 +156,17 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
                 key = event.key()
                 if key in [Qt.Key.Key_Space, Qt.Key.Key_Tab]:
                     if self.MoveFocus(key):
-                        '''A focus has been moved. Drop the input.'''
+                        """A focus has been moved. Drop the input."""
                         return True
         return super(Logger_MainWindow, self).eventFilter(source, event)
 
-    '''==========================================================================='''
+    """==========================================================================="""
     def destroy(self) -> None:
         self._running = False
 
-    '''==========================================================================='''
+    """==========================================================================="""
     def display_log(self):
-        '''Displays the entire log.'''
+        """Displays the entire log."""
         contacts = self._db.load_all_contacts(FIELD_TIMESTAMP)
         self.listLog.clear()
 
@@ -194,12 +194,12 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
             )
             self.listLog.addItem(logline)
 
-    '''==========================================================================='''
+    """==========================================================================="""
     def MoveFocus(self, key: Qt.Key = Qt.Key.Key_Space) -> bool:
-        '''
+        """
         Circularly moves focus among Callsign, Name, and Comment.
         Does nothing if none of the controls mentioned above is selected.
-        '''
+        """
         try:
             selected_control = self.getSelectedControl()
             # Callsign
@@ -233,14 +233,14 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
 
         return False
 
-    '''==========================================================================='''
+    """==========================================================================="""
     def GetPathToDatabase(self) -> Path:
-        '''Calculates the full path to the database'''
+        """Calculates the full path to the database"""
         return FileSystemHelper.get_appdata_path(Path('U2.Suite') / 'Logger' / 'Database', create_if_not_exists=True)
 
-    '''==========================================================================='''
+    """==========================================================================="""
     def save_qso(self) -> None:
-        '''Saves the current session'''
+        """Saves the current session"""
         callsign = self.tbCallsign.text().lstrip().rstrip()
         if len(callsign) == 0:
             return
@@ -267,25 +267,25 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         self._db.log_contact(contact)
         self.save_current_qso_state()
 
-    '''==========================================================================='''
+    """==========================================================================="""
     def save_current_qso_state(self) -> None:
-        '''Stores current state of controls to the preferences.'''
+        """Stores current state of controls to the preferences."""
         self._preferences.DefaultMode = self.cbMode.currentText()
         self._preferences.DefaultBand = self.cbBand.currentText()
         self._preferences.Utc = self.cbUtc.isChecked()
         self._preferences.Realtime = self.cbRealtime.isChecked()
         self._preferences.write_preferences()
 
-    '''==========================================================================='''
+    """==========================================================================="""
     def clear_fields(self) -> None:
-        '''Removes all information from inputs'''
+        """Removes all information from inputs"""
         self.tbCallsign.setText('')
         self.tbName.setText('')
         self.tbComment.setText('')
 
-    '''==========================================================================='''
+    """==========================================================================="""
     def getSelectedControl(self) -> QWidget:
-        '''Locates and returns the control that is focused.'''
+        """Locates and returns the control that is focused."""
         for control in self._allControls:
             if control.hasFocus():
                 return control
@@ -294,31 +294,31 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         self.tbCallsign.setFocus()
         return self.tbCallsign
 
-    '''==========================================================================='''
+    """==========================================================================="""
     @pyqtSlot()
     def set_current_date_time(self) -> None:
-        '''Handles the clicking the Now button'''
+        """Handles the clicking the Now button"""
         if self.cbUtc.isChecked():
             self.tdDateTime.setDateTime(QDateTime.currentDateTimeUtc())
         else:
             self.tdDateTime.setDateTime(QDateTime.currentDateTime())
 
-    '''==========================================================================='''
+    """==========================================================================="""
     @pyqtSlot()
     def dateTimeCheckBoxChanged(self):
-        '''Handles changing of the date and time related checkboxes'''
+        """Handles changing of the date and time related checkboxes"""
         self._datetime_utc = self.cbUtc.isChecked()
 
-    '''==========================================================================='''
+    """==========================================================================="""
     @pyqtSlot()
     def bandChanged(self):
-        '''Handles changing of the band'''
+        """Handles changing of the band"""
 
 
-    '''==========================================================================='''
+    """==========================================================================="""
     @pyqtSlot()
     def modeChanged(self):
-        '''Handles changing of the mode'''
+        """Handles changing of the mode"""
         current_text = self.cbMode.currentText()
         report = '599'
         if current_text == MODE_CW:
@@ -331,7 +331,7 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         self.tbRcv.setText(report)
         self.tbSnt.setText(report)
 
-    '''==========================================================================='''
+    """==========================================================================="""
     def qso_double_clicked(self) -> None:
         """
         Gets the line of the log clicked on, and passes that line to the edit dialog.
@@ -345,16 +345,16 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         dialog.change.dialogClosed.connect(self.edit_qso_dialog_closed)
         dialog.open()
 
-    '''==========================================================================='''
+    """==========================================================================="""
     def qso_edited(self) -> None:
-        '''Handles post edit or delete event.'''
+        """Handles post edit or delete event."""
         self.display_log()
 
-    '''==========================================================================='''
+    """==========================================================================="""
     def edit_qso_dialog_closed(self) -> None:
-        '''Handles closing of the EditQSO dialog'''
+        """Handles closing of the EditQSO dialog"""
 
-    '''==========================================================================='''
+    """==========================================================================="""
     def update_time(self) -> None:
         if self.cbUtc.isChecked():
             timestamp = datetime.utcnow()
@@ -362,14 +362,14 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
             timestamp = datetime.now()
         self.lblTimestamp.setText(timestamp.strftime('%d.%m.%Y %H:%M:%S'))
 
-    '''==========================================================================='''
+    """==========================================================================="""
     def real_time_changed(self) -> None:
-        '''Handles the switching between real-time and manual input modes.'''
+        """Handles the switching between real-time and manual input modes."""
         LoggerMainWindowUiHelper.update_timestamp_controls(self)
 
-    '''==========================================================================='''
+    """==========================================================================="""
     def display_station_info_dialog(self) -> None:
-        '''Handles clicking the `Show Station Info` menu'''
+        """Handles clicking the `Show Station Info` menu"""
         dialog = Logger_StationInfoDialog(self)
         # get values from application preferences, if any
         if len(self._db.LoggerOptions.StationCallsign) == 0:
@@ -380,11 +380,11 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         dialog.change_event.dialogClosed.connect(self.station_info_dialog_closed)
         dialog.open()
 
-    '''==========================================================================='''
+    """==========================================================================="""
     def station_info_dialog_closed(self) -> None:
-        '''Handles closing of the Station Info dialog'''
+        """Handles closing of the Station Info dialog"""
 
-    '''=========================================================================='''
+    """=========================================================================="""
     def keyPressEvent(self, event):
         """This overrides Qt key event."""
         modifier = event.modifiers()
@@ -404,9 +404,9 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
             if self.MoveFocus():
                 event.accept()
 
-    '''=========================================================================='''
+    """=========================================================================="""
     def delete_qso(self) -> None:
-        '''Deletes a selected QSO, if any.'''
+        """Deletes a selected QSO, if any."""
         item = self.listLog.currentItem()
         contactnumber = int(item.text().split()[0])
         result = self._db.get_contact_by_id(contactnumber)
@@ -414,9 +414,9 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
             self._db.delete_contact_by_id(result['id'])
             self.display_log()
 
-    '''=========================================================================='''
+    """=========================================================================="""
     def import_from_file(self) -> None:
-        '''Handles click on the `Import from ADIF file` action'''
+        """Handles click on the `Import from ADIF file` action"""
         filename, filetype = QFileDialog.getOpenFileName(self, 'Select ADIF file', '.',
                 filter="ADIF files (*.adi;*.adx)")
 
@@ -441,21 +441,21 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         
         self.display_log()
 
-    '''==========================================================================='''
+    """==========================================================================="""
     def export_to_adx(self) -> None:
-        '''Handles clicking the `Export to ADX file` menu item.'''
+        """Handles clicking the `Export to ADX file` menu item."""
         filename, filetype = QFileDialog.getSaveFileName(self, 'Select ADX file', '.',
                 filter="ADX files (*.adx)")
         self.export_to_adif_file(filename, filetype)
 
-    '''==========================================================================='''
+    """==========================================================================="""
     def export_to_adif(self) -> None:
-        '''Handles clicking the `Export to ADIF file` menu item.'''
+        """Handles clicking the `Export to ADIF file` menu item."""
         filename, filetype = QFileDialog.getSaveFileName(self, 'Select ADIF file', '.',
                 filter="ADIF files (*.adi)")
         self.export_to_adif_file(filename, filetype)
 
-    '''=========================================================================='''
+    """=========================================================================="""
     def export_to_adif_file(self, filename : str, filetype : str) -> None:
         if len(filename) == 0:
             return
@@ -492,29 +492,29 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         elif filetype.find('adx') > -1:
             AdifHelper.ExportAdx(filename, log)
 
-    '''=========================================================================='''
+    """=========================================================================="""
     def display_preferences_dialog(self) -> None:
-        '''Displays the application preferences dialog.'''
+        """Displays the application preferences dialog."""
         dialog = Logger_PreferencesDialog(self)
         #dialog.change_event.changed.connect(self.preferences_changed)
         dialog.setup(self._preferences)
         dialog.open()
         
-    '''=========================================================================='''
+    """=========================================================================="""
     def preferences_changed(self) -> None:
-        '''Handles changing the application preferences.'''
+        """Handles changing the application preferences."""
         if self._preferences.AcceptWsjtPackets:
             self._wsjt_listener.start()
         else:
             self._wsjt_listener.stop()
         
-    '''=========================================================================='''
+    """=========================================================================="""
     def adif_received(self, log : ADIF_log) -> None:
-        '''Handles receiving of the ADIF log.'''
+        """Handles receiving of the ADIF log."""
         self.import_from_adif_log(log)
         self.display_log()
         
-    '''=========================================================================='''
+    """=========================================================================="""
     def display_about_dialog(self) -> None:
         dialog = DialogAbout()
         dialog.Title = 'About Logger'
@@ -526,7 +526,7 @@ class Logger_MainWindow(QMainWindow, Ui_LoggerMainWindow):
         dialog.Copyright = f'© {year} Sergey Usmanov, UT8UU'
         dialog.exec()
 
-'''==========================================================================='''
+"""==========================================================================="""
 if __name__ == '__main__':
     from logger.ui.Ui_LoggerMainWindow import Ui_LoggerMainWindow
     app = QApplication(sys.argv)

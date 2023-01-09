@@ -22,12 +22,12 @@ from logger.logger_constants import PREFERENCES_FILE_LOGGER
 
 
 class LoggerApplicationPreferences(ApplicationPreferences):
-    '''
+    """
     Represents logger application preferences.
     Be aware, although preferences are autometically loaded upon object creation,
     it is required to save them explicitly. This is required to prevent breaking
     the file during two or more simultaneous implicit commits.
-    '''
+    """
     
     def __init__(self) -> None:
         self._default_values = {

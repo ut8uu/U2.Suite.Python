@@ -21,7 +21,7 @@ import unittest
 class LoggerTests(unittest.TestCase):
 
     def test_HandleHotkeys(self) -> None:
-        '''This is to test how application can handle the keystrokes'''
+        """This is to test how application can handle the keystrokes"""
         wnd = Logger_MainWindow()
         wnd.tbCallsign.setFocus()
         wnd.show()

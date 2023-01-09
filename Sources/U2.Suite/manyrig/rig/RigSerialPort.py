@@ -82,7 +82,7 @@ class RigSerialPort():
                     break
 
         except serial.SerialTimeoutException:
-            '''Do nothing in case of the timeout, just return what was fetched'''
+            """Do nothing in case of the timeout, just return what was fetched"""
         return bytes(outputCharacters)
 
 def test_serial():

@@ -61,14 +61,14 @@ console_handler = logging.StreamHandler()
 logger.addHandler(console_handler)
 
 class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
-    '''Represents a brandmeister monitor application.'''
+    """Represents a brandmeister monitor application."""
     
     VERSION : str = '1.0.0'
     _db : BmMonitorDatabase
     _monitor_core : BrandmeisterMonitorCore
     _stored_count : int
     
-    '''==============================================================='''    
+    """==============================================================="""    
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
         
@@ -169,9 +169,9 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
 
         self.start_monitor()
             
-    '''================================================================'''
+    """================================================================"""
     def lbgroups_on_checked(self, index, state):
-        '''Handles checking/unchecking of the item in the groups list view.'''
+        """Handles checking/unchecking of the item in the groups list view."""
         text = f'Group {index.data()} is '
         
         if state == QtCore.Qt.CheckState.Unchecked:
@@ -180,9 +180,9 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         self._logger.debug(text)
         self.update_preferences()
         
-    '''================================================================'''
+    """================================================================"""
     def lbcountries_on_checked(self, index, state):
-        '''Handles checking/unchecking of the item in the countries list view.'''
+        """Handles checking/unchecking of the item in the countries list view."""
         text = f'Country {index.data()} is '
         
         if state == QtCore.Qt.CheckState.Unchecked:
@@ -191,22 +191,22 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         self._logger.debug(text)
         self.update_preferences()
         
-    '''==============================================================='''    
+    """==============================================================="""    
     def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
         self._monitor_core.Stop()
         return super().closeEvent(a0)
 
-    '''==============================================================='''
+    """==============================================================="""
     def monitor_heartbeat(self, stats : MonitoringStats) -> None:
-        '''
+        """
         Handles reporting of the monitor's heartbeat.
-        '''
+        """
         msg = f'Received: {stats.Total}, caught: {stats.Caught}, stored: {self._stored_count}'
         self.statusbar.showMessage(msg)
         
-    '''==============================================================='''
+    """==============================================================="""
     def monitor_reported(self, data : MonitorReportData, stats : MonitoringStats) -> None:
-        '''Handles reporting of data from the monitor.'''
+        """Handles reporting of data from the monitor."""
         id = self._db.insert_report(data)
         data.Id = id
         self._stored_count += 1
@@ -220,11 +220,11 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         msg = f'Received: {stats.Total}, caught: {stats.Caught}, stored: {self._stored_count}'
         self.statusbar.showMessage(msg)
     
-    '''==========================================================================='''
+    """==========================================================================="""
     def cleanup_view(self, list_view : QListView, min_timestamp : datetime) -> None:
-        '''
+        """
         Removes items from the given list view older than the given timestamp.
-        '''
+        """
         model = list_view.model()
         for index in reversed(range(model.rowCount())):
             item : QtGui.QStandardItem
@@ -233,14 +233,14 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
             if ts < min_timestamp:
                 model.removeRow(index)
         
-    '''==========================================================================='''
+    """==========================================================================="""
     def string_filter_to_minutes(self, filter : str) -> int:
-        '''
+        """
         Converts given string to the number of minutes in it.
         E.g. 'Last hour' should return 60.
         
         Returns a number of minutes for the given filter.
-        '''        
+        """        
         if filter == const.FILTER_LAST_5MINUTES:
             return 5
         if filter == const.FILTER_LAST_HOUR:
@@ -255,11 +255,11 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
             return 10080
         return 999999999       
         
-    '''==========================================================================='''
+    """==========================================================================="""
     def display_record(self, list_view : QListView, data : MonitorReportData) -> None:
-        '''
+        """
         Displays the report on the given list view.
-        '''
+        """
         timestamp = data.Timestamp.strftime('%d.%m.%Y %H:%M:%S')
         line = (
             f'{timestamp.rjust(16)} '
@@ -272,14 +272,14 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         item.data = data
         list_view.model().insertRow(0, item)   
         
-    '''==========================================================================='''
+    """==========================================================================="""
     def GetPathToDatabase(self) -> Path:
-        '''Calculates the full path to the database'''
+        """Calculates the full path to the database"""
         return FileSystemHelper.get_appdata_path(Path('U2.Suite') / 'BmMonitor' / 'Database', create_if_not_exists=True)
 
-    '''==============================================================='''
+    """==============================================================="""
     def update_preferences(self) -> None:
-        '''Updates preferences according to the current window state.'''
+        """Updates preferences according to the current window state."""
         self._monitor_core.Preferences.UseCallsigns = self.cbFilterByCallsigns.isChecked()
         self.tbCallsigns.setEnabled(self.cbFilterByCallsigns.isChecked())
         callsigns = self.tbCallsigns.toPlainText().split(',')
@@ -311,7 +311,7 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         
         self._monitor_core.Preferences.write_preferences()
         
-    '''==============================================================='''    
+    """==============================================================="""    
     def start_monitor(self):
         if not self.actionStart.isEnabled():
             return
@@ -320,7 +320,7 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         self.actionStop.setEnabled(True)
         self._monitor_core.Start()
     
-    '''==============================================================='''    
+    """==============================================================="""    
     def stop_monitor(self):
         if not self.actionStop.isEnabled():
             return
@@ -329,11 +329,11 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         self.actionStop.setEnabled(False)
         self._monitor_core.Stop()
     
-    '''==============================================================='''    
+    """==============================================================="""    
     def close_window(self):
         self.close()
         
-    '''==============================================================='''
+    """==============================================================="""
     def display_about_dialog(self):
         dialog = DialogAbout()
         dialog.Title = 'About Brandmeister Monitor'
@@ -345,7 +345,7 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         dialog.Copyright = f'© {year} Sergey Usmanov, UT8UU'
         dialog.exec()
     
-'''==============================================================='''    
+"""==============================================================="""    
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     app.setStyle("Fusion")

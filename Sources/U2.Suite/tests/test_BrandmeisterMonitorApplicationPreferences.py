@@ -25,7 +25,7 @@ from logger.logger_constants import KEY_REALTIME, PREFERENCES_FILE_LOGGER
 from logger.logger_preferences import LoggerApplicationPreferences
 
 class  BrandmeisterMonitorApplicationPreferencesTests(unittest.TestCase):
-    '''Represents a set of application preferences tests'''
+    """Represents a set of application preferences tests"""
 
     _path = Path(os.path.abspath("./test_data/bm_monitor"))
 
@@ -40,7 +40,7 @@ class  BrandmeisterMonitorApplicationPreferencesTests(unittest.TestCase):
         return super().tearDown()
 
     def test_CanWorkWithMonitorPreferences(self):
-        '''Tests possibility to read and write application preferences'''
+        """Tests possibility to read and write application preferences"""
 
         file = 'preferences.json'
         pref0 = BrandmeisterMonitorApplicationPreferences(file)

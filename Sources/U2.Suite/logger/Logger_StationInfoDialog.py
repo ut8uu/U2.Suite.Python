@@ -35,12 +35,12 @@ class StationInfoDialogEvent(QtCore.QObject):
     dialogClosed = QtCore.pyqtSignal()
 
 class Logger_StationInfoDialog(QDialog, Ui_StationInfoDialog):
-    '''Represents a station info dialog.'''
+    """Represents a station info dialog."""
 
     _options : LoggerOptions
     change_event : StationInfoDialogEvent
 
-    '''---------------------------------------------------------------------------'''
+    """---------------------------------------------------------------------------"""
     def __init__(self, parent = None):
         super().__init__(parent)
 
@@ -52,9 +52,9 @@ class Logger_StationInfoDialog(QDialog, Ui_StationInfoDialog):
         self.tbCallsign.setFont(font)
         self.setFixedSize(self.width(), self.height())
 
-    '''---------------------------------------------------------------------------'''
+    """---------------------------------------------------------------------------"""
     def setup(self, options: LoggerOptions) -> None:
-        '''Initiates the dialog with data.'''
+        """Initiates the dialog with data."""
         self.change_event = StationInfoDialogEvent()
 
         self.buttonBox.accepted.connect(self.save_changes)
@@ -63,9 +63,9 @@ class Logger_StationInfoDialog(QDialog, Ui_StationInfoDialog):
         self.tbCallsign.setText(self._options.StationCallsign)
         self.tbOoperatorName.setText(self._options.OperatorName)
 
-    '''---------------------------------------------------------------------------'''
+    """---------------------------------------------------------------------------"""
     def save_changes(self) -> None:
-        '''Saves all the changes and closes the dialog box'''
+        """Saves all the changes and closes the dialog box"""
         self._options.OperatorName = self.tbOoperatorName.text()
         self._options.StationCallsign = self.tbCallsign.text()
 

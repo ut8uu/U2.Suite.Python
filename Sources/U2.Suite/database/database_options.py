@@ -27,7 +27,7 @@ from logger.logger_constants import FIELD_KEY, FIELD_VALUE, OPTION_VERSION, TABL
 import semver
 
 class DatabaseOptions(object):
-    '''Represents options-related activities in the database.'''
+    """Represents options-related activities in the database."""
 
     #from logger.log_database import LogDatabase
     #_db : LogDatabase
@@ -37,7 +37,7 @@ class DatabaseOptions(object):
         self._db = db
 
     def create_table(self) -> None:
-        '''Creates the OPTIONS table if it does not exist'''
+        """Creates the OPTIONS table if it does not exist"""
         # create a table for options
         sql = (
             f'CREATE TABLE IF NOT EXISTS "{TABLE_OPTIONS}" ('
@@ -48,23 +48,23 @@ class DatabaseOptions(object):
         self._db.execute_non_query(sql)
 
     def get_option(self, key : str) -> str:
-        '''
+        """
         Retrieves an option by the given key.
         Returns the stored value or `None` if option not found.
-        '''
+        """
         sql = f'SELECT {FIELD_VALUE} FROM {TABLE_OPTIONS} WHERE key=?'
         return self._db.execute_scalar(sql, (key,))
 
     def delete_option(self, key: str) -> None:
-        '''Deletes an option with given key.'''
+        """Deletes an option with given key."""
         sql = f'DELETE FROM {TABLE_OPTIONS} WHERE {FIELD_KEY}=?'
         self._db.execute_non_query(sql, (key,))
 
     def get_or_insert_option(self, key : str, value : str = '') -> str:
-        '''
+        """
         Fetches an option by given key.
         If option is not found, it is created using the passed value.
-        '''
+        """
         existing_value = self.get_option(key)
         if existing_value == None:
             # option not found, it's time to insert it
@@ -75,9 +75,9 @@ class DatabaseOptions(object):
         return existing_value
 
     def update_or_insert_option(self, key: str, value: str) -> None:
-        '''
+        """
         Updates existing option or inserts new one if given key is not present.
-        '''
+        """
         existing_value = self.get_option(key)
         if existing_value == None:
             # option not found, it's time to insert it
@@ -88,5 +88,5 @@ class DatabaseOptions(object):
             self._db.execute_non_query(sql, (value, key,))
 
     def get_or_insert_version(self, version : semver.VersionInfo) -> semver:
-        ''''''
+        """"""
         return self.get_or_insert_option(OPTION_VERSION, str(version))

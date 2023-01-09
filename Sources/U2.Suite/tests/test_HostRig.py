@@ -76,7 +76,7 @@ class HostRigTests(unittest.TestCase):
         self.assertEqual(freq, emulator._rig.FreqA)
         self.assertEqual(freq + 1, emulator._rig.FreqB)
 
-        '''Set Mode'''
+        """Set Mode"""
         rig.Mode = RigParameter.fm
         time.sleep(1)
         self.assertEqual(RigParameter.fm, emulator._rig.Mode)
@@ -85,7 +85,7 @@ class HostRigTests(unittest.TestCase):
         time.sleep(1)
         self.assertEqual(RigParameter.am, emulator._rig.Mode)
 
-        '''Set Split'''
+        """Set Split"""
         rig.Split = RigParameter.spliton
         time.sleep(1)
         self.assertEqual(RigParameter.spliton, emulator._rig.Split)
@@ -94,7 +94,7 @@ class HostRigTests(unittest.TestCase):
         time.sleep(1)
         self.assertEqual(RigParameter.splitoff, emulator._rig.Split)
 
-        '''Set Tx'''
+        """Set Tx"""
         rig.Tx = RigParameter.tx
         time.sleep(1)
         self.assertEqual(RigParameter.tx, emulator._rig.Tx)
@@ -103,7 +103,7 @@ class HostRigTests(unittest.TestCase):
         time.sleep(1)
         self.assertEqual(RigParameter.rx, emulator._rig.Tx)
 
-        '''Set Rit'''
+        """Set Rit"""
         rig.Rit = RigParameter.ritoff
         time.sleep(1)
         self.assertEqual(RigParameter.ritoff, emulator._rig.Rit)
@@ -112,7 +112,7 @@ class HostRigTests(unittest.TestCase):
         time.sleep(1)
         self.assertEqual(RigParameter.riton, emulator._rig.Rit)
 
-        '''Set Xit'''
+        """Set Xit"""
         rig.Xit = RigParameter.xitoff
         time.sleep(1)
         self.assertEqual(RigParameter.xitoff, emulator._rig.Xit)
@@ -125,7 +125,7 @@ class HostRigTests(unittest.TestCase):
         emulator.stop()
 
     def test_GetFreqAViaSerialPort(self) -> None:
-        '''to test how the FreqA can be retrieved using the STATUS command'''
+        """to test how the FreqA can be retrieved using the STATUS command"""
         emulator = IC705Emulator()
         emulator.start()
         emulator._rig.FreqA = 14232000

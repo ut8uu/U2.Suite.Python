@@ -52,10 +52,10 @@ class FastSatEntry(QMainWindow, Ui_FastSatEntry):
         self.read_preferences()
 
     def init_database(self) -> None:
-        '''
+        """
         Initializes a database of satellites
         List contains the following values: sat_name, band, mode, sat_mode
-        '''
+        """
         self._sat_info.append(('SO-50', '2m', 'FM', 'VU'))
         self._sat_info.append(('ISS', '2m', 'FM', 'VU'))
         self._sat_info.append(('AO-27', '2m', 'FM', 'VU'))
@@ -65,12 +65,12 @@ class FastSatEntry(QMainWindow, Ui_FastSatEntry):
 
     @pyqtSlot()
     def now_clicked(self) -> None:
-        '''Handles clicking the Now button'''
+        """Handles clicking the Now button"""
         self.dateTime.setDateTime(QDateTime.currentDateTimeUtc())
 
     @pyqtSlot()
     def save_clicked(self) -> None:
-        '''Handles clicking the Save button'''
+        """Handles clicking the Save button"""
         self.preferences[KEY_DEFAULT_MODE] = self.cbMode.currentText()
         self.preferences[KEY_DEFAULT_SATELLITE] = self.cbSatellite.currentText()
         self.preferences[KEY_MYCALLSIGN] = self.tbMyCallsign.text()
@@ -80,7 +80,7 @@ class FastSatEntry(QMainWindow, Ui_FastSatEntry):
 
     @pyqtSlot()
     def export_clicked(self) -> None:
-        '''Handles clicking the Export button'''
+        """Handles clicking the Export button"""
         if len(self.tbMyCallsign.text()) == 0:
             self.display_error_message('Please specify your callsign.')
             return
@@ -89,7 +89,7 @@ class FastSatEntry(QMainWindow, Ui_FastSatEntry):
             return
         
         now = datetime.datetime.now().strftime('%m/%d/%Y, %H:%M:%S')
-        adif = f'''
+        adif = f"""
 #++
 #
 #   Fast Sat Entry version 1.0, Copyright © 2022 Sergey Usmanov, UT8UU
@@ -104,7 +104,7 @@ class FastSatEntry(QMainWindow, Ui_FastSatEntry):
 <PROGRAMVERSION:11>Version 1.0
 <EOH>
 
-'''
+"""
         my_call = self.tbMyCallsign.text().lstrip().rstrip()
         qso_date = self.dateTime.dateTime().toString('yyyyMMdd')
         qso_time = self.dateTime.dateTime().toString('HHmm')
@@ -120,14 +120,14 @@ class FastSatEntry(QMainWindow, Ui_FastSatEntry):
             call = block.text().rstrip().lstrip()
             if len(call) == 0:
                 continue
-            adif += f'''
+            adif += f"""
 <STATION_CALLSIGN:{len(my_call)}>{my_call} <CALL:{len(call)}>{call} 
 <QSO_DATE:8>{qso_date} <TIME_ON:4>{qso_time} <BAND:{len(band)}>{band} <MODE:{len(mode)}>{mode} 
 <OPERATOR:{len(my_call)}>{my_call} <MY_GRIDSQUARE:{len(grid)}>{grid} 
 <PROP_MODE:3>SAT <SAT_MODE:{len(sat_mode)}>{sat_mode} <SAT_NAME:{len(sat_name)}>{sat_name}
 <EOR>
 
-'''
+"""
             block = block.next()
         
         name = QFileDialog.getSaveFileName(self, 'Save File')
@@ -143,11 +143,11 @@ class FastSatEntry(QMainWindow, Ui_FastSatEntry):
         self.display_message(f'ADIF was written to "{file_name}".')
 
     def get_sat_info(self, sat_name : str) -> Tuple[str, str, str, str]:
-        '''
+        """
         Returns the satellite information by its name.
         The following information is being returned: 
         sat_name, band, mode, sat_mode
-        '''
+        """
         for sat_info in self._sat_info:
             if sat_info[0] == sat_name:
                 return sat_info
@@ -170,24 +170,24 @@ class FastSatEntry(QMainWindow, Ui_FastSatEntry):
             msg.exec_()
 
     def get_preference(self, key : str, default_value : str = '') -> str:
-        '''
+        """
         Performs an attempt to get the preference by the given name.
         If preference not found, a default value will be returned.
-        '''
+        """
         try:
             return self.preferences.get(key)
         except KeyError:
             return default_value
 
     def write_preferences(self):
-        '''Writes the preferences file'''
+        """Writes the preferences file"""
         with open(f'./{PREFERENCES_FILE_FSE}', "wt", encoding="utf-8") as file_descriptor:
             self.preferences = self.reference_preference.copy()
             file_descriptor.write(dumps(self.preferences, indent=4))
             logging.info("%s", self.preferences)
 
     def read_preferences(self):
-        '''Reads preferences from existing file or creates a new one'''
+        """Reads preferences from existing file or creates a new one"""
         try:
             preferences_file_name = f'./{PREFERENCES_FILE_FSE}'
             if os.path.exists(preferences_file_name):
@@ -228,9 +228,9 @@ if __name__ == '__main__':
     demo = False
     if demo:
         window.tbMyCallsign.setText('UT8UU')
-        window.tbCallsigns.setText('''UT2UB
+        window.tbCallsigns.setText("""UT2UB
 UR8US
-4O/UT3UBR''')
+4O/UT3UBR""")
         window.tbGridLocator.setText('KO50aa')
         window.dateTime.setDateTime(QDateTime.currentDateTimeUtc())
 

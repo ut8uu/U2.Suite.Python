@@ -57,13 +57,13 @@ class FileSystemHelper():
 
     @staticmethod
     def get_appdata_path(folder : pathlib.Path, create_if_not_exists : bool = False) -> pathlib.Path:
-        '''
+        """
         Returns a path to the given folder in the application 
         data folder depending on the OS.
 
         folder - a name of the folder inside the shared folder
         create_if_not_exists - indicates whether the folder must be created if it is absent
-        '''
+        """
         home = pathlib.Path.home()
         path : pathlib.Path
 

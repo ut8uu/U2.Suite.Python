@@ -335,7 +335,7 @@ class RigParameterTests(unittest.TestCase):
             ch.float_to_stopbits(3.0)
         
 class AllBandsTests(unittest.TestCase):
-    '''This is about the AllBands-related conversion'''
+    """This is about the AllBands-related conversion"""
 
     def test_FrequencyToBand(self):
         self.assertEqual(AllBands.Band160m, ch.FrequencyToRadioBand(1850000))

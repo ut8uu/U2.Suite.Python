@@ -23,12 +23,12 @@ import unittest
 from helpers.AdifHelper import ADIF_CALL, ADIF_OPERATOR, ADIF_log, ADIF_logentry, AdifHelper
 
 class AdifTests(unittest.TestCase):
-    '''Represents tests of ADIF helper'''
+    """Represents tests of ADIF helper"""
 
     TEST_DIR = './test_files'
 
     def test_CanWorkWithAdifFiles(self)-> None:
-        '''This is to test how to work with adif files'''
+        """This is to test how to work with adif files"""
         TEST_DIR = './test_files'
         if not os.path.exists(TEST_DIR):
             os.mkdir(TEST_DIR)

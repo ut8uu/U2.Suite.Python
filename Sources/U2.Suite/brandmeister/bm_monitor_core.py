@@ -53,7 +53,7 @@ class MonitoringStats(object):
         self._caught = value
 
 class MonitorReportData(object):
-    '''Represents a data to report outside of the monitor.'''
+    """Represents a data to report outside of the monitor."""
     def __init__(self, data: dict) -> None:
         self._id = 0
         self._timestamp = data.get(const.KEY_TIMESTAMP, dt.datetime.utcnow())
@@ -118,7 +118,7 @@ class BmMonitorClientNamespace(socketio.ClientNamespace):
         self._monitor.RegisterMqtt(data)
 
 class BrandmeisterMonitorCore(object):
-    '''Represents a monitor for BM network activities.'''
+    """Represents a monitor for BM network activities."""
     
     #############################
     ##### Define Variables
@@ -182,21 +182,21 @@ class BrandmeisterMonitorCore(object):
     def Preferences(self) -> BrandmeisterMonitorApplicationPreferences:
         return self._preferences
     
-    '''==================================================================='''
+    """==================================================================="""
     @property
     def MonitorReport(self) -> MonitorReportEvent:
         return self._monitor_report_event
     
-    '''==================================================================='''
+    """==================================================================="""
     def heartbeat(self):
         self._monitor_report_event.heartbeat.emit(self._monitoringStats)
         if self._started:
             self._heartbeat_timer = Timer(1, self.heartbeat)
             self._heartbeat_timer.start()
     
-    '''==================================================================='''
+    """==================================================================="""
     def preferences_changed(self) -> None:
-        '''Handles changing of the application preferences.'''
+        """Handles changing of the application preferences."""
 
     def Start(self) -> None:
         if self._started:
@@ -262,7 +262,7 @@ class BrandmeisterMonitorCore(object):
         self._mqtt_data.append(data)
         
     def HandleTimerTick(self) -> None:
-        '''Handles a tick from the MqttProcessTimer.'''
+        """Handles a tick from the MqttProcessTimer."""
         if not self._started:
             return
         

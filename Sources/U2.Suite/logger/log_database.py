@@ -33,7 +33,7 @@ import uuid
 import semver
 
 class LogDatabase(object):
-    '''Class handles all requests to the database'''
+    """Class handles all requests to the database"""
 
     _db : DatabaseCore
     _db_version : str = '1.0.0'
@@ -121,14 +121,14 @@ class LogDatabase(object):
             print("Error while connecting to the database.", error)
 
     def get_callsign(self, callsign : str) -> dict:
-        '''
+        """
         Looks for a given callsign in the database.
         Returns the dictionary containing all the info about the callsign, if one is found.
         The keys of the dictionary are names of the table columns.
         The values are the actual values from the table.
         Returns 0 if callsign is absent in the database.
 
-        '''
+        """
         sql = f'SELECT * FROM {TABLE_CALLS} WHERE {FIELD_CALLSIGN}=? COLLATE NOCASE'
         with sqlite3.connect(self._db_full_path) as conn:
             cursor = conn.cursor()
@@ -146,20 +146,20 @@ class LogDatabase(object):
         return result
 
     def __insert_callsign(self, input_data : dict) -> dict:
-        '''
+        """
         Inserts given callsign in the database.
         A duplicate check is not performed.
-        '''
+        """
 
         data = self._db.filter_dictionary(input_data, CALLSIGN_FIELDS)
         self._db.insert_in_table(TABLE_CALLS, data)
         return self.get_callsign(data[FIELD_CALLSIGN])
 
     def get_callsign_by_id(self, i_id : int) -> dict:
-        '''
+        """
         Retrieves the callsign and operator name by the given id.
         Returns a dictionary having all the record data.
-        '''
+        """
         sql = f'SELECT * FROM {TABLE_CALLS} WHERE {FIELD_ID}=?'
         with sqlite3.connect(self._db_full_path) as conn:
             cursor = conn.cursor()
@@ -178,12 +178,12 @@ class LogDatabase(object):
         return result
 
     def get_or_add_callsign(self, input_data : dict) -> dict:
-        '''
+        """
         Looks for a given callsign (case insensitive) and returns one found.
         Creates a new record if callsign was not found.
 
         `data` - a dictionary containing the callsign data.
-        '''
+        """
 
         data = self._db.filter_dictionary(input_data, CALLSIGN_FIELDS)
         print(data)
@@ -204,7 +204,7 @@ class LogDatabase(object):
         return result
 
     def change_callsign(self, id : int, data : dict) -> dict:
-        '''
+        """
         Updates callsign data by its identifier.
         The `data` parameter is a dictionary containing the following values:
         - callsign
@@ -213,7 +213,7 @@ class LogDatabase(object):
         - address
         - source
         - has_data
-        '''
+        """
 
         if len(data[FIELD_CALLSIGN].lstrip().rstrip()) == 0:
             raise ArgumentException('Callsign is a mandatory parameter.')
@@ -221,27 +221,27 @@ class LogDatabase(object):
         self._db.change_row_in_table(TABLE_CALLS, id, data)
 
     def delete_callsign_by_id(self, id : int) -> None:
-        '''
+        """
         Deletes a callsign by its identifier.
         Does nothing if identifier not found.
-        '''
+        """
         sql = f'DELETE FROM {TABLE_CALLS} WHERE {FIELD_ID}={id}'
         self._db.execute_non_query(sql)
         
     def delete_callsign_by_callsign(self, callsign : str) -> None:
-        '''
+        """
         Deletes a callsign by its identifier.
         Does nothing if identifier not found.
-        '''
+        """
         sql = f'DELETE FROM {TABLE_CALLS} WHERE {FIELD_CALLSIGN}=?'
         self._db.execute_non_query(sql, (callsign,))  
 
     def load_all_contacts(self, order_by_field : str = '') -> tuple[tuple, List[tuple]]:
-        '''
+        """
         Loads all contacts from the database.
         Returns a tuple containing all the fields
         and a list of tuples containing all the fetched rows.
-        '''
+        """
 
         sql = f'SELECT * FROM {TABLE_CONTACTS}'
         order_by = order_by_field.lstrip().rstrip()
@@ -258,15 +258,15 @@ class LogDatabase(object):
             return result
 
     def calculate_checksum(self, data : dict) -> str:
-        '''Calculates checksum based on the values from the given dictionary.'''
+        """Calculates checksum based on the values from the given dictionary."""
         content = f'{data[FIELD_CALLSIGN]}{data[FIELD_BAND]}{data[FIELD_MODE]}{data[FIELD_TIMESTAMP]}'
         return hashlib.md5(content.encode('utf-8')).hexdigest()
 
     def is_duplicate(self, data : dict) -> bool:
-        '''
+        """
         Checks whether the contact is a duplicate one.
         
-        '''
+        """
         checksum = self.calculate_checksum(data)
         sql = f'SELECT count(id) FROM {TABLE_CONTACTS} WHERE {FIELD_CHECKSUM}=?'
         count = self._db.execute_scalar(sql, (checksum,))
@@ -310,11 +310,11 @@ class LogDatabase(object):
         self._db.insert_in_table(TABLE_CONTACTS, data)
 
     def get_contact_by_id(self, id : int) -> dict:
-        '''
+        """
         Retrieves a contact from the database.
         Returns a dictionary with column names as keys.
         Returns empty dictionary if no record is found.
-        '''
+        """
         sql = f'SELECT * FROM {TABLE_CONTACTS} WHERE id=?'
 
         with sqlite3.connect(self._db_full_path,
@@ -345,11 +345,11 @@ class LogDatabase(object):
                 logging.info("DataBase delete_contact: %s", exception)
 
     def delete_all_contacts(self) -> None:
-        '''Deletes all contacts from the database.'''
+        """Deletes all contacts from the database."""
         self._db.execute_non_query(f'DELETE FROM {TABLE_CONTACTS}')
 
     def change_contact(self, id: int, input_data : dict) -> None:
-        '''
+        """
         Changes a contact in the db by the given id.
         The following values can be present in the dictionary:
         - callsign
@@ -360,7 +360,7 @@ class LogDatabase(object):
         - rst_rcvd
         - rst_sent
         - id
-        '''
+        """
 
         callsign_data = self.get_or_add_callsign(input_data)
         print(callsign_data)
