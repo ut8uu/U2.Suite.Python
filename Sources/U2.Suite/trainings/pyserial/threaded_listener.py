@@ -31,11 +31,11 @@ class x:
                         break
 
             except Exception:
-                ''''''
+                """"""
         print('exiting the thread')
 
     def test1(self):
-        ''''''
+        """"""
         self._started = True
 
         self._master_port,slave = pty.openpty() #open the pseudoterminal

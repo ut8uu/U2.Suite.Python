@@ -17,15 +17,15 @@
 
 import os
 from common.ApplicationPreferences import ApplicationPreferences
-import brandmeister.bm_monitor_constants as const
+import brandmeister.BmMonitorConstants as const
 
 class BrandmeisterMonitorApplicationPreferences(ApplicationPreferences):
-    '''
+    """
     Represents logger application preferences.
     Be aware, although preferences are autometically loaded upon object creation,
     it is required to save them explicitly. This is required to prevent breaking
     the file during two or more simultaneous implicit commits.
-    '''
+    """
     
     def __init__(self, file : str = const.PREFERENCES_FILE_BM_MONITOR) -> None:
         self._default_values = {

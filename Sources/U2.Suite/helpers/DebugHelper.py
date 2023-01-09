@@ -24,6 +24,6 @@ class DebugHelper(object):
 
     @staticmethod
     def DisplayMessage(message_mode : MessageDisplayModes, message : str):
-        '''Displays the message if message mode is allowed'''
+        """Displays the message if message mode is allowed"""
         #if DebugHelper.message_display_modes.index(message_mode) > -1:
         print(message)

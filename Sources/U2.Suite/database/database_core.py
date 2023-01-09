@@ -27,7 +27,7 @@ from pathlib import Path
 import sqlite3
 
 class DatabaseCore(object):
-    '''Class handles all requests to the database'''
+    """Class handles all requests to the database"""
 
     DB_VERSION_MAJOR : int = 1
     DB_VERSION_MINOR : int = 0
@@ -47,13 +47,13 @@ class DatabaseCore(object):
         pass
 
     def __check_db(self) -> None:
-        '''Check the presence of the database and creates it if it does not exist.'''
+        """Check the presence of the database and creates it if it does not exist."""
         if not os.path.exists(self._db_full_path):
             # a database does not exist. We have to create it first.
             self.__create_db()
 
     def __create_db(self) -> None:
-        '''Creates a database by the given path'''
+        """Creates a database by the given path"""
         try:
             # create a table for version
             sql = (
@@ -69,11 +69,11 @@ class DatabaseCore(object):
             print("Error while connecting to the database.", error)
 
     def execute_scalar(self, sql : str, params = ()) -> Any:
-        '''
+        """
         Executes given query and returns the first column of the first row.
         Returns the value of the very first column in the first row.
         Returns `None` if query has brough no results.
-        '''
+        """
         try:
             with sqlite3.connect(self._db_full_path) as conn:
                 cursor = conn.cursor()
@@ -89,7 +89,7 @@ class DatabaseCore(object):
             print('Error during executing scalar query.', error)
 
     def execute_non_query(self, sql : str, params = ()) -> None:
-        '''Executes given SQL against the database'''
+        """Executes given SQL against the database"""
         try:
             with sqlite3.connect(self._db_full_path) as conn:
                 cursor = conn.cursor()
@@ -101,7 +101,7 @@ class DatabaseCore(object):
         #logging.debug(f'Query {sql} executed successfully.')
 
     def insert_in_table(self, table : str, data : dict) -> None:
-        '''Inserts a record in the given table'''
+        """Inserts a record in the given table"""
         sql_fields = ', '.join(data)
         sql_values = ', '.join(['?' for key in data])
         values = tuple(data.values())
@@ -110,7 +110,7 @@ class DatabaseCore(object):
         self.execute_non_query(sql, values)
 
     def change_row_in_table(self, table : str, id : int, data : dict) -> None:
-        '''Updates row in the given table by its identifier.'''
+        """Updates row in the given table by its identifier."""
         sql_fields = ', '.join([f'{key}=?' for key in data])
         sql_values = [data[key] for key in data]
 
@@ -118,7 +118,7 @@ class DatabaseCore(object):
         self.execute_non_query(sql, sql_values)
 
     def filter_dictionary(self, input : dict, allowed_keys : tuple) -> dict:
-        '''Creates new dictionary containing only allowed keys.'''
+        """Creates new dictionary containing only allowed keys."""
         result = dict()
         all_keys = input.keys()
         for key in allowed_keys:

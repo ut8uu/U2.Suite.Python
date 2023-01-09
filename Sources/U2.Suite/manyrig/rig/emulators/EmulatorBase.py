@@ -69,7 +69,7 @@ class EmulatorBase():
         return self._serial_port_name
 
     def ShutdownEmulator(self):
-        '''Shuts down the emulator'''
+        """Shuts down the emulator"""
         self.stop()
 
     def init_rig(self):

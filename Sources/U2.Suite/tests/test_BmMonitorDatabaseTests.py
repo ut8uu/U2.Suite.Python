@@ -19,13 +19,13 @@ import os
 from pathlib import Path
 import shutil
 import unittest
-from brandmeister.bm_monitor_constants import KEY_CALLSIGN, KEY_DURATION, KEY_TALK_GROUP
-from brandmeister.bm_monitor_core import MonitorReportData
+from brandmeister.BmMonitorConstants import KEY_CALLSIGN, KEY_DURATION, KEY_TALK_GROUP
+from brandmeister.BmMonitorCore import MonitorReportData
 
-from brandmeister.bm_monitor_database import FIELD_BM_MONITOR_CALLSIGN, FIELD_BM_MONITOR_DURATION, FIELD_BM_MONITOR_TG, BmMonitorDatabase
+from brandmeister.BmMonitorDatabase import FIELD_BM_MONITOR_CALLSIGN, FIELD_BM_MONITOR_DURATION, FIELD_BM_MONITOR_TG, BmMonitorDatabase
 
 class DatabaseTests(unittest.TestCase):
-    '''A database-related unit tests'''
+    """A database-related unit tests"""
 
     _db_name : str
     _path : Path
@@ -58,17 +58,17 @@ class DatabaseTests(unittest.TestCase):
         return super().tearDown()
 
     def GetPathToDatabase(self) -> Path:
-        '''Calculates the full path to the database'''
+        """Calculates the full path to the database"""
         return Path(os.path.abspath("./test_data/bm_monitor_database_tests"))
 
     def test_DatabaseCreatedAutomatically(self) -> None:
-        '''A callsigns-related test'''
+        """A callsigns-related test"""
         self.assertFalse(self._full_path.exists())
         db = BmMonitorDatabase(self.GetPathToDatabase())
         self.assertTrue(self._full_path.exists())
 
     def test_CanInsertReports(self) -> None:
-        '''This is to test how reports can be inserted.'''
+        """This is to test how reports can be inserted."""
         db = BmMonitorDatabase(self.GetPathToDatabase())
         reports = db.get_reports()
         self.assertEqual(0, len(reports[1]))

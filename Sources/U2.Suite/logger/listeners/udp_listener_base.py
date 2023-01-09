@@ -23,10 +23,10 @@ from threading import Thread
 from common.UdpSimpleServer import UdpSimpleServer
 
 class UdpListenerBase():
-    '''
+    """
     Represents a generic UDP listener. 
     Can be used as a base class for other listeners.
-    '''
+    """
     
     _address : str
     _port : int
@@ -45,7 +45,7 @@ class UdpListenerBase():
         self._thread = Thread(target=self.listening_worker, args = ())
         
     def start(self):
-        '''Starts listening to the multicast channel.'''
+        """Starts listening to the multicast channel."""
         if self._started:
             return
         
@@ -53,7 +53,7 @@ class UdpListenerBase():
         self._thread.start()
         
     def stop(self) -> None:
-        '''Stops listening to the multicast channel.'''
+        """Stops listening to the multicast channel."""
         if not self._started:
             return
         self._started = False
@@ -70,9 +70,9 @@ class UdpListenerBase():
                 self.packet_received(pkt, addr_port)
             
     def packet_received(self, pkt, addr_port) -> None:
-        '''
+        """
         A simple method dumping the packet.
         Can be overridden in derived classes.
-        '''
+        """
         print(addr_port, pkt)
         

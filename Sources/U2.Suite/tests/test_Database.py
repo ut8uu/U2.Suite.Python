@@ -38,7 +38,7 @@ OP_NAME = 'Sergey'
 OP_NAME_MOD = 'Alex'
 
 class DatabaseTests(unittest.TestCase):
-    '''A database-related unit tests'''
+    """A database-related unit tests"""
 
     _db_name : str
     _path : Path
@@ -58,11 +58,11 @@ class DatabaseTests(unittest.TestCase):
             try:
                 self._full_path.unlink()
             except:
-                ''''''
+                """"""
                 print(f'Cannot remove file {self._full_path}')
 
     def GetPathToDatabase(self) -> Path:
-        '''Calculates the full path to the database'''
+        """Calculates the full path to the database"""
         return Path(os.path.abspath("./test_data/database_tests"))
 
     def GetTestDatabase(self) -> LogDatabase:
@@ -76,16 +76,16 @@ class DatabaseTests(unittest.TestCase):
         return db
 
     def test_DatabaseCreatedAutomatically(self) -> None:
-        '''A callsigns-related test'''
+        """A callsigns-related test"""
         self.assertFalse(self._full_path.exists())
         db = self.GetTestDatabase()
         self.assertTrue(self._full_path.exists())
 
     def test_CanNotAddDuplicateCallsign(self):
-        '''
+        """
         This is to test how duplicate callsigns can be handled.
         An attempt to add the existing callsign returns the id of the existing record.
-        '''
+        """
         db = self.GetTestDatabase()
         record = db.get_or_add_callsign({FIELD_CALLSIGN : UT8UU})
         self.assertEqual(UT8UU_ID, record[FIELD_ID])
@@ -94,16 +94,16 @@ class DatabaseTests(unittest.TestCase):
         self.assertEqual(UT8UU_ID, record[FIELD_ID])
 
     def test_UpperCaseCallsign(self) -> None:
-        '''Tests how callsign case is converted to upper.'''
+        """Tests how callsign case is converted to upper."""
         db = self.GetTestDatabase()
         db.get_or_add_callsign({FIELD_CALLSIGN : 'a1a'})
         record = db.get_callsign('a1a')
         self.assertEqual('A1A', record[FIELD_CALLSIGN])
 
     def test_CanUpdateCallsign(self) -> None:
-        '''
+        """
         This is to test updating of the callsign info.
-        '''
+        """
         db = self.GetTestDatabase()
 
         data = {
@@ -189,14 +189,14 @@ class DatabaseTests(unittest.TestCase):
             self.assertEqual(expected, actual)
             
     def test_CanDeleteContact(self) -> None:
-        '''Tests how to delete the contact'''
+        """Tests how to delete the contact"""
         db = self.GetTestDatabase()
         db.delete_contact_by_id(UT8UU_ID)
         record = db.get_contact_by_id(UT8UU_ID)
         self.assertEqual(0, len(record))
 
     def test_CanWorkWithOptions(self) -> None:
-        '''Tests how options can be accessed.'''
+        """Tests how options can be accessed."""
         db = self.GetTestDatabase()
 
         options = LoggerOptions(db._db)

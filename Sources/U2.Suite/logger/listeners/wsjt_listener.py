@@ -29,7 +29,7 @@ class WsjtListenerEvent(QtCore.QObject):
     adif_received = QtCore.pyqtSignal(ADIF_log)
 
 class WsjtListener(UdpListenerBase):
-    '''Represents a listener aimed at WSJT-X UDP packets.'''
+    """Represents a listener aimed at WSJT-X UDP packets."""
     _listener_event : WsjtListenerEvent
     
     def __init__(self) -> None:
@@ -53,7 +53,7 @@ class WsjtListener(UdpListenerBase):
                 self._listener_event.adif_received.emit(log)
         
 if __name__ == '__main__':
-    '''Direct run for demo purposes.'''
+    """Direct run for demo purposes."""
     
     from wsjt_listener import WsjtListener
     

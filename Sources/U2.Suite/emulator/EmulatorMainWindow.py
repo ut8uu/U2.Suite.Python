@@ -47,14 +47,14 @@ class EmulatorMainWindow(QDialog, Ui_EmulatorMainWindow):
 
     def UpdateVfoValue(self, original_value: int, dial_value: int, \
             modifier: int, mult : int) -> int:
-        '''
+        """
         Updates the given original value:
         - original_value - a value to be updated
         - dial_value - a value taken from the dial
         - modifier - contains 0 if change is regular, 
             -100 or 100 in case of zero traversal
         - mult - a multiplier according to the dial_step
-        '''
+        """
         rest = original_value % mult
         if mult == 1:
             rest = 0
@@ -71,7 +71,7 @@ class EmulatorMainWindow(QDialog, Ui_EmulatorMainWindow):
             self.lcdFreqB.display(new_value)
 
     def UpdateDial(self):
-        ''''''
+        """"""
         left_part = int(floor(self._current_frequency / self._dial_step))
         value = int(left_part % 100)
         if self.dial.value() != value:
@@ -82,7 +82,7 @@ class EmulatorMainWindow(QDialog, Ui_EmulatorMainWindow):
 
     @pyqtSlot()
     def tuningValueChanged(self):
-        ''''''
+        """"""
         #tuningValue = value
         current_position = self.dial.value()
         if current_position == 100:
@@ -106,7 +106,7 @@ class EmulatorMainWindow(QDialog, Ui_EmulatorMainWindow):
         
     @pyqtSlot()
     def dialStepChanged(self):
-        '''Reflects the change of the dial step'''
+        """Reflects the change of the dial step"""
         new_value = self.cbDialStep.currentText()
         if new_value == '1 Hz':
             self._dial_step = 1
@@ -127,7 +127,7 @@ class EmulatorMainWindow(QDialog, Ui_EmulatorMainWindow):
 
     @pyqtSlot()
     def vfoASwitched(self):
-        ''''''
+        """"""
         if self.rbVfoA.isChecked(): 
             self.rbVfoB.setChecked(False)
             self._current_frequency = self.lcdFreqA.intValue()
@@ -135,7 +135,7 @@ class EmulatorMainWindow(QDialog, Ui_EmulatorMainWindow):
 
     @pyqtSlot()
     def vfoBSwitched(self):
-        ''''''
+        """"""
         if self.rbVfoB.isChecked(): 
             self.rbVfoA.setChecked(False)
             self._current_frequency = self.lcdFreqB.intValue()
@@ -143,7 +143,7 @@ class EmulatorMainWindow(QDialog, Ui_EmulatorMainWindow):
 
     @pyqtSlot()
     def powerButtonClick(self):
-        ''''''
+        """"""
         if self.btnPower.isChecked():
             self.btnPower.setText('Power: ON')
             self._emulator._serial_port_name = self._com_port
@@ -154,48 +154,48 @@ class EmulatorMainWindow(QDialog, Ui_EmulatorMainWindow):
 
     @pyqtSlot()
     def comPortTextChanged(self):
-        '''Handles changes to the COM port drop down list'''
+        """Handles changes to the COM port drop down list"""
         self._com_port = self.cbComPort.currentText()
 
     @pyqtSlot()
     def rxSwitched(self):
-        ''''''
+        """"""
 
     @pyqtSlot()
     def txSwitched(self):
-        ''''''
+        """"""
 
     @pyqtSlot()
     def bandChanged(self):
-        ''''''
+        """"""
 
     @pyqtSlot()
     def modeChanged(self):
-        ''''''
+        """"""
 
     @pyqtSlot()
     def splitChanged(self):
-        ''''''
+        """"""
 
     @pyqtSlot()
     def pitchChanged(self):
-        ''''''
+        """"""
 
     @pyqtSlot()
     def xitChanged(self):
-        ''''''
+        """"""
 
     @pyqtSlot()
     def xitOffsetChanged(self):
-        ''''''
+        """"""
 
     @pyqtSlot()
     def ritChanged(self):
-        ''''''
+        """"""
 
     @pyqtSlot()
     def ritOffsetChanged(self):
-        ''''''
+        """"""
 
 app = QApplication(sys.argv)
 window = EmulatorMainWindow()

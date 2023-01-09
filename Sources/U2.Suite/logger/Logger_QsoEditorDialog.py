@@ -60,7 +60,7 @@ class Logger_QsoEditorDialog(QDialog, Ui_QsoEditor):
         self.change = QSOEdit()
 
     def setup(self, qso : dict, db : LogDatabase) -> None:
-        '''Performs an initial setup'''
+        """Performs an initial setup"""
         self._db = db
         self._qso = qso
 
@@ -83,11 +83,11 @@ class Logger_QsoEditorDialog(QDialog, Ui_QsoEditor):
         self.editDateTime.setDateTime(qso[FIELD_TIMESTAMP])
 
     def close_dialog(self) -> None:
-        '''Does nothing but closes the window.'''
+        """Does nothing but closes the window."""
         self.close()
 
     def save_changes(self) -> None:
-        '''Updates a content of the contact.'''
+        """Updates a content of the contact."""
         data = {
             FIELD_BAND : self.editBand.currentText(),
             FIELD_MODE : self.editMode.currentText(),
@@ -110,7 +110,7 @@ class Logger_QsoEditorDialog(QDialog, Ui_QsoEditor):
         self.close()
 
     def delete_contact(self) -> None:
-        '''Deletes a contact from the database'''
+        """Deletes a contact from the database"""
         self._db.delete_contact_by_id(self._qso[FIELD_ID])
         self.change.lineChanged.emit()
         self.close()

@@ -26,11 +26,11 @@ class PreferencesChangedEvent(QObject):
     changed = pyqtSignal()
 
 class ApplicationPreferences(object):
-    '''
+    """
     Represents base class for application preferences.
     The preferences data is stored in the <filename>.json file
     and is a simple key-value storage.
-    '''
+    """
 
     _preferences_changed : PreferencesChangedEvent
     _preferences_loaded : bool
@@ -53,19 +53,19 @@ class ApplicationPreferences(object):
     
     @property
     def Directory(self) -> str:
-        '''
+        """
         A directory for BmMonitor preferences.
         By default it's a current directory (./).
         No trailing slashes, please.
-        '''
+        """
         return self._directory
     @Directory.setter
     def Directory(self, path : str) -> None:
-        '''
+        """
         A directory for BmMonitor preferences.
         By default it's a current directory (./).
         No trailing slashes, please.
-        '''
+        """
         self._directory = path
 
     @property
@@ -78,9 +78,9 @@ class ApplicationPreferences(object):
             self.read_preferences()
         return self._preferences
 
-    '''====================================================================='''
+    """====================================================================="""
     def read_preferences(self):
-        '''Reads preferences from the given file.'''
+        """Reads preferences from the given file."""
         try:
             path = Path(self._directory) / self._file
             preferences_file_name = str(path)
@@ -99,12 +99,12 @@ class ApplicationPreferences(object):
         except IOError as exception:
             logging.critical("Error: %s", exception)
 
-    '''====================================================================='''
+    """====================================================================="""
     def write_preferences(self):
-        '''
+        """
         Writes the preferences to file. 
         Existing file is being overwritten, not existing is being created.
-        '''
+        """
         path = Path(self._directory) / self._file
         preferences_file_name = str(path)
         with open(preferences_file_name, "wt", encoding="utf-8") as file_descriptor:
@@ -113,12 +113,12 @@ class ApplicationPreferences(object):
             
         self._preferences_changed.changed.emit()
 
-    '''====================================================================='''
+    """====================================================================="""
     def get_string_value(self, key : str, default_value : str = '') -> str:
-        '''
+        """
         Performs an attempt to get the preference by the given name.
         If preference not found, a default value will be returned.
-        '''
+        """
         try:
             result = self.Preferences.get(key)
             if result != None:
@@ -127,23 +127,23 @@ class ApplicationPreferences(object):
         except KeyError:
             return default_value
 
-    '''====================================================================='''
+    """====================================================================="""
     def get_int_value(self, key : str, default_value : int = 0) -> int:
-        '''
+        """
         Performs an attempt to get the preference by the given name.
         If preference not found, a default value will be returned.
-        '''
+        """
         try:
             return int(self.Preferences.get(key))
         except KeyError:
             return default_value
 
-    '''====================================================================='''
+    """====================================================================="""
     def get_list_value(self, key : str, default_value : list = []) -> list:
-        '''
+        """
         Performs an attempt to get the preference by the given name.
         If preference not found, a default value will be returned.
-        '''
+        """
         try:
             list_data = self.Preferences.get(key)
             if list_data == None:
@@ -152,7 +152,7 @@ class ApplicationPreferences(object):
         except KeyError:
             return default_value
 
-    '''====================================================================='''
+    """====================================================================="""
     def get_bool_value(self, key : str, default_value : bool) -> bool:
         value = self.get_string_value(key, default_value)
         if type(value) is bool:

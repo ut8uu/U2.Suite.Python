@@ -36,7 +36,7 @@ class PreferencesDialogEvent(QObject):
 
 
 class Logger_PreferencesDialog(QDialog, Ui_LoggerPreferencesDialog):
-    '''Represents Preferences dialog.'''
+    """Represents Preferences dialog."""
     
     _preferences : LoggerApplicationPreferences
     change_event : PreferencesDialogEvent
@@ -54,9 +54,9 @@ class Logger_PreferencesDialog(QDialog, Ui_LoggerPreferencesDialog):
         self.setFixedSize(self.width(), self.height())
         self.setWindowIcon(QIcon(FileSystemHelper.relpath('icon/edit_file-32.png')))
     
-    '''---------------------------------------------------------------------------'''
+    """---------------------------------------------------------------------------"""
     def setup(self, preferences : LoggerApplicationPreferences) -> None:
-        '''Initiates the dialog with data.'''
+        """Initiates the dialog with data."""
 
         self._preferences = preferences
         self.cbAcceptWsjtPackets.setChecked(preferences.AcceptWsjtPackets)
@@ -70,7 +70,7 @@ class Logger_PreferencesDialog(QDialog, Ui_LoggerPreferencesDialog):
         self.close()
 
     def save_changes(self) -> None:
-        '''Saves changes to preferences file.'''
+        """Saves changes to preferences file."""
         self._preferences.AcceptWsjtPackets = self.cbAcceptWsjtPackets.isChecked()
         #Station Info stuff
         self._preferences.OperatorName = self.tbOperatorName.text()
@@ -82,7 +82,7 @@ class Logger_PreferencesDialog(QDialog, Ui_LoggerPreferencesDialog):
         self.close()
         
 if __name__ == '__main__':
-    '''Launched directly. Consider a test run.'''
+    """Launched directly. Consider a test run."""
     import os
     from logger.ui.Ui_StationInfoDialog import Ui_StationInfoDialog
     app = QApplication(sys.argv)

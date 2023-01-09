@@ -463,9 +463,9 @@ class ConversionHelper():
 
     @staticmethod
     def FrequencyToRadioBand(frequency : int) -> RadioBand:
-        '''
+        """
         Converts given integer to the radio band
-        '''
+        """
         for band in AllBands.AllBands:
             if band.BeginMhz <= frequency and band.EndMhz >=frequency:
                 return band

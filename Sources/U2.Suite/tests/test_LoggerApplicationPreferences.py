@@ -23,10 +23,10 @@ from logger.logger_constants import KEY_REALTIME, PREFERENCES_FILE_LOGGER
 from logger.logger_preferences import LoggerApplicationPreferences
 
 class  LoggerApplicationPreferencesTests(unittest.TestCase):
-    '''Represents a set of application preferences tests'''
+    """Represents a set of application preferences tests"""
 
     def test_CanWorkWithPreferences(self):
-        '''Tests possibility to read and write application preferences'''
+        """Tests possibility to read and write application preferences"""
 
         file = 'test.preferences'
         path = Path(f'./{file}')
@@ -53,7 +53,7 @@ class  LoggerApplicationPreferencesTests(unittest.TestCase):
         self.assertEqual(pref1.Preferences['k2'], pref2.Preferences['k2'])
         
     def test_CanWorkWithLoggerPreferences(self) -> None:
-        '''Tests how logger preferences can be read from and written to file.'''
+        """Tests how logger preferences can be read from and written to file."""
 
         # preferences should be created from scratch
         path = Path(f'./{PREFERENCES_FILE_LOGGER}')

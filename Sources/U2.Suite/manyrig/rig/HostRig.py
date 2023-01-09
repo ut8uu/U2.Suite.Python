@@ -15,12 +15,12 @@
 # You should have received a copy of the GNU General Public License 
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-'''
+"""
 A HostRig instance connects to the RIG via COM port and manages it.
 An instance should be launched on the PC connected to the RIG.
 When configured, a HostRig instance can send UDP packages to any listener.
 The GuestRig class is an implementation of such listener object.
-'''
+"""
 import logging
 import threading
 import time
@@ -403,10 +403,10 @@ class HostRig(Rig):
                 if len(self._queue) > 0:
                     self._queue.remove(self._queue.CurrentCmd)
         except:
-            ''''''
+            """"""
 
     def ProcessReceivedData(self, cmd: QueueItem, data: bytes) -> None:
-        '''Processes a reply for the given command'''
+        """Processes a reply for the given command"""
         if not cmd.NeedsReply or cmd.ReplyLength != len(data):
             return
         if cmd.Kind == CommandKind.Init:
@@ -419,12 +419,12 @@ class HostRig(Rig):
             self.ProcessCustomReply(cmd, data)
 
     def ProcessInitReply(self, cmd: QueueItem, data: bytes):
-        '''Processes a reply for the Init command'''
+        """Processes a reply for the Init command"""
         DebugHelper.DisplayMessage(MessageDisplayModes.Diagnostics3, f'Processing the Init command: {ConversionHelper.BytesToHexStr(data)}')
         self.ValidateReply(data, self._rig_commands.InitCmd[cmd.Number].Validation)
 
     def ProcessWriteReply(self, cmd: QueueItem, data: bytes):
-        '''Processes a reply for the Write command'''
+        """Processes a reply for the Write command"""
         DebugHelper.DisplayMessage(MessageDisplayModes.Diagnostics3, f'Processing the Write command: {ConversionHelper.BytesToHexStr(data)}')
         self.ValidateReply(data, self._rig_commands.WriteCmd[cmd.Number].Validation)
 

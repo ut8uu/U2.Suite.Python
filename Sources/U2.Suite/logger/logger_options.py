@@ -25,7 +25,7 @@ if __name__ == '__main__':
     exit(0)
 
 class LoggerOptions(object):
-    '''Represents a logger options keeper class.'''
+    """Represents a logger options keeper class."""
 
     _db : DatabaseCore
     _options : DatabaseOptions

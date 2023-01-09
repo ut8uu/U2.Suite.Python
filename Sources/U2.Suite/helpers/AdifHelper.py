@@ -1524,7 +1524,7 @@ class ADIF_log(list):
                     e[x.upper()] = e[x]
                     del e[x]
     def load_from_file(self, path_to_file: str):
-        '''Loads ADIF from given file.'''
+        """Loads ADIF from given file."""
         f = open(path_to_file, 'r')
         data = f.read()#.decode('utf-8')
         f.close()
@@ -1537,18 +1537,18 @@ class ADIF_log(list):
             self.from_string(data)
         
     def load_from_string(self, data) -> list[dict]:
-        '''Loads ADID from the given string.'''
+        """Loads ADID from the given string."""
         self.from_string(data)
 
 class AdifHelper(object):
-    '''Represents helper methods for working with ADIF files.'''
+    """Represents helper methods for working with ADIF files."""
 
     @staticmethod
     def ImportFromFile(path_to_file: str) -> ADIF_log:
-        '''
+        """
         Loads records from given file.
         Raises FileNotFoundError if file cannot be found.
-        '''
+        """
         if not os.path.exists(path_to_file):
             raise FileNotFoundError(path_to_file)
 
@@ -1567,30 +1567,30 @@ class AdifHelper(object):
 
     @staticmethod
     def ExportAdif(path_to_file : str, log : ADIF_log) -> None:
-        '''
+        """
         Exports given log to the given file.
-        '''
+        """
         f = open(path_to_file, 'wt')
         f.write(str(log))
         f.close()
 
     @staticmethod
     def ExportAdx(path_to_file : str, log : ADIF_log) -> None:
-        '''
+        """
         Exports given log to the given file.
-        '''
+        """
         f = open(path_to_file, 'wt')
         f.write(log.xml())
         f.close()
 
 @staticmethod
 def callsign_to_dxcc(callsign : str) -> int:
-    '''
+    """
     Tries to calculate the country by the given callsign.
     
     Returns an actual DXCC id if country was successfully calculated OR
     -1 otherwise.
-    '''
+    """
     return -1
 
 if __name__ == '__main__':

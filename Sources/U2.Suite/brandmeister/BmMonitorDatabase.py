@@ -20,8 +20,8 @@ import logging
 import sqlite3
 import semver
 
-import brandmeister.bm_monitor_constants as const
-from brandmeister.bm_monitor_core import MonitorReportData
+import brandmeister.BmMonitorConstants as const
+from brandmeister.BmMonitorCore import MonitorReportData
 from database.database_core import DatabaseCore
 from database.database_options import DatabaseOptions
 from pathlib import Path
@@ -36,7 +36,7 @@ FIELD_BM_MONITOR_DURATION = 'duration'
 FIELD_BM_MONITOR_DXCC = 'dxcc'
 
 class BmMonitorDatabase:
-    '''Represents a persistent storage for Brandmeister Monitor.'''
+    """Represents a persistent storage for Brandmeister Monitor."""
     
     _db : DatabaseCore
     _db_name : str
@@ -82,13 +82,13 @@ class BmMonitorDatabase:
         self._db.execute_non_query(sql)
         pass
     
-    '''======================================================================'''
+    """======================================================================"""
     def insert_report(self, data : MonitorReportData) -> int:
-        '''
+        """
         Inserts a report in the database.
         
         Returns an identifier of the newly added record.
-        '''
+        """
         values = {
             FIELD_BM_MONITOR_TIMESTAMP : datetime.utcnow(),
             FIELD_BM_MONITOR_CALLSIGN : data.Callsign,
@@ -99,13 +99,13 @@ class BmMonitorDatabase:
         self._db.insert_in_table(TABLE_BM_MONITOR_REPORTS, values)
         return self._db.execute_scalar(f'SELECT max({FIELD_BM_MONITOR_ID}) FROM {TABLE_BM_MONITOR_REPORTS}')
     
-    '''======================================================================'''
+    """======================================================================"""
     def get_reports(self, filter : dict = {}, order_by : str = '') -> tuple[list, list]:
-        '''
+        """
         Requests report records from the database.
         filter - a dictionary used to filter input. Used AND clause.
         order_by - a name of the field to sort by.
-        '''
+        """
         result : list
         fields = ','.join(self._db._table_descriptions[TABLE_BM_MONITOR_REPORTS])
         sql = f'SELECT {fields} FROM {TABLE_BM_MONITOR_REPORTS}'

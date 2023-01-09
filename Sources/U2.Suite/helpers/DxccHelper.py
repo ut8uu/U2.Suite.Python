@@ -40,6 +40,8 @@ class DxccHelper(object, metaclass=Singleton):
         import os
 
         path = str(FileSystemHelper.get_appdata_path(Path('U2.Suite') / 'dxcc')) + os.path.sep
+        if not os.path.exists(path):
+            os.mkdir(path)
         url = 'http://www.ok2cqr.com/linux/cqrlog/ctyfiles/cqrlog-cty.tar.gz'
 
         self._dxcc_inst = dxcc(path, url, AUTOFETCH_FILES=False, VERBOSE=0)
