@@ -27,8 +27,8 @@ from PyQt5.QtCore import QObject, pyqtSignal
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from brandmeister.bm_monitor_preferences import BrandmeisterMonitorApplicationPreferences
-import brandmeister.bm_monitor_constants as const
+from brandmeister.BmMonitorPreferences import BrandmeisterMonitorApplicationPreferences
+import brandmeister.BmMonitorConstants as const
 from helpers.DxccHelper import DxccHelper
 from helpers.dxcc import dxcc
 

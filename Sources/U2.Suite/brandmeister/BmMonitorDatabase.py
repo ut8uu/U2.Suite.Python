@@ -20,8 +20,8 @@ import logging
 import sqlite3
 import semver
 
-import brandmeister.bm_monitor_constants as const
-from brandmeister.bm_monitor_core import MonitorReportData
+import brandmeister.BmMonitorConstants as const
+from brandmeister.BmMonitorCore import MonitorReportData
 from database.database_core import DatabaseCore
 from database.database_options import DatabaseOptions
 from pathlib import Path

@@ -19,10 +19,10 @@ import os
 from pathlib import Path
 import shutil
 import unittest
-from brandmeister.bm_monitor_constants import KEY_CALLSIGN, KEY_DURATION, KEY_TALK_GROUP
-from brandmeister.bm_monitor_core import MonitorReportData
+from brandmeister.BmMonitorConstants import KEY_CALLSIGN, KEY_DURATION, KEY_TALK_GROUP
+from brandmeister.BmMonitorCore import MonitorReportData
 
-from brandmeister.bm_monitor_database import FIELD_BM_MONITOR_CALLSIGN, FIELD_BM_MONITOR_DURATION, FIELD_BM_MONITOR_TG, BmMonitorDatabase
+from brandmeister.BmMonitorDatabase import FIELD_BM_MONITOR_CALLSIGN, FIELD_BM_MONITOR_DURATION, FIELD_BM_MONITOR_TG, BmMonitorDatabase
 
 class DatabaseTests(unittest.TestCase):
     """A database-related unit tests"""

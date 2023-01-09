@@ -19,7 +19,7 @@ import os
 from pathlib import Path
 import shutil
 import unittest
-from brandmeister.bm_monitor_preferences import BrandmeisterMonitorApplicationPreferences
+from brandmeister.BmMonitorPreferences import BrandmeisterMonitorApplicationPreferences
 
 from logger.logger_constants import KEY_REALTIME, PREFERENCES_FILE_LOGGER
 from logger.logger_preferences import LoggerApplicationPreferences

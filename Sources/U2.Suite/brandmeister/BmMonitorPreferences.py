@@ -17,7 +17,7 @@
 
 import os
 from common.ApplicationPreferences import ApplicationPreferences
-import brandmeister.bm_monitor_constants as const
+import brandmeister.BmMonitorConstants as const
 
 class BrandmeisterMonitorApplicationPreferences(ApplicationPreferences):
     """

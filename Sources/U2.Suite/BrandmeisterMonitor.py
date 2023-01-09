@@ -23,10 +23,10 @@ import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-import brandmeister.bm_groups as bm_groups
-import brandmeister.bm_monitor_constants as const
-from brandmeister.bm_monitor_core import BrandmeisterMonitorCore, MonitorReportData, MonitoringStats
-from brandmeister.bm_monitor_database import BmMonitorDatabase
+import brandmeister.BmGroups as BmGroups
+import brandmeister.BmMonitorConstants as const
+from brandmeister.BmMonitorCore import BrandmeisterMonitorCore, MonitorReportData, MonitoringStats
+from brandmeister.BmMonitorDatabase import BmMonitorDatabase
 from brandmeister.ui.Ui_BmMonitorMainWindow import Ui_BmMonitorMainWindow
 import common.data.dxcc as dxcc
 from common.ui.DialogAbout import DialogAbout
@@ -75,8 +75,8 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         self._stored_count = 0
         
         self._monitor_core = BrandmeisterMonitorCore()
-        self._monitor_core.MonitorReport.report.connect(self.monitor_reported)
-        self._monitor_core.MonitorReport.heartbeat.connect(self.monitor_heartbeat)
+        self._monitor_core.MonitorReport.report.connect(self._monitor_reported)
+        self._monitor_core.MonitorReport.heartbeat.connect(self._monitor_heartbeat)
 
         log_level = logging.getLevelName(self._monitor_core.Preferences.LogLevel)
         logger.setLevel(log_level)
@@ -90,10 +90,10 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         self.setFixedSize(self.width(), self.height())
         self.setWindowIcon(QtGui.QIcon(FileSystemHelper.relpath('icon/radio-48.png')))
         
-        self.actionExit.triggered.connect(self.close_window)
-        self.actionStart.triggered.connect(self.start_monitor)
-        self.actionStop.triggered.connect(self.stop_monitor)
-        self.actionAbout.triggered.connect(self.display_about_dialog)
+        self.actionExit.triggered.connect(self._close_window)
+        self.actionStart.triggered.connect(self._start_monitor)
+        self.actionStop.triggered.connect(self._stop_monitor)
+        self.actionAbout.triggered.connect(self._display_about_dialog)
 
         pref = self._monitor_core.Preferences
         self.cbFilterByCallsigns.setChecked(pref.UseCallsigns)
@@ -104,8 +104,8 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         
         model = QtGui.QStandardItemModel()
         all_groups = pref.TalkGroups
-        for group_id in bm_groups.bm_groups:
-            group_title = bm_groups.bm_groups[group_id]
+        for group_id in BmGroups.bm_groups:
+            group_title = BmGroups.bm_groups[group_id]
             item = QtGui.QStandardItem(f'[{group_id}] {group_title}')
             is_checked = int(group_id) in all_groups
             check = QtCore.Qt.CheckState.Checked if is_checked else QtCore.Qt.CheckState.Unchecked
@@ -154,23 +154,23 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         
         self.lbGroups.setEnabled(pref.UseTalkGroups)
         
-        self.cbTalkGroups.stateChanged.connect(self.update_preferences)
-        self.cbFilterByDxcc.stateChanged.connect(self.update_preferences)
-        self.cbFilterByCallsigns.stateChanged.connect(self.update_preferences)
-        self.tbCallsigns.textChanged.connect(self.update_preferences)        
+        self.cbTalkGroups.stateChanged.connect(self._update_preferences)
+        self.cbFilterByDxcc.stateChanged.connect(self._update_preferences)
+        self.cbFilterByCallsigns.stateChanged.connect(self._update_preferences)
+        self.tbCallsigns.textChanged.connect(self._update_preferences)        
         
         delegate = StyledItemDelegate()
-        delegate.checked.connect(self.lbgroups_on_checked)
+        delegate.checked.connect(self._lbgroups_on_checked)
         self.lbGroups.setItemDelegate(delegate)
 
         delegate = StyledItemDelegate()
-        delegate.checked.connect(self.lbcountries_on_checked)
+        delegate.checked.connect(self._lbcountries_on_checked)
         self.lbCountries.setItemDelegate(delegate)
 
-        self.start_monitor()
+        self._start_monitor()
             
     """================================================================"""
-    def lbgroups_on_checked(self, index, state):
+    def _lbgroups_on_checked(self, index, state):
         """Handles checking/unchecking of the item in the groups list view."""
         text = f'Group {index.data()} is '
         
@@ -178,10 +178,10 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
             text += 'un'
         text += 'checked.'
         self._logger.debug(text)
-        self.update_preferences()
+        self._update_preferences()
         
     """================================================================"""
-    def lbcountries_on_checked(self, index, state):
+    def _lbcountries_on_checked(self, index, state):
         """Handles checking/unchecking of the item in the countries list view."""
         text = f'Country {index.data()} is '
         
@@ -189,7 +189,7 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
             text += 'un'
         text += 'checked.'
         self._logger.debug(text)
-        self.update_preferences()
+        self._update_preferences()
         
     """==============================================================="""    
     def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
@@ -197,7 +197,7 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         return super().closeEvent(a0)
 
     """==============================================================="""
-    def monitor_heartbeat(self, stats : MonitoringStats) -> None:
+    def _monitor_heartbeat(self, stats : MonitoringStats) -> None:
         """
         Handles reporting of the monitor's heartbeat.
         """
@@ -205,23 +205,23 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         self.statusbar.showMessage(msg)
         
     """==============================================================="""
-    def monitor_reported(self, data : MonitorReportData, stats : MonitoringStats) -> None:
+    def _monitor_reported(self, data : MonitorReportData, stats : MonitoringStats) -> None:
         """Handles reporting of data from the monitor."""
         id = self._db.insert_report(data)
         data.Id = id
         self._stored_count += 1
 
-        self.display_record(self.monitoringList, data)
+        self._display_record(self.monitoringList, data)
 
-        minutes = self.string_filter_to_minutes(self.cbTimestampFilter.currentText())
+        minutes = self._string_filter_to_minutes(self.cbTimestampFilter.currentText())
         timestamp = datetime.utcnow() - timedelta(minutes=minutes)
-        self.cleanup_view(self.monitoringList, timestamp)
+        self._cleanup_view(self.monitoringList, timestamp)
         
         msg = f'Received: {stats.Total}, caught: {stats.Caught}, stored: {self._stored_count}'
         self.statusbar.showMessage(msg)
     
     """==========================================================================="""
-    def cleanup_view(self, list_view : QListView, min_timestamp : datetime) -> None:
+    def _cleanup_view(self, list_view : QListView, min_timestamp : datetime) -> None:
         """
         Removes items from the given list view older than the given timestamp.
         """
@@ -234,7 +234,7 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
                 model.removeRow(index)
         
     """==========================================================================="""
-    def string_filter_to_minutes(self, filter : str) -> int:
+    def _string_filter_to_minutes(self, filter : str) -> int:
         """
         Converts given string to the number of minutes in it.
         E.g. 'Last hour' should return 60.
@@ -256,7 +256,7 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         return 999999999       
         
     """==========================================================================="""
-    def display_record(self, list_view : QListView, data : MonitorReportData) -> None:
+    def _display_record(self, list_view : QListView, data : MonitorReportData) -> None:
         """
         Displays the report on the given list view.
         """
@@ -273,12 +273,12 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         list_view.model().insertRow(0, item)   
         
     """==========================================================================="""
-    def GetPathToDatabase(self) -> Path:
+    def _get_path_to_database(self) -> Path:
         """Calculates the full path to the database"""
         return FileSystemHelper.get_appdata_path(Path('U2.Suite') / 'BmMonitor' / 'Database', create_if_not_exists=True)
 
     """==============================================================="""
-    def update_preferences(self) -> None:
+    def _update_preferences(self) -> None:
         """Updates preferences according to the current window state."""
         self._monitor_core.Preferences.UseCallsigns = self.cbFilterByCallsigns.isChecked()
         self.tbCallsigns.setEnabled(self.cbFilterByCallsigns.isChecked())
@@ -312,7 +312,7 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         self._monitor_core.Preferences.write_preferences()
         
     """==============================================================="""    
-    def start_monitor(self):
+    def _start_monitor(self):
         if not self.actionStart.isEnabled():
             return
 
@@ -321,7 +321,7 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         self._monitor_core.Start()
     
     """==============================================================="""    
-    def stop_monitor(self):
+    def _stop_monitor(self):
         if not self.actionStop.isEnabled():
             return
 
@@ -330,11 +330,11 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         self._monitor_core.Stop()
     
     """==============================================================="""    
-    def close_window(self):
+    def _close_window(self):
         self.close()
         
     """==============================================================="""
-    def display_about_dialog(self):
+    def _display_about_dialog(self):
         dialog = DialogAbout()
         dialog.Title = 'About Brandmeister Monitor'
         dialog.DisplayImage('brandmeistermonitor.png')
