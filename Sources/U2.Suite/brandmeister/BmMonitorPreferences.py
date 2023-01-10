@@ -17,7 +17,7 @@
 
 import os
 from common.ApplicationPreferences import ApplicationPreferences
-import brandmeister.BmMonitorConstants as const
+import brandmeister.BmMonitorConstants as bm_const
 
 class BrandmeisterMonitorApplicationPreferences(ApplicationPreferences):
     """
@@ -27,156 +27,178 @@ class BrandmeisterMonitorApplicationPreferences(ApplicationPreferences):
     the file during two or more simultaneous implicit commits.
     """
     
-    def __init__(self, file : str = const.PREFERENCES_FILE_BM_MONITOR) -> None:
+    def __init__(self, file : str = bm_const.PREFERENCES_FILE_BM_MONITOR) -> None:
         self._default_values = {
-            const.KEY_LOG_LEVEL : 'ERROR',
-            const.KEY_NOTIFY_DISCORD : False,
-            const.KEY_NOTIFY_DISCORD_WH_URL : '',
-            const.KEY_NOTIFY_DAPNET : False,
-            const.KEY_NOTIFY_PUSHOVER : False,
-            const.KEY_NOTIFY_TELEGRAM : False,
-            const.KEY_VERBOSE : True,
-            const.KEY_USE_CALLSIGNS : False,
-            const.KEY_CALLSIGNS : [],
-            const.KEY_NOISY_CALLS : [],
-            const.KEY_USE_TALK_GROUPS : True,
-            const.KEY_DISPLAY_ALL_TALK_GROUPS : True,
-            const.KEY_TALK_GROUPS : [91],
-            const.KEY_MIN_SILENCE : 300,
-            const.KEY_MIN_DURATION : 5,
-            const.KEY_PATH_TO_DATABASE : os.path.abspath("./"),
-            const.KEY_USE_COUNTRIES : False,
-            const.KEY_COUNTRIES : []
+            bm_const.KEY_LOG_LEVEL : 'ERROR',
+            bm_const.KEY_NOTIFY_DISCORD : False,
+            bm_const.KEY_NOTIFY_DISCORD_WH_URL : '',
+            bm_const.KEY_NOTIFY_DAPNET : False,
+            bm_const.KEY_NOTIFY_PUSHOVER : False,
+            bm_const.KEY_NOTIFY_TELEGRAM : False,
+            bm_const.KEY_VERBOSE : True,
+            bm_const.KEY_USE_CALLSIGNS : False,
+            bm_const.KEY_CALLSIGNS : [],
+            bm_const.KEY_NOISY_CALLS : [],
+            bm_const.KEY_USE_TALK_GROUPS : True,
+            bm_const.KEY_DISPLAY_ALL_TALK_GROUPS : True,
+            bm_const.KEY_TALK_GROUPS : [91],
+            bm_const.KEY_MIN_SILENCE : 300,
+            bm_const.KEY_MIN_DURATION : 5,
+            bm_const.KEY_PATH_TO_DATABASE : os.path.abspath("./"),
+            bm_const.KEY_SAVE_TO_DATABASE : True,
+            bm_const.KEY_SAVE_TO_DATABASE_LIMIT : bm_const.DB_LIMIT_NO_LIMIT,
+            bm_const.KEY_USE_COUNTRIES : False,
+            bm_const.KEY_COUNTRIES : []
             }
         super().__init__(file, self._default_values)
 
     @property
     def LogLevel(self) -> str:
-        level = self.get_string_value(const.KEY_LOG_LEVEL, 'ERROR')
+        level = self.get_string_value(bm_const.KEY_LOG_LEVEL, 'ERROR')
         if level is None or len(level) == 0:
             level = 'ERROR'
-            self._preferences[const.KEY_LOG_LEVEL] = level
+            self._preferences[bm_const.KEY_LOG_LEVEL] = level
             self.write_preferences()
         return level
         
     @property
     def PathToDatabase(self) -> str:
-        path = self.get_string_value(const.KEY_PATH_TO_DATABASE, '')
+        path = self.get_string_value(bm_const.KEY_PATH_TO_DATABASE, '')
         if path is None or len(path) == 0:
             path = os.path.abspath("./")
-            self._preferences[const.KEY_PATH_TO_DATABASE] = path
+            self._preferences[bm_const.KEY_PATH_TO_DATABASE] = path
             self.write_preferences()
         return path
+    @PathToDatabase.setter
+    def PathToDatabase(self, value) -> None:
+        self.get_string_value(bm_const.KEY_PATH_TO_DATABASE, value)
         
     @property
+    def SaveToDatabase(self) -> bool:
+        return self.get_bool_value(bm_const.KEY_SAVE_TO_DATABASE, True)
+    @SaveToDatabase.setter
+    def SaveToDatabase(self, value : bool) -> None:
+        self.Preferences[bm_const.KEY_SAVE_TO_DATABASE] = value
+
+    @property
+    def SaveToDatabaseLimit(self) -> str:
+        limit = self.get_string_value(bm_const.KEY_SAVE_TO_DATABASE_LIMIT, bm_const.DB_LIMIT_NO_LIMIT)
+        if len(limit) == None:
+            limit = bm_const.DB_LIMIT_NO_LIMIT
+        return limit
+    @SaveToDatabaseLimit.setter
+    def SaveToDatabaseLimit(self, value : str) -> None:
+        self.Preferences[bm_const.KEY_SAVE_TO_DATABASE_LIMIT] = value
+
+    @property
     def UseTalkGroups(self) -> bool:
-        return self.get_bool_value(const.KEY_USE_TALK_GROUPS, False)
+        return self.get_bool_value(bm_const.KEY_USE_TALK_GROUPS, False)
     @UseTalkGroups.setter
     def UseTalkGroups(self, value : bool) -> None:
-        self.Preferences[const.KEY_USE_TALK_GROUPS] = value
+        self.Preferences[bm_const.KEY_USE_TALK_GROUPS] = value
 
     @property
     def DisplayAllTalkGroups(self) -> bool:
-        return self.get_bool_value(const.KEY_DISPLAY_ALL_TALK_GROUPS, False)
+        return self.get_bool_value(bm_const.KEY_DISPLAY_ALL_TALK_GROUPS, False)
     @DisplayAllTalkGroups.setter
     def DisplayAllTalkGroups(self, value : bool) -> None:
-        self.Preferences[const.KEY_DISPLAY_ALL_TALK_GROUPS] = value
+        self.Preferences[bm_const.KEY_DISPLAY_ALL_TALK_GROUPS] = value
 
     @property
     def TalkGroups(self) -> list[str]:
-        return self.get_list_value(const.KEY_TALK_GROUPS, [])
+        return self.get_list_value(bm_const.KEY_TALK_GROUPS, [])
     @TalkGroups.setter
     def TalkGroups(self, value : list[str]) -> None:
-        self.Preferences[const.KEY_TALK_GROUPS] = value
+        self.Preferences[bm_const.KEY_TALK_GROUPS] = value
         
     @property
     def Countries(self) -> list[str]:
-        return self.get_list_value(const.KEY_COUNTRIES, [])
+        return self.get_list_value(bm_const.KEY_COUNTRIES, [])
     @Countries.setter
     def Countries(self, value : list[str]) -> None:
-        self.Preferences[const.KEY_COUNTRIES] = value
+        self.Preferences[bm_const.KEY_COUNTRIES] = value
         
     @property
     def NoisyCalls(self) -> list[str]:
-        return self.get_list_value(const.KEY_NOISY_CALLS, [])
+        return self.get_list_value(bm_const.KEY_NOISY_CALLS, [])
     @NoisyCalls.setter
     def NoisyCalls(self, value : list[str]) -> None:
-        self.Preferences[const.KEY_NOISY_CALLS] = value
+        self.Preferences[bm_const.KEY_NOISY_CALLS] = value
         
     @property
     def UseCallsigns(self) -> bool:
-        return self.get_bool_value(const.KEY_USE_CALLSIGNS, False)
+        return self.get_bool_value(bm_const.KEY_USE_CALLSIGNS, False)
     @UseCallsigns.setter
     def UseCallsigns(self, value : bool) -> None:
-        self.Preferences[const.KEY_USE_CALLSIGNS] = value
+        self.Preferences[bm_const.KEY_USE_CALLSIGNS] = value
 
     @property
     def UseCountries(self) -> bool:
-        return self.get_bool_value(const.KEY_USE_COUNTRIES, False)
+        return self.get_bool_value(bm_const.KEY_USE_COUNTRIES, False)
     @UseCountries.setter
     def UseCountries(self, value : bool) -> None:
-        self.Preferences[const.KEY_USE_COUNTRIES] = value
+        self.Preferences[bm_const.KEY_USE_COUNTRIES] = value
 
     @property
     def Callsigns(self) -> list[str]:
-        return self.get_list_value(const.KEY_CALLSIGNS, False)
+        return self.get_list_value(bm_const.KEY_CALLSIGNS, False)
     @Callsigns.setter
     def Callsigns(self, value : list[str]) -> None:
-        self.Preferences[const.KEY_CALLSIGNS] = value
+        self.Preferences[bm_const.KEY_CALLSIGNS] = value
         
     @property
     def MinDurationSec(self) -> int:
-        return self.get_int_value(const.KEY_MIN_DURATION, False)
+        return self.get_int_value(bm_const.KEY_MIN_DURATION, 5)
     @MinDurationSec.setter
     def MinDurationSec(self, value : int) -> None:
-        self.Preferences[const.KEY_MIN_DURATION] = value
+        self.Preferences[bm_const.KEY_MIN_DURATION] = value
         
     @property
     def Verbose(self) -> bool:
-        return self.get_bool_value(const.KEY_VERBOSE, False)
+        return self.get_bool_value(bm_const.KEY_VERBOSE, False)
     @Verbose.setter
     def Verbose(self, value : bool) -> None:
-        self.Preferences[const.KEY_VERBOSE] = value
+        self.Preferences[bm_const.KEY_VERBOSE] = value
         
     @property
     def MinSilenceSec(self) -> int:
-        return self.get_int_value(const.KEY_MIN_SILENCE, False)
+        return self.get_int_value(bm_const.KEY_MIN_SILENCE, 300)
     @MinSilenceSec.setter
     def MinSilenceSec(self, value : int) -> None:
-        self.Preferences[const.KEY_MIN_SILENCE] = value
+        self.Preferences[bm_const.KEY_MIN_SILENCE] = value
         
     @property
     def NotifyDapnet(self) -> bool:
-        return self.get_bool_value(const.KEY_NOTIFY_DAPNET, False)
+        return self.get_bool_value(bm_const.KEY_NOTIFY_DAPNET, False)
     @NotifyDapnet.setter
     def NotifyDapnet(self, value : bool) -> None:
-        self.Preferences[const.KEY_NOTIFY_DAPNET] = value
+        self.Preferences[bm_const.KEY_NOTIFY_DAPNET] = value
         
     @property
     def NotifyDiscord(self) -> bool:
-        return self.get_bool_value(const.KEY_NOTIFY_DISCORD, False)
+        return self.get_bool_value(bm_const.KEY_NOTIFY_DISCORD, False)
     @NotifyDiscord.setter
     def NotifyDiscord(self, value : bool) -> None:
-        self.Preferences[const.KEY_NOTIFY_DISCORD] = value
+        self.Preferences[bm_const.KEY_NOTIFY_DISCORD] = value
         
     @property
     def NotifyDiscordWhUrl(self) -> str:
-        return self.get_string_value(const.KEY_NOTIFY_DISCORD_WH_URL, False)
+        return self.get_string_value(bm_const.KEY_NOTIFY_DISCORD_WH_URL, False)
     @NotifyDiscordWhUrl.setter
     def NotifyDiscordWhUrl(self, value : str) -> None:
-        self.Preferences[const.KEY_NOTIFY_DISCORD_WH_URL] = value
+        self.Preferences[bm_const.KEY_NOTIFY_DISCORD_WH_URL] = value
         
     @property
     def NotifyPushover(self) -> bool:
-        return self.get_bool_value(const.KEY_NOTIFY_PUSHOVER, False)
+        return self.get_bool_value(bm_const.KEY_NOTIFY_PUSHOVER, False)
     @NotifyPushover.setter
     def NotifyPushover(self, value : bool) -> None:
-        self.Preferences[const.KEY_NOTIFY_PUSHOVER] = value
+        self.Preferences[bm_const.KEY_NOTIFY_PUSHOVER] = value
         
     @property
     def NotifyTelegram(self) -> bool:
-        return self.get_bool_value(const.KEY_NOTIFY_TELEGRAM, False)
+        return self.get_bool_value(bm_const.KEY_NOTIFY_TELEGRAM, False)
     @NotifyTelegram.setter
     def NotifyTelegram(self, value : bool) -> None:
-        self.Preferences[const.KEY_NOTIFY_TELEGRAM] = value
+        self.Preferences[bm_const.KEY_NOTIFY_TELEGRAM] = value
         

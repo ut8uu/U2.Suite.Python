@@ -21,6 +21,8 @@ import os
 from pathlib import Path
 import sys
 
+from brandmeister.BmMonitorPreferencesDialog import BmMonitor_PreferencesDialog
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import brandmeister.BmGroups as BmGroups
@@ -94,6 +96,7 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         self.actionStart.triggered.connect(self._start_monitor)
         self.actionStop.triggered.connect(self._stop_monitor)
         self.actionAbout.triggered.connect(self._display_about_dialog)
+        self.actionPreferences.triggered.connect(self._display_preferences_dialog)
 
         pref = self._monitor_core.Preferences
         self.cbFilterByCallsigns.setChecked(pref.UseCallsigns)
@@ -207,9 +210,10 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
     """==============================================================="""
     def _monitor_reported(self, data : MonitorReportData, stats : MonitoringStats) -> None:
         """Handles reporting of data from the monitor."""
-        id = self._db.insert_report(data)
-        data.Id = id
-        self._stored_count += 1
+        if self._monitor_core.Preferences.SaveToDatabase:
+            id = self._db.insert_report(data)
+            data.Id = id
+            self._stored_count += 1
 
         self._display_record(self.monitoringList, data)
 
@@ -344,7 +348,18 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         year = datetime.utcnow().strftime('%Y')
         dialog.Copyright = f'© {year} Sergey Usmanov, UT8UU'
         dialog.exec()
-    
+
+    """==============================================================="""
+    def _display_preferences_dialog(self) -> None:
+        dialog = BmMonitor_PreferencesDialog()
+        dialog.setup(self._monitor_core.Preferences)
+        dialog.change_event.changed.connect(self._preferences_changed)
+        dialog.open()
+        
+    """=============================================================="""
+    def _preferences_changed(self) -> None:
+        """Handles changing of preferences."""
+            
 """==============================================================="""    
 if __name__ == '__main__':
     app = QApplication(sys.argv)
