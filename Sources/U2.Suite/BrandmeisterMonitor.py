@@ -354,7 +354,7 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         dialog = BmMonitor_PreferencesDialog()
         dialog.setup(self._monitor_core.Preferences)
         dialog.change_event.changed.connect(self._preferences_changed)
-        dialog.open()
+        dialog.exec()
         
     """=============================================================="""
     def _preferences_changed(self) -> None:

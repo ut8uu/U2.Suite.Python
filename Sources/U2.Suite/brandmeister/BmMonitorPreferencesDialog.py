@@ -144,8 +144,8 @@ class BmMonitor_PreferencesDialog(QDialog, Ui_BmPreferencesDialog):
         pp.UseCallsigns = self.cbFilterByCallsigns.isChecked()
 
         # filter - TG
-        pp.UseTalkGroups = self.cbTalkGroups.isChecked()
-        self.cbTalkGroups.setEnabled(self.cbTalkGroups.isChecked())
+        pp.UseTalkGroups = self.cbFilterByTG.isChecked()
+        self.cbFilterByTG.setEnabled(self.cbFilterByTG.isChecked())
         groups = []
         model = self.lbGroups.model()
         item : QStandardItem
@@ -177,7 +177,6 @@ class BmMonitor_PreferencesDialog(QDialog, Ui_BmPreferencesDialog):
 if __name__ == '__main__':
     """Launched directly. Consider a test run."""
     import os
-    from logger.ui.Ui_StationInfoDialog import Ui_StationInfoDialog
     app = QApplication(sys.argv)
     preferences = BrandmeisterMonitorApplicationPreferences()
     preferences.SaveToDatabase = True
