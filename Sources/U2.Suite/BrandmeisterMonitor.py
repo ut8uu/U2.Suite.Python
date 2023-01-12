@@ -32,7 +32,7 @@ from brandmeister.BmMonitorDatabase import BmMonitorDatabase
 from brandmeister.ui.Ui_BmMonitorMainWindow import Ui_BmMonitorMainWindow
 import common.data.dxcc as dxcc
 from common.ui.DialogAbout import DialogAbout
-from PyQt5.QtWidgets import QMainWindow, QApplication, QStyledItemDelegate, QListView
+from PyQt5.QtWidgets import QMainWindow, QApplication, QStyledItemDelegate, QListView, QLabel, QScrollArea, QSizePolicy
 from PyQt5 import QtGui, QtCore
 
 from helpers.FileSystemHelper import FileSystemHelper
@@ -92,52 +92,17 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         self.setFixedSize(self.width(), self.height())
         self.setWindowIcon(QtGui.QIcon(FileSystemHelper.relpath('icon/radio-48.png')))
         
+        dxcc_model = QtGui.QStandardItemModel()
+        self.lvFilterByDxcc.setModel(dxcc_model)
+
+        tg_model = QtGui.QStandardItemModel()
+        self.lvFilterByTG.setModel(tg_model)
+        
         self.actionExit.triggered.connect(self._close_window)
         self.actionStart.triggered.connect(self._start_monitor)
         self.actionStop.triggered.connect(self._stop_monitor)
         self.actionAbout.triggered.connect(self._display_about_dialog)
         self.actionPreferences.triggered.connect(self._display_preferences_dialog)
-
-        pref = self._monitor_core.Preferences
-        self.cbFilterByCallsigns.setChecked(pref.UseCallsigns)
-        self.tbCallsigns.setPlainText(','.join(pref.Callsigns))
-        self.tbCallsigns.setEnabled(pref.UseCallsigns)
-
-        self.cbTalkGroups.setChecked(pref.UseTalkGroups)
-        
-        model = QtGui.QStandardItemModel()
-        all_groups = pref.TalkGroups
-        for group_id in BmGroups.bm_groups:
-            group_title = BmGroups.bm_groups[group_id]
-            item = QtGui.QStandardItem(f'[{group_id}] {group_title}')
-            is_checked = int(group_id) in all_groups
-            check = QtCore.Qt.CheckState.Checked if is_checked else QtCore.Qt.CheckState.Unchecked
-            item.setCheckState(check)
-            item.setCheckable(True)
-            item.data = group_id
-            model.appendRow(item)
-        self.lbGroups.setModel(model)
-        
-        # DXCC-related stuff
-        self.cbFilterByDxcc.setChecked(pref.UseCountries)
-
-        all_countries = pref.Countries
-        dxcc_model = QtGui.QStandardItemModel()
-        
-        entries = dict(sorted(dxcc.Countries.items(), key=lambda item: item[1]))
-        for country_id in entries:
-            country_title = dxcc.Countries[country_id]
-            item = QtGui.QStandardItem(country_title)
-            is_checked = int(country_id) in all_countries
-            check = QtCore.Qt.CheckState.Checked if is_checked else QtCore.Qt.CheckState.Unchecked
-            item.setCheckState(check)
-            item.setCheckable(True)
-            item.data = country_id
-            dxcc_model.appendRow(item)
-        self.lbCountries.setModel(dxcc_model)
-        
-        all_records_model = QtGui.QStandardItemModel()
-        self.monitoringList.setModel(all_records_model)
         
         # setup the filter combobox
         self.cbTimestampFilter.clear()
@@ -155,44 +120,62 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
         filtered_records_model = QtGui.QStandardItemModel()
         self.monitoringList.setModel(filtered_records_model)
         
-        self.lbGroups.setEnabled(pref.UseTalkGroups)
-        
-        self.cbTalkGroups.stateChanged.connect(self._update_preferences)
-        self.cbFilterByDxcc.stateChanged.connect(self._update_preferences)
-        self.cbFilterByCallsigns.stateChanged.connect(self._update_preferences)
-        self.tbCallsigns.textChanged.connect(self._update_preferences)        
-        
-        delegate = StyledItemDelegate()
-        delegate.checked.connect(self._lbgroups_on_checked)
-        self.lbGroups.setItemDelegate(delegate)
-
-        delegate = StyledItemDelegate()
-        delegate.checked.connect(self._lbcountries_on_checked)
-        self.lbCountries.setItemDelegate(delegate)
+        self._display_filter_info()
 
         self._start_monitor()
             
     """================================================================"""
-    def _lbgroups_on_checked(self, index, state):
-        """Handles checking/unchecking of the item in the groups list view."""
-        text = f'Group {index.data()} is '
+    def _display_filter_info(self) -> None:
+        """Displays the current filter info."""
+        rect = self.scrollArea.geometry()
         
-        if state == QtCore.Qt.CheckState.Unchecked:
-            text += 'un'
-        text += 'checked.'
-        self._logger.debug(text)
-        self._update_preferences()
+        self.scrollArea = QScrollArea()
+        self.scrollArea.setGeometry(rect)
         
-    """================================================================"""
-    def _lbcountries_on_checked(self, index, state):
-        """Handles checking/unchecking of the item in the countries list view."""
-        text = f'Country {index.data()} is '
+        pref = self._monitor_core.Preferences
         
-        if state == QtCore.Qt.CheckState.Unchecked:
-            text += 'un'
-        text += 'checked.'
-        self._logger.debug(text)
-        self._update_preferences()
+        filtered_by_groups = False
+        # clear the model first
+        model = self.lvFilterByTG.model()
+        if model.rowCount() > 0:
+            model.removeRows(0, model.rowCount())
+
+        all_groups = pref.TalkGroups
+        for group_id in BmGroups.bm_groups:
+            is_checked = int(group_id) in all_groups
+            if not is_checked:
+                continue
+            filtered_by_groups = True
+            group_title = BmGroups.bm_groups[group_id]
+            title = f'[{group_id}] {group_title}'
+            item = QtGui.QStandardItem(title)
+            model.insertRow(model.rowCount(), item)
+            
+        if not filtered_by_groups:
+            self._display_filter_info_text('None selected')
+        
+        # DXCC-related stuff
+        # clear the model first
+        model = self.lvFilterByDxcc.model()
+        if model.rowCount() > 0:
+            model.removeRows(0, model.rowCount())
+
+        all_countries = pref.Countries
+        filtered_by_dxcc = False
+        
+        entries = dict(sorted(dxcc.Countries.items(), key=lambda item: item[1]))
+        for country_id in entries:
+            is_checked = int(country_id) in all_countries
+            if not is_checked:
+                continue
+            filtered_by_dxcc = True
+            country_title = dxcc.Countries[country_id]
+            item = QtGui.QStandardItem(country_title)
+            model.insertRow(model.rowCount(), item)
+        
+        if not filtered_by_dxcc:
+            self._display_filter_info_text('None selected')
+
         
     """==============================================================="""    
     def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
@@ -359,6 +342,7 @@ class BrandmeisterMonitor(QMainWindow, Ui_BmMonitorMainWindow):
     """=============================================================="""
     def _preferences_changed(self) -> None:
         """Handles changing of preferences."""
+        self._display_filter_info()
             
 """==============================================================="""    
 if __name__ == '__main__':
